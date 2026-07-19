@@ -1,0 +1,919 @@
+[
+  {
+    "id": "ecom_001",
+    "category": "E-commerce & Shopping",
+    "problem_keywords": ["refund", "flipkart", "amazon", "seller refused", "defective"],
+    "applicable_law": "Consumer Protection Act 2019, Section 47",
+    "user_rights": "You have the right to return defective goods and claim a full refund within 30 days.",
+    "steps": [
+      "Contact seller support with order ID and proof",
+      "Escalate to platform grievance officer within 48 hours",
+      "File complaint on National Consumer Helpline (1800-11-4000)",
+      "Approach District Consumer Commission if unresolved in 30 days"
+    ],
+    "authorities": ["National Consumer Helpline", "District Consumer Commission"],
+    "documents_required": ["Order invoice", "Payment proof", "Seller communication screenshots"],
+    "physical_visit_required": false,
+    "confidence": 92,
+    "isVerified": true
+  },
+  {
+    "id": "ecom_002",
+    "category": "E-commerce & Shopping",
+    "problem_keywords": ["fake", "counterfeit", "replica"],
+    "applicable_law": "Consumer Protection Act 2019, Section 2(10)",
+    "user_rights": "Right to be protected against marketing of goods which are hazardous to life and property.",
+    "steps": [
+      "Document the counterfeit item with photos and videos",
+      "Report to the e-commerce platform immediately",
+      "Demand an immediate refund and pickup of the fake item",
+      "If refused, file a complaint on the National Consumer Helpline"
+    ],
+    "authorities": ["National Consumer Helpline", "Local Police (if fraud is high value)"],
+    "documents_required": ["Order invoice", "Photos of received product", "Manufacturer confirmation of fake"],
+    "physical_visit_required": false,
+    "confidence": 88,
+    "isVerified": true
+  },
+  {
+    "id": "ecom_003",
+    "category": "E-commerce & Shopping",
+    "problem_keywords": ["late delivery", "delay", "not delivered"],
+    "applicable_law": "Consumer Protection Act 2019, Section 2(47)",
+    "user_rights": "Right to receive goods within the promised timeframe or seek compensation for delay.",
+    "steps": [
+      "Check tracking status and contact courier company",
+      "Raise a dispute with the e-commerce platform",
+      "If delayed beyond 15 days of promised date, demand cancellation and full refund",
+      "Lodge a complaint on NCH if refund is denied"
+    ],
+    "authorities": ["National Consumer Helpline", "Consumer Commission"],
+    "documents_required": ["Order confirmation email", "Tracking history", "Communication with seller"],
+    "physical_visit_required": false,
+    "confidence": 85,
+    "isVerified": true
+  },
+  {
+    "id": "ecom_004",
+    "category": "E-commerce & Shopping",
+    "problem_keywords": ["wrong item", "different product", "mismatch"],
+    "applicable_law": "Consumer Protection (E-Commerce) Rules 2020",
+    "user_rights": "Right to receive the exact product as described on the platform.",
+    "steps": [
+      "Take unboxing video if possible",
+      "Initiate a return request immediately",
+      "Upload photos of the wrong item received",
+      "Contact customer care if the return is rejected"
+    ],
+    "authorities": ["National Consumer Helpline", "Consumer Commission"],
+    "documents_required": ["Order invoice", "Photos of wrong item", "Unboxing video (if any)"],
+    "physical_visit_required": false,
+    "confidence": 95,
+    "isVerified": true
+  },
+  {
+    "id": "ecom_005",
+    "category": "E-commerce & Shopping",
+    "problem_keywords": ["overcharging", "above mrp", "mrp violation"],
+    "applicable_law": "Legal Metrology Act 2009, Section 36",
+    "user_rights": "No person shall sell any pre-packaged commodity at a price exceeding the maximum retail price.",
+    "steps": [
+      "Keep the bill showing the price above MRP",
+      "Complain to the store manager",
+      "Report to the Legal Metrology Department of your state",
+      "File a complaint on the National Consumer Helpline"
+    ],
+    "authorities": ["Legal Metrology Department", "National Consumer Helpline"],
+    "documents_required": ["Purchase bill", "Photo of MRP on the product"],
+    "physical_visit_required": false,
+    "confidence": 98,
+    "isVerified": true
+  },
+  {
+    "id": "bank_001",
+    "category": "Banking & UPI Fraud",
+    "problem_keywords": ["unauthorized transaction", "credit card fraud", "atm fraud"],
+    "applicable_law": "RBI Circular on Customer Protection, 2017",
+    "user_rights": "Zero liability if reported within 3 working days of the unauthorized transaction.",
+    "steps": [
+      "Block the card/account immediately through the bank app or helpline",
+      "Report to the bank within 3 days to ensure zero liability",
+      "File a complaint on cybercrime.gov.in",
+      "Obtain an acknowledgement from the bank and police"
+    ],
+    "authorities": ["Your Bank", "Cyber Crime Portal", "RBI Ombudsman"],
+    "documents_required": ["Bank statement", "Transaction SMS/Email", "Cyber crime complaint copy"],
+    "physical_visit_required": true,
+    "physical_visit_instructions": "Visit your home branch to submit a formal written dispute form and a copy of the FIR/Cyber complaint.",
+    "confidence": 95,
+    "isVerified": true
+  },
+  {
+    "id": "bank_002",
+    "category": "Banking & UPI Fraud",
+    "problem_keywords": ["upi fraud", "google pay", "phonepe", "fraudulent link"],
+    "applicable_law": "Payment and Settlement Systems Act 2007",
+    "user_rights": "Right to secure payment systems and redressal for fraudulent transactions.",
+    "steps": [
+      "Immediately report the transaction in the UPI app (GPay/PhonePe)",
+      "Call the national cybercrime helpline 1930",
+      "Report to your bank and the beneficiary bank",
+      "File a formal complaint on the RBI CMS portal"
+    ],
+    "authorities": ["Cyber Crime Portal (1930)", "RBI Complaint Management System"],
+    "documents_required": ["Transaction ID", "Screenshot of fraud message/link", "Bank statement"],
+    "physical_visit_required": false,
+    "confidence": 90,
+    "isVerified": true
+  },
+  {
+    "id": "bank_003",
+    "category": "Banking & UPI Fraud",
+    "problem_keywords": ["atm cash not dispensed", "transaction failed", "money deducted"],
+    "applicable_law": "RBI Guidelines on Failed Transactions, 2019",
+    "user_rights": "Bank must reverse the transaction within T+5 days or pay ₹100 per day penalty.",
+    "steps": [
+      "Wait for 24 hours for auto-reversal",
+      "If not reversed, file a complaint with your bank",
+      "Note the ATM ID and transaction time",
+      "Escalate to the Banking Ombudsman if not resolved in 30 days"
+    ],
+    "authorities": ["Your Bank", "Banking Ombudsman"],
+    "documents_required": ["Transaction slip (if any)", "Bank statement", "Complaint reference number"],
+    "physical_visit_required": false,
+    "confidence": 97,
+    "isVerified": true
+  },
+  {
+    "id": "bank_004",
+    "category": "Banking & UPI Fraud",
+    "problem_keywords": ["hidden charges", "wrong interest", "excessive fees"],
+    "applicable_law": "Banking Regulation Act 1949",
+    "user_rights": "Right to transparency in banking charges and fair treatment.",
+    "steps": [
+      "Identify the specific charge in your statement",
+      "Request a clarification from the bank manager",
+      "If charges are against RBI guidelines, demand a reversal",
+      "File a complaint with the Banking Ombudsman"
+    ],
+    "authorities": ["Your Bank", "Banking Ombudsman"],
+    "documents_required": ["Bank statement", "Bank's schedule of charges", "Communication with bank"],
+    "physical_visit_required": false,
+    "confidence": 85,
+    "isVerified": true
+  },
+  {
+    "id": "bank_005",
+    "category": "Banking & UPI Fraud",
+    "problem_keywords": ["loan harassment", "recovery agent", "threatening calls"],
+    "applicable_law": "RBI Fair Practices Code for Lenders",
+    "user_rights": "Recovery agents cannot call before 8 AM or after 7 PM, nor can they use physical or mental harassment.",
+    "steps": [
+      "Record the calls and keep evidence of harassment",
+      "File a formal complaint with the bank's Nodal Officer",
+      "Report to the local police if there are threats",
+      "Complain to the RBI via the CMS portal"
+    ],
+    "authorities": ["Your Bank's Nodal Officer", "Local Police", "RBI CMS Portal"],
+    "documents_required": ["Call recordings", "Agent details", "Bank's response"],
+    "physical_visit_required": true,
+    "physical_visit_instructions": "Visit the local police station to file a complaint if you face physical threats or intimidation.",
+    "confidence": 92,
+    "isVerified": true
+  },
+  {
+    "id": "travel_001",
+    "category": "Flights & Travel Issues",
+    "problem_keywords": ["flight cancellation", "denied boarding", "refund indigo", "air india"],
+    "applicable_law": "DGCA Civil Aviation Requirements (CAR), Section 3",
+    "user_rights": "Right to full refund or alternative flight plus compensation for cancellations within certain timeframes.",
+    "steps": [
+      "Ask the airline for the reason for cancellation in writing",
+      "Check if you are entitled to free meals or hotel stay",
+      "Request a full refund if the alternative flight is not acceptable",
+      "File a complaint on AirSewa portal if the airline refuses"
+    ],
+    "authorities": ["Airlines Grievance Cell", "AirSewa Portal", "DGCA"],
+    "documents_required": ["Flight ticket/PNR", "Cancellation SMS/Email", "Correspondence with airline"],
+    "physical_visit_required": false,
+    "confidence": 94,
+    "isVerified": true
+  },
+  {
+    "id": "travel_002",
+    "category": "Flights & Travel Issues",
+    "problem_keywords": ["lost baggage", "damaged luggage", "missing suitcase"],
+    "applicable_law": "Carriage by Air Act 1972",
+    "user_rights": "Right to compensation for lost or damaged baggage based on weight and rules.",
+    "steps": [
+      "File a Property Irregularity Report (PIR) before leaving the airport",
+      "Take photos of the damaged luggage immediately",
+      "Submit a formal claim for compensation within 7 days",
+      "Escalate to AirSewa if the claim is ignored"
+    ],
+    "authorities": ["Airline Lost & Found Desk", "AirSewa Portal"],
+    "documents_required": ["PIR copy", "Baggage tag", "Photos of damage", "Original invoices for lost items"],
+    "physical_visit_required": true,
+    "physical_visit_instructions": "You must file the PIR report at the airline's baggage counter before exiting the arrivals hall.",
+    "confidence": 91,
+    "isVerified": true
+  },
+  {
+    "id": "travel_003",
+    "category": "Flights & Travel Issues",
+    "problem_keywords": ["train delay", "irctc refund", "railway complaint"],
+    "applicable_law": "Indian Railways Act 1989",
+    "user_rights": "Right to refund if the train is delayed by more than 3 hours and the passenger does not travel.",
+    "steps": [
+      "Check the live status of the train",
+      "File a Ticket Deposit Receipt (TDR) online through IRCTC",
+      "Mention 'Train Delayed More Than Three Hours' as the reason",
+      "Use RailMadad app for real-time complaints during travel"
+    ],
+    "authorities": ["IRCTC Customer Care", "RailMadad", "Railway Claims Tribunal"],
+    "documents_required": ["E-ticket", "TDR acknowledgement", "Train delay proof"],
+    "physical_visit_required": false,
+    "confidence": 96,
+    "isVerified": true
+  },
+  {
+    "id": "travel_004",
+    "category": "Flights & Travel Issues",
+    "problem_keywords": ["hotel booking cancellation", "denied entry", "poor service"],
+    "applicable_law": "Consumer Protection Act 2019",
+    "user_rights": "Right to receive services as promised and refund for deficiency in service.",
+    "steps": [
+      "Take photos/videos of poor conditions",
+      "Contact the booking platform (MakeMyTrip/OYO etc.)",
+      "Ask for a room upgrade or relocation",
+      "If unresolved, file a complaint on the National Consumer Helpline"
+    ],
+    "authorities": ["Booking Platform", "Hotel Management", "National Consumer Helpline"],
+    "documents_required": ["Booking confirmation", "Payment receipt", "Photos of deficiency"],
+    "physical_visit_required": false,
+    "confidence": 88,
+    "isVerified": true
+  },
+  {
+    "id": "travel_005",
+    "category": "Flights & Travel Issues",
+    "problem_keywords": ["visa service fraud", "travel agent scam", "package tour dispute"],
+    "applicable_law": "Consumer Protection Act 2019, Section 2(11)",
+    "user_rights": "Right to be protected against unfair trade practices by travel agents.",
+    "steps": [
+      "Verify the agent's credentials and registration",
+      "Request a detailed itinerary and payment breakdown",
+      "File a complaint with the Ministry of Tourism if the agent is registered",
+      "Approach the Consumer Commission for refund of the package cost"
+    ],
+    "authorities": ["Ministry of Tourism", "Consumer Commission", "Local Police"],
+    "documents_required": ["Tour agreement", "Payment receipts", "Correspondence with agent"],
+    "physical_visit_required": false,
+    "confidence": 83,
+    "isVerified": true
+  },
+  {
+    "id": "food_001",
+    "category": "Restaurant & Food Billing",
+    "problem_keywords": ["service charge", "forced service charge", "bill error"],
+    "applicable_law": "CCPA Guidelines on Service Charge, 2022",
+    "user_rights": "Service charge is voluntary. Restaurants cannot add it to the bill by default.",
+    "steps": [
+      "Point out the CCPA guidelines to the manager",
+      "Request the removal of the service charge from the bill",
+      "If they refuse, pay the bill and note your protest on it",
+      "File a complaint on the National Consumer Helpline (1800-11-4000)"
+    ],
+    "authorities": ["Restaurant Management", "National Consumer Helpline", "CCPA"],
+    "documents_required": ["Original bill", "Photo of menu showing service charge (if any)"],
+    "physical_visit_required": false,
+    "confidence": 98,
+    "isVerified": true
+  },
+  {
+    "id": "food_002",
+    "category": "Restaurant & Food Billing",
+    "problem_keywords": ["food poisoning", "unhygienic food", "foreign object in food"],
+    "applicable_law": "Food Safety and Standards Act (FSSAI) 2006",
+    "user_rights": "Right to safe and wholesome food; compensation for injury caused by unsafe food.",
+    "steps": [
+      "Preserve the food sample and take photos",
+      "Keep the medical reports and bills if you fell ill",
+      "File a complaint on the FSSAI FoSCoS portal",
+      "Report to the local health officer/municipal corporation"
+    ],
+    "authorities": ["FSSAI", "Local Health Department", "Consumer Commission"],
+    "documents_required": ["Restaurant bill", "Medical reports", "Photos of contaminated food"],
+    "physical_visit_required": true,
+    "physical_visit_instructions": "Visit a government hospital to get a medical certificate if you suffer from food poisoning to strengthen your case.",
+    "confidence": 93,
+    "isVerified": true
+  },
+  {
+    "id": "food_003",
+    "category": "Restaurant & Food Billing",
+    "problem_keywords": ["gst violation", "wrong gst", "no bill"],
+    "applicable_law": "CGST Act 2017",
+    "user_rights": "Right to a valid GST invoice; restaurants cannot charge GST if not registered.",
+    "steps": [
+      "Check if the GSTIN is printed on the bill",
+      "Verify the GSTIN on the GST portal",
+      "If incorrect, report it to the GST department",
+      "File a complaint on the CBIC Mitra portal"
+    ],
+    "authorities": ["GST Department", "CBIC Mitra"],
+    "documents_required": ["Restaurant bill", "GST portal verification screenshot"],
+    "physical_visit_required": false,
+    "confidence": 95,
+    "isVerified": true
+  },
+  {
+    "id": "food_004",
+    "category": "Restaurant & Food Billing",
+    "problem_keywords": ["zomato swiggy refund", "wrong food delivered", "spilled food"],
+    "applicable_law": "Consumer Protection (E-Commerce) Rules 2020",
+    "user_rights": "Right to receive the food as ordered or get a refund for incorrect/damaged items.",
+    "steps": [
+      "Take a photo of the spilled/incorrect food immediately",
+      "Raise a dispute in the Zomato/Swiggy app chat",
+      "Escalate to their customer support team",
+      "If unresolved, file a complaint on NCH"
+    ],
+    "authorities": ["Zomato/Swiggy Support", "National Consumer Helpline"],
+    "documents_required": ["Order ID", "Photos of food", "Chat screenshots"],
+    "physical_visit_required": false,
+    "confidence": 90,
+    "isVerified": true
+  },
+  {
+    "id": "food_005",
+    "category": "Restaurant & Food Billing",
+    "problem_keywords": ["expired food", "shelf life over"],
+    "applicable_law": "Food Safety and Standards (Packaging and Labelling) Regulations",
+    "user_rights": "Right to be informed about the expiry date and not be sold expired products.",
+    "steps": [
+      "Check the 'Best Before' or 'Expiry' date on the package",
+      "Do not consume the product",
+      "Report the store to FSSAI",
+      "Seek a refund from the retailer"
+    ],
+    "authorities": ["FSSAI", "Local Health Officer"],
+    "documents_required": ["Purchase receipt", "Photo of expiry date on package"],
+    "physical_visit_required": false,
+    "confidence": 96,
+    "isVerified": true
+  },
+  {
+    "id": "hospital_001",
+    "category": "Hospital Billing Problems",
+    "problem_keywords": ["overcharging", "excessive bill", "hidden hospital charges"],
+    "applicable_law": "Clinical Establishments Act 2010",
+    "user_rights": "Right to transparent billing and to see the rate list of the hospital.",
+    "steps": [
+      "Request an itemized bill from the hospital",
+      "Compare the charges with the hospital's published rate list",
+      "Raise the issue with the hospital's grievance cell",
+      "File a complaint with the State Medical Council"
+    ],
+    "authorities": ["Hospital Administration", "State Medical Council", "National Consumer Helpline"],
+    "documents_required": ["Itemized bill", "Discharge summary", "Payment receipts"],
+    "physical_visit_required": false,
+    "confidence": 89,
+    "isVerified": true
+  },
+  {
+    "id": "hospital_002",
+    "category": "Hospital Billing Problems",
+    "problem_keywords": ["medical negligence", "wrong treatment", "doctor error"],
+    "applicable_law": "Consumer Protection Act 2019, Section 2(11)",
+    "user_rights": "Right to receive professional care; right to compensation for medical negligence.",
+    "steps": [
+      "Obtain all medical records and discharge summaries",
+      "Get an independent opinion from another doctor",
+      "File a formal complaint with the State Medical Council",
+      "Approach the Consumer Commission for compensation"
+    ],
+    "authorities": ["State Medical Council", "Consumer Commission", "Local Police (if criminal negligence)"],
+    "documents_required": ["All medical records", "Test reports", "Expert opinion report"],
+    "physical_visit_required": true,
+    "physical_visit_instructions": "You may need to appear before the Medical Council committee to explain your case and provide evidence.",
+    "confidence": 82,
+    "isVerified": true
+  },
+  {
+    "id": "hospital_003",
+    "category": "Hospital Billing Problems",
+    "problem_keywords": ["denied treatment", "emergency refusal"],
+    "applicable_law": "Article 21 of the Constitution (Right to Life)",
+    "user_rights": "Hospitals must provide emergency treatment regardless of the patient's ability to pay immediately.",
+    "steps": [
+      "Document the refusal (video or witness statements)",
+      "Seek treatment at the nearest government hospital immediately",
+      "Report the private hospital to the State Health Department",
+      "File a writ petition in the High Court if it's a grave violation"
+    ],
+    "authorities": ["State Health Department", "High Court"],
+    "documents_required": ["Refusal note (if any)", "Witness details", "Emergency records from another hospital"],
+    "physical_visit_required": false,
+    "confidence": 91,
+    "isVerified": true
+  },
+  {
+    "id": "hospital_004",
+    "category": "Hospital Billing Problems",
+    "problem_keywords": ["dead body not released", "billing dispute release"],
+    "applicable_law": "NHRC Guidelines on Patient Rights",
+    "user_rights": "Hospitals cannot detain a dead body or a patient due to unpaid bills.",
+    "steps": [
+      "Inform the hospital that detaining the body is illegal",
+      "Call the local police for immediate assistance",
+      "File a complaint with the District Magistrate",
+      "Settle the dispute later through the Consumer Commission"
+    ],
+    "authorities": ["Local Police", "District Magistrate", "State Health Department"],
+    "documents_required": ["Death certificate copy", "Outstanding bill", "Police complaint copy"],
+    "physical_visit_required": true,
+    "physical_visit_instructions": "Immediate police intervention at the hospital is usually necessary to resolve this situation.",
+    "confidence": 97,
+    "isVerified": true
+  },
+  {
+    "id": "hospital_005",
+    "category": "Hospital Billing Problems",
+    "problem_keywords": ["insurance claim denied", "tpa dispute"],
+    "applicable_law": "IRDAI Health Insurance Regulations",
+    "user_rights": "Right to fair claim settlement and clear reasons for rejection.",
+    "steps": [
+      "Review the rejection letter from the TPA/Insurance company",
+      "Gather medical evidence to counter the rejection reason",
+      "File an appeal with the insurance company's grievance officer",
+      "Approach the Insurance Ombudsman if unresolved"
+    ],
+    "authorities": ["Insurance Grievance Officer", "Insurance Ombudsman"],
+    "documents_required": ["Policy document", "Claim rejection letter", "Medical records"],
+    "physical_visit_required": false,
+    "confidence": 87,
+    "isVerified": true
+  },
+  {
+    "id": "traffic_001",
+    "category": "Traffic & Vehicle Issues",
+    "problem_keywords": ["wrong challan", "fake challan", "dispute traffic fine"],
+    "applicable_law": "Motor Vehicles (Amendment) Act 2019",
+    "user_rights": "Right to contest a challan in court if you believe it was wrongly issued.",
+    "steps": [
+      "Do not pay the challan immediately if you wish to contest it",
+      "Check the evidence (photo/video) attached to the challan online",
+      "Wait for the challan to be sent to the Virtual Court",
+      "Submit your contest/explanation on the Virtual Court portal"
+    ],
+    "authorities": ["Traffic Police Department", "Virtual Court Portal"],
+    "documents_required": ["Challan copy", "Proof of innocence (dashcam video, etc.)", "Vehicle documents"],
+    "physical_visit_required": false,
+    "confidence": 92,
+    "isVerified": true
+  },
+  {
+    "id": "traffic_002",
+    "category": "Traffic & Vehicle Issues",
+    "problem_keywords": ["vehicle accident", "hit and run", "insurance claim"],
+    "applicable_law": "Motor Vehicles Act 1988, Section 161",
+    "user_rights": "Right to claim compensation from the Motor Accident Claims Tribunal (MACT).",
+    "steps": [
+      "Note the registration number of the other vehicle",
+      "File an FIR at the nearest police station",
+      "Inform your insurance company within 24 hours",
+      "File a claim petition in the MACT with the help of a lawyer"
+    ],
+    "authorities": ["Local Police", "MACT", "Insurance Company"],
+    "documents_required": ["FIR copy", "Insurance policy", "Driving License", "RC"],
+    "physical_visit_required": true,
+    "physical_visit_instructions": "You must visit the police station to file the FIR and the MACT court for the compensation proceedings.",
+    "confidence": 85,
+    "isVerified": true
+  },
+  {
+    "id": "traffic_003",
+    "category": "Traffic & Vehicle Issues",
+    "problem_keywords": ["car towing damage", "illegal towing"],
+    "applicable_law": "Local Municipal/Traffic Police Rules",
+    "user_rights": "Towing must be done as per procedure; authorities are liable for damage caused during towing.",
+    "steps": [
+      "Take photos of the damage at the towing yard",
+      "Inform the yard officer and note it in their records",
+      "File a formal complaint with the Traffic Police Commissioner",
+      "Seek compensation for repairs through the Consumer Commission"
+    ],
+    "authorities": ["Traffic Police Commissioner", "Consumer Commission"],
+    "documents_required": ["Photos of damage", "Towing receipt", "Repair estimates"],
+    "physical_visit_required": true,
+    "physical_visit_instructions": "Visit the traffic police headquarters to file a formal complaint against the towing contractor.",
+    "confidence": 80,
+    "isVerified": true
+  },
+  {
+    "id": "traffic_004",
+    "category": "Traffic & Vehicle Issues",
+    "problem_keywords": ["license renewal delay", "rto service issue"],
+    "applicable_law": "Motor Vehicles Act 1988",
+    "user_rights": "Right to receive RTO services within the prescribed time under the Citizen's Charter.",
+    "steps": [
+      "Check the application status on the Parivahan portal",
+      "Raise a grievance on the Parivahan portal",
+      "Visit the RTO and meet the Public Relations Officer (PRO)",
+      "File a complaint on the state's Jan Grievance portal"
+    ],
+    "authorities": ["RTO", "Parivahan Portal", "State Grievance Portal"],
+    "documents_required": ["Application reference number", "Payment receipt", "ID proof"],
+    "physical_visit_required": true,
+    "physical_visit_instructions": "A visit to the RTO might be necessary to meet the officer in charge of your application.",
+    "confidence": 88,
+    "isVerified": true
+  },
+  {
+    "id": "traffic_005",
+    "category": "Traffic & Vehicle Issues",
+    "problem_keywords": ["second hand car fraud", "hidden defects car"],
+    "applicable_law": "Indian Contract Act 1872",
+    "user_rights": "Right to be informed about the true condition of the vehicle; protection against fraud.",
+    "steps": [
+      "Get a mechanical inspection report",
+      "Check the vehicle history on the Parivahan portal",
+      "Send a legal notice to the seller for misrepresentation",
+      "File a civil suit for recovery of money"
+    ],
+    "authorities": ["Civil Court", "Local Police (if criminal fraud)"],
+    "documents_required": ["Sale agreement", "Payment proof", "Inspection report", "RC copy"],
+    "physical_visit_required": false,
+    "confidence": 78,
+    "isVerified": true
+  },
+  {
+    "id": "telecom_001",
+    "category": "Telecom & Internet Services",
+    "problem_keywords": ["wrong billing telecom", "jio airtel vi complaint", "excessive data charge"],
+    "applicable_law": "TRAI Quality of Service Regulations",
+    "user_rights": "Right to accurate billing and 24/7 customer support for grievance redressal.",
+    "steps": [
+      "Call the customer care (198) and get a complaint number",
+      "If not resolved in 3 days, escalate to the Appellate Authority of the operator",
+      "Wait for 10 days for their decision",
+      "File a complaint on the TRAI portal if still unresolved"
+    ],
+    "authorities": ["Operator Appellate Authority", "TRAI", "National Consumer Helpline"],
+    "documents_required": ["Phone bill", "Complaint number", "Correspondence with operator"],
+    "physical_visit_required": false,
+    "confidence": 94,
+    "isVerified": true
+  },
+  {
+    "id": "telecom_002",
+    "category": "Telecom & Internet Services",
+    "problem_keywords": ["broadband speed slow", "internet downtime", "fiber cut"],
+    "applicable_law": "TRAI Broadband Quality of Service Regulations",
+    "user_rights": "Right to receive at least 80% of the promised broadband speed.",
+    "steps": [
+      "Run speed tests and take screenshots",
+      "Log a complaint with the ISP and get a ticket number",
+      "Demand a pro-rata refund for the downtime period",
+      "Escalate to the ISP's nodal officer"
+    ],
+    "authorities": ["ISP Nodal Officer", "TRAI"],
+    "documents_required": ["Speed test reports", "Service agreement", "Complaint tickets"],
+    "physical_visit_required": false,
+    "confidence": 89,
+    "isVerified": true
+  },
+  {
+    "id": "telecom_003",
+    "category": "Telecom & Internet Services",
+    "problem_keywords": ["sim swap fraud", "unauthorized porting"],
+    "applicable_law": "Information Technology Act 2000",
+    "user_rights": "Operator is responsible for ensuring secure SIM verification processes.",
+    "steps": [
+      "Immediately contact the operator to block the SIM",
+      "Report to the bank if mobile banking is linked",
+      "File a complaint on the Cyber Crime Portal",
+      "Hold the telecom operator liable for negligence"
+    ],
+    "authorities": ["Telecom Operator", "Cyber Crime Portal", "Consumer Commission"],
+    "documents_required": ["ID proof", "Bank statement showing fraud", "Cyber complaint copy"],
+    "physical_visit_required": true,
+    "physical_visit_instructions": "Visit the operator's store with your ID proof to regain control of your mobile number.",
+    "confidence": 91,
+    "isVerified": true
+  },
+  {
+    "id": "telecom_004",
+    "category": "Telecom & Internet Services",
+    "problem_keywords": ["spam calls", "dnd violation"],
+    "applicable_law": "TRAI Telecom Commercial Communications Customer Preference Regulations",
+    "user_rights": "Right to not receive unsolicited commercial communications if registered on DND.",
+    "steps": [
+      "Register for DND by sending 'FULL DND' to 1909",
+      "Report spam SMS by forwarding to 1909 in the format: 'Spam, Number, Date'",
+      "Use the TRAI DND 3.0 app for easy reporting",
+      "Operator must take action against the telemarketer within 7 days"
+    ],
+    "authorities": ["Telecom Operator", "TRAI"],
+    "documents_required": ["Spam message/Call log", "DND registration proof"],
+    "physical_visit_required": false,
+    "confidence": 96,
+    "isVerified": true
+  },
+  {
+    "id": "telecom_005",
+    "category": "Telecom & Internet Services",
+    "problem_keywords": ["data privacy breach", "leak of personal info"],
+    "applicable_law": "Digital Personal Data Protection Act 2023",
+    "user_rights": "Right to data protection and to be informed about data breaches.",
+    "steps": [
+      "Ask the company for details of the data breach",
+      "Report to the Data Protection Board (once fully operational)",
+      "Change all passwords and enable 2FA",
+      "Seek compensation if the breach causes financial loss"
+    ],
+    "authorities": ["Data Protection Board", "Cyber Crime Portal"],
+    "documents_required": ["Breach notification", "Proof of loss (if any)"],
+    "physical_visit_required": false,
+    "confidence": 82,
+    "isVerified": true
+  },
+  {
+    "id": "edu_001",
+    "category": "Education & Coaching Complaints",
+    "problem_keywords": ["fee refund coaching", "false promises coaching", "byjus complaint"],
+    "applicable_law": "Consumer Protection Act 2019",
+    "user_rights": "Right to refund of fees if the coaching center fails to provide promised services or if a student leaves mid-course (subject to terms).",
+    "steps": [
+      "Review the enrollment agreement and refund policy",
+      "Send a formal written request for a refund to the center",
+      "If refused, send a legal notice citing deficiency in service",
+      "File a complaint with the Consumer Commission"
+    ],
+    "authorities": ["Coaching Center Management", "Consumer Commission", "National Consumer Helpline"],
+    "documents_required": ["Fee receipts", "Enrollment form", "Brochure showing promises"],
+    "physical_visit_required": false,
+    "confidence": 87,
+    "isVerified": true
+  },
+  {
+    "id": "edu_002",
+    "category": "Education & Coaching Complaints",
+    "problem_keywords": ["degree delay", "marksheet not issued"],
+    "applicable_law": "UGC Guidelines / University Statutes",
+    "user_rights": "Right to receive degrees and marksheets within a reasonable time after completion of the course.",
+    "steps": [
+      "Apply formally for the document and keep the receipt",
+      "File an RTI application to know the status and reason for delay",
+      "Meet the Controller of Examinations at the University",
+      "File a complaint with the UGC or the Governor (Chancellor of the University)"
+    ],
+    "authorities": ["University Registrar", "UGC", "Chancellor's Office"],
+    "documents_required": ["Course completion certificate", "Application for degree", "RTI response"],
+    "physical_visit_required": true,
+    "physical_visit_instructions": "You may need to visit the university administrative block to follow up on your application.",
+    "confidence": 90,
+    "isVerified": true
+  },
+  {
+    "id": "edu_003",
+    "category": "Education & Coaching Complaints",
+    "problem_keywords": ["fake university", "unrecognized course"],
+    "applicable_law": "UGC Act 1956",
+    "user_rights": "Protection against fraudulent educational institutions.",
+    "steps": [
+      "Check the UGC list of fake universities online",
+      "Demand a full refund of all fees paid",
+      "File an FIR for cheating and fraud",
+      "Approach the Consumer Commission for compensation"
+    ],
+    "authorities": ["UGC", "Local Police", "Consumer Commission"],
+    "documents_required": ["Fee receipts", "Admission letter", "UGC notification copy"],
+    "physical_visit_required": true,
+    "physical_visit_instructions": "Visit the local police station to file a criminal complaint against the institution owners.",
+    "confidence": 93,
+    "isVerified": true
+  },
+  {
+    "id": "edu_004",
+    "category": "Education & Coaching Complaints",
+    "problem_keywords": ["school overcharging", "capitation fee", "donation"],
+    "applicable_law": "Right to Education (RTE) Act 2009",
+    "user_rights": "Schools are prohibited from charging capitation fees or demanding donations for admission.",
+    "steps": [
+      "Record any demand for donation if possible",
+      "File a complaint with the District Education Officer (DEO)",
+      "Report to the State Commission for Protection of Child Rights (SCPCR)",
+      "Approach the High Court if the school takes retaliatory action"
+    ],
+    "authorities": ["DEO", "SCPCR", "State Education Department"],
+    "documents_required": ["Admission brochure", "Evidence of donation demand", "Fee structure"],
+    "physical_visit_required": false,
+    "confidence": 85,
+    "isVerified": true
+  },
+  {
+    "id": "edu_005",
+    "category": "Education & Coaching Complaints",
+    "problem_keywords": ["hostel deposit refund", "hostel poor facilities"],
+    "applicable_law": "Consumer Protection Act 2019",
+    "user_rights": "Right to safe accommodation and refund of security deposits as per agreement.",
+    "steps": [
+      "Document poor conditions with photos",
+      "Send a written notice for refund of deposit",
+      "Check if the hostel is registered with local authorities",
+      "File a complaint on NCH if the deposit is withheld without reason"
+    ],
+    "authorities": ["Hostel Warden", "National Consumer Helpline", "Local Municipal Office"],
+    "documents_required": ["Deposit receipt", "Hostel agreement", "Photos of facilities"],
+    "physical_visit_required": false,
+    "confidence": 88,
+    "isVerified": true
+  },
+  {
+    "id": "housing_001",
+    "category": "Rental & Housing Issues",
+    "problem_keywords": ["security deposit refund", "landlord dispute", "withholding deposit"],
+    "applicable_law": "Model Tenancy Act / State Rent Control Act",
+    "user_rights": "Landlord must return the security deposit within one month of vacating, after valid deductions.",
+    "steps": [
+      "Give valid notice as per the rent agreement",
+      "Take photos of the vacant house to prove no damage",
+      "Send a formal demand letter for the deposit",
+      "Approach the Rent Authority or Civil Court for recovery"
+    ],
+    "authorities": ["Rent Authority", "Civil Court", "Local Police (if landlord is threatening)"],
+    "documents_required": ["Rent agreement", "Rent receipts", "Notice to vacate", "Photos of house"],
+    "physical_visit_required": false,
+    "confidence": 90,
+    "isVerified": true
+  },
+  {
+    "id": "housing_002",
+    "category": "Rental & Housing Issues",
+    "problem_keywords": ["illegal eviction", "forced to leave", "lockout"],
+    "applicable_law": "Section 106 of the Transfer of Property Act 1882",
+    "user_rights": "Tenant cannot be evicted without due process of law and proper notice.",
+    "steps": [
+      "Call the local police if the landlord tries to forcibly evict you",
+      "File for an injunction in the Civil Court to stop the eviction",
+      "Show your valid rent agreement and latest rent receipts",
+      "Report the matter to the Rent Controller"
+    ],
+    "authorities": ["Local Police", "Civil Court", "Rent Controller"],
+    "documents_required": ["Rent agreement", "Latest rent receipt", "Police complaint copy"],
+    "physical_visit_required": true,
+    "physical_visit_instructions": "You must visit the civil court to file a suit for injunction and the police station for protection.",
+    "confidence": 94,
+    "isVerified": true
+  },
+  {
+    "id": "housing_003",
+    "category": "Rental & Housing Issues",
+    "problem_keywords": ["rera complaint", "possession delay", "builder fraud"],
+    "applicable_law": "Real Estate (Regulation and Development) Act (RERA) 2016",
+    "user_rights": "Right to timely possession or refund with interest for delays by the builder.",
+    "steps": [
+      "Check the project registration on the State RERA website",
+      "File a formal complaint on the RERA portal",
+      "Attend the hearings conducted by the RERA authority",
+      "Execute the RERA order through the District Collector if the builder doesn't pay"
+    ],
+    "authorities": ["State RERA Authority", "RERA Tribunal", "District Collector"],
+    "documents_required": ["Builder-Buyer agreement", "Payment receipts", "Possession letter (if any)"],
+    "physical_visit_required": true,
+    "physical_visit_instructions": "You may need to attend hearings at the RERA office in your state capital.",
+    "confidence": 96,
+    "isVerified": true
+  },
+  {
+    "id": "housing_004",
+    "category": "Rental & Housing Issues",
+    "problem_keywords": ["maintenance dispute", "rwa issues", "overcharging maintenance"],
+    "applicable_law": "Societies Registration Act / Apartment Ownership Act",
+    "user_rights": "Right to transparent accounts and fair maintenance charges as decided by the General Body.",
+    "steps": [
+      "Request the audit reports and breakdown of maintenance charges",
+      "Raise the issue in the Annual General Body Meeting (AGM)",
+      "File a complaint with the Registrar of Societies",
+      "Approach the Consumer Commission for deficiency in service"
+    ],
+    "authorities": ["Registrar of Societies", "Consumer Commission"],
+    "documents_required": ["Society bye-laws", "Maintenance bills", "AGM minutes"],
+    "physical_visit_required": false,
+    "confidence": 84,
+    "isVerified": true
+  },
+  {
+    "id": "housing_005",
+    "category": "Rental & Housing Issues",
+    "problem_keywords": ["repairs not done", "leaking roof", "electricity water cut"],
+    "applicable_law": "State Rent Control Act",
+    "user_rights": "Landlord is responsible for structural repairs and cannot cut essential services.",
+    "steps": [
+      "Send a written notice to the landlord for repairs",
+      "If they fail, apply to the Rent Controller for permission to repair and deduct from rent",
+      "If electricity/water is cut, file an urgent application with the Rent Authority",
+      "Police can also intervene in case of cut-off of essential services"
+    ],
+    "authorities": ["Rent Authority", "Local Police", "Electricity/Water Board"],
+    "documents_required": ["Rent agreement", "Photos of damage", "Notice sent to landlord"],
+    "physical_visit_required": true,
+    "physical_visit_instructions": "Visit the Rent Authority office to file an application for restoration of essential services.",
+    "confidence": 92,
+    "isVerified": true
+  },
+  {
+    "id": "gov_001",
+    "category": "Government Service Problems",
+    "problem_keywords": ["passport delay", "passport police verification", "passport office issue"],
+    "applicable_law": "Passports Act 1967",
+    "user_rights": "Right to receive passport services within the time specified in the Citizen's Charter.",
+    "steps": [
+      "Check the status on the Passport Seva portal",
+      "Visit the Passport Seva Kendra (PSK) during inquiry hours",
+      "Raise a grievance on the CPGRAMS portal",
+      "Contact the Regional Passport Officer (RPO) via Twitter or email"
+    ],
+    "authorities": ["Regional Passport Office", "CPGRAMS", "Ministry of External Affairs"],
+    "documents_required": ["Application ARN", "Acknowledgement receipt", "Identity proof"],
+    "physical_visit_required": true,
+    "physical_visit_instructions": "Visit the RPO office for a personal interview if your passport is stuck for a long time.",
+    "confidence": 95,
+    "isVerified": true
+  },
+  {
+    "id": "gov_002",
+    "category": "Government Service Problems",
+    "problem_keywords": ["pension delay", "pension not credited", "epfo issue"],
+    "applicable_law": "Pension Rules / EPF Act",
+    "user_rights": "Right to timely disbursement of pension and provident fund benefits.",
+    "steps": [
+      "Check the status on the EPFO/Pension portal",
+      "Log a complaint on the EPFiGMS portal",
+      "File an RTI to know the reason for delay and the names of officers responsible",
+      "Escalate to the Central Grievance Portal (CPGRAMS)"
+    ],
+    "authorities": ["EPFO", "CPGRAMS", "Pension Ombudsman"],
+    "documents_required": ["PPO number", "UAN number", "Bank account details", "Identity proof"],
+    "physical_visit_required": false,
+    "confidence": 91,
+    "isVerified": true
+  },
+  {
+    "id": "gov_003",
+    "category": "Government Service Problems",
+    "problem_keywords": ["corruption", "bribe demand", "government official bribe"],
+    "applicable_law": "Prevention of Corruption Act 1988",
+    "user_rights": "Right to services without paying bribes; protection for whistleblowers.",
+    "steps": [
+      "Do not pay the bribe",
+      "Record the conversation or demand if possible",
+      "Contact the Anti-Corruption Bureau (ACB) of your state",
+      "Report to the Central Vigilance Commission (CVC) online"
+    ],
+    "authorities": ["Anti-Corruption Bureau", "CVC", "Lokayukta"],
+    "documents_required": ["Audio/Video recordings", "Details of the official", "Service application proof"],
+    "physical_visit_required": true,
+    "physical_visit_instructions": "You must visit the ACB office to file a formal complaint and participate in a trap if they suggest it.",
+    "confidence": 97,
+    "isVerified": true
+  },
+  {
+    "id": "gov_004",
+    "category": "Government Service Problems",
+    "problem_keywords": ["rti not answered", "rti delay", "pio refusal"],
+    "applicable_law": "Right to Information (RTI) Act 2005",
+    "user_rights": "Right to get information within 30 days of application.",
+    "steps": [
+      "Wait for 30 days from the date of application",
+      "If no response, file a First Appeal with the First Appellate Authority (FAA)",
+      "If FAA also doesn't respond in 45 days, file a Second Appeal with the Information Commission",
+      "Demand a penalty of ₹250 per day for the delay"
+    ],
+    "authorities": ["First Appellate Authority", "State/Central Information Commission"],
+    "documents_required": ["Original RTI application", "Proof of dispatch/receipt", "FAA appeal copy"],
+    "physical_visit_required": false,
+    "confidence": 98,
+    "isVerified": true
+  },
+  {
+    "id": "gov_005",
+    "category": "Government Service Problems",
+    "problem_keywords": ["garbage collection issue", "potholes", "street light not working"],
+    "applicable_law": "State Municipal Corporation Act",
+    "user_rights": "Right to basic civic amenities as a taxpayer.",
+    "steps": [
+      "Register a complaint on the local municipality's app (e.g., Swachhata app)",
+      "Take photos of the issue and post on social media tagging the authority",
+      "Meet the Ward Councilor or the Zonal Commissioner",
+      "File a complaint on the state's unified grievance portal"
+    ],
+    "authorities": ["Municipal Corporation", "Ward Councilor", "State Grievance Portal"],
+    "documents_required": ["Photos of the issue", "Complaint number", "Location details"],
+    "physical_visit_required": false,
+    "confidence": 89,
+    "isVerified": true
+  }
+]

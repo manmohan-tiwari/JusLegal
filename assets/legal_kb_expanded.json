@@ -1,0 +1,365 @@
+[
+  {
+    "id": "ecom_001",
+    "category": "E-commerce & Shopping",
+    "problem_keywords": ["refund", "flipkart", "amazon", "seller refused", "defective"],
+    "applicable_law": "Consumer Protection Act 2019, Section 47",
+    "user_rights": "You have the right to return defective goods and claim a full refund within 30 days.",
+    "steps": [
+      "Contact seller support with order ID and proof",
+      "Escalate to platform grievance officer within 48 hours",
+      "File complaint on National Consumer Helpline (1800-11-4000)",
+      "Approach District Consumer Commission if unresolved in 30 days"
+    ],
+    "authorities": ["National Consumer Helpline", "District Consumer Commission"],
+    "documents_required": ["Order invoice", "Payment proof", "Seller communication screenshots"],
+    "physical_visit_required": false,
+    "confidence": 92,
+    "isVerified": true
+  },
+  {
+    "id": "bank_001",
+    "category": "Banking & UPI Fraud",
+    "problem_keywords": ["unauthorized transaction", "credit card fraud", "atm fraud"],
+    "applicable_law": "RBI Circular on Customer Protection, 2017 & Payment and Settlement Systems Act 2007",
+    "user_rights": "Zero liability if reported within 3 working days. Limited liability if reported within 4-7 days.",
+    "steps": [
+      "Block the card/account immediately through bank app or helpline",
+      "Report to the bank within 3 days for zero liability",
+      "File FIR with local police if amount exceeds ₹25,000",
+      "Approach Banking Ombudsman if bank doesn't resolve in 30 days",
+      "File complaint on cyber crime portal (cybercrime.gov.in)"
+    ],
+    "authorities": ["Banking Ombudsman", "Local Police", "Cyber Crime Cell", "RBI"],
+    "documents_required": ["Bank statement", "Transaction details", "ID proof", "Police complaint copy"],
+    "physical_visit_required": false,
+    "confidence": 95,
+    "isVerified": true
+  },
+  {
+    "id": "bank_002",
+    "category": "Banking & UPI Fraud",
+    "problem_keywords": ["upi fraud", "fake qr code", "phishing", "social engineering"],
+    "applicable_law": "Information Technology Act 2000, Section 66D & Indian Penal Code 420",
+    "user_rights": "Right to file complaint for cheating and impersonation under IT Act and IPC.",
+    "steps": [
+      "Take screenshots of the transaction and chat conversations",
+      "Report to UPI app customer care immediately",
+      "File complaint on National Cyber Crime Reporting Portal",
+      "Contact your bank to block the account if compromised",
+      "File FIR with local police station"
+    ],
+    "authorities": ["Cyber Crime Cell", "Local Police", "Bank", "National Cyber Crime Reporting Portal"],
+    "documents_required": ["Transaction screenshots", "Chat history", "Bank statement", "ID proof"],
+    "physical_visit_required": false,
+    "confidence": 90,
+    "isVerified": true
+  },
+  {
+    "id": "travel_001",
+    "category": "Flights & Travel Issues",
+    "problem_keywords": ["flight cancellation", "refund denied", "delay compensation"],
+    "applicable_law": "DGCA Civil Aviation Requirements 2019 & Carriage by Air Act 1972",
+    "user_rights": "Full refund for flight cancellations by airline. Compensation for delays over 2 hours.",
+    "steps": [
+      "Check airline's refund policy and cancellation rules",
+      "File refund request through airline website/app",
+      "If denied, approach Directorate General of Civil Aviation (DGCA)",
+      "File complaint on AirSewa portal (airsewa.gov.in)",
+      "Approach Consumer Commission for unresolved issues"
+    ],
+    "authorities": ["DGCA", "AirSewa", "Consumer Commission", "Ministry of Civil Aviation"],
+    "documents_required": ["Ticket confirmation", "Cancellation proof", "Communication with airline", "ID proof"],
+    "physical_visit_required": false,
+    "confidence": 93,
+    "isVerified": true
+  },
+  {
+    "id": "travel_002",
+    "category": "Flights & Travel Issues",
+    "problem_keywords": ["hotel booking", "refund", "overcharging", "fake booking"],
+    "applicable_law": "Consumer Protection Act 2019 & Hotel (Regulation of Accommodation) Act",
+    "user_rights": "Right to receive services as promised and get refund for cancellations as per policy.",
+    "steps": [
+      "Document the booking confirmation and payment proof",
+      "Contact hotel customer service immediately",
+      "If using booking platform, escalate to their grievance officer",
+      "File complaint on Ministry of Tourism portal",
+      "Approach Consumer Commission if unresolved"
+    ],
+    "authorities": ["Ministry of Tourism", "Consumer Commission", "State Tourism Department"],
+    "documents_required": ["Booking confirmation", "Payment proof", "Communication history", "ID proof"],
+    "physical_visit_required": false,
+    "confidence": 88,
+    "isVerified": true
+  },
+  {
+    "id": "food_001",
+    "category": "Restaurant & Food Billing",
+    "problem_keywords": ["overcharging", "gst violation", "service charge", "fake bill"],
+    "applicable_law": "GST Act 2017 & Consumer Protection Act 2019",
+    "user_rights": "Service charge is optional, not mandatory. GST must be charged correctly on actual amount.",
+    "steps": [
+      "Check bill for correct GST calculation (5% for restaurant, 18% for alcohol)",
+      "Refuse to pay mandatory service charge (it's voluntary)",
+      "Take photo of the bill and menu prices",
+      "Complain to restaurant manager",
+      "File complaint on National Consumer Helpline or GST grievance portal"
+    ],
+    "authorities": ["National Consumer Helpline", "GST Grievance Redressal Committee", "Consumer Commission"],
+    "documents_required": ["Bill copy", "Menu card photo", "Payment proof", "Communication with restaurant"],
+    "physical_visit_required": false,
+    "confidence": 96,
+    "isVerified": true
+  },
+  {
+    "id": "food_002",
+    "category": "Restaurant & Food Billing",
+    "problem_keywords": ["food poisoning", "contamination", "unhygienic", "quality"],
+    "applicable_law": "Food Safety and Standards Act 2006 & IPC Section 272/273",
+    "user_rights": "Right to safe and hygienic food. Can claim compensation for food poisoning.",
+    "steps": [
+      "Seek immediate medical attention if food poisoning suspected",
+      "Preserve food sample if possible",
+      "Take photos of the food and restaurant conditions",
+      "File complaint with Food Safety and Standards Authority of India (FSSAI)",
+      "File FIR if serious health issues occur",
+      "Approach Consumer Commission for compensation"
+    ],
+    "authorities": ["FSSAI", "Local Health Department", "Consumer Commission", "Police"],
+    "documents_required": ["Medical reports", "Bill copy", "Food photos", "Doctor prescription"],
+    "physical_visit_required": false,
+    "confidence": 94,
+    "isVerified": true
+  },
+  {
+    "id": "hospital_001",
+    "category": "Hospital Billing Problems",
+    "problem_keywords": ["overcharging", "fake bill", "unnecessary tests", "emergency charges"],
+    "applicable_law": "Clinical Establishments Act 2010 & Consumer Protection Act 2019",
+    "user_rights": "Right to standardized rates and transparent billing. Can challenge unnecessary procedures.",
+    "steps": [
+      "Request detailed bill with break-up of all charges",
+      "Verify rates with government schedule if applicable",
+      "Take second opinion for expensive procedures suggested",
+      "File complaint with hospital's grievance redressal cell",
+      "Approach State Medical Council for malpractice",
+      "File complaint on National Consumer Helpline"
+    ],
+    "authorities": ["State Medical Council", "Consumer Commission", "National Consumer Helpline", "Health Ministry"],
+    "documents_required": ["Detailed bill", "Doctor prescriptions", "Medical reports", "Insurance documents"],
+    "physical_visit_required": false,
+    "confidence": 91,
+    "isVerified": true
+  },
+  {
+    "id": "hospital_002",
+    "category": "Hospital Billing Problems",
+    "problem_keywords": ["denied treatment", "emergency", "insurance rejection", "cashless"],
+    "applicable_law": "Clinical Establishments Act 2010 & Insurance Regulatory Act 1999",
+    "user_rights": "Right to emergency medical care without prepayment. Insurance companies must follow IRDAI guidelines.",
+    "steps": [
+      "Document emergency nature of treatment required",
+      "If insurance denied cashless, pay and claim reimbursement later",
+      "File complaint with insurance company's grievance officer",
+      "Approach IRDAI grievance redressal cell",
+      "File complaint on Consumer Commission for denied emergency treatment"
+    ],
+    "authorities": ["IRDAI", "Consumer Commission", "State Health Department", "Insurance Ombudsman"],
+    "documents_required": ["Medical records", "Insurance policy", "Rejection letter", "Emergency proof"],
+    "physical_visit_required": false,
+    "confidence": 89,
+    "isVerified": true
+  },
+  {
+    "id": "traffic_001",
+    "category": "Traffic & Vehicle Issues",
+    "problem_keywords": ["wrong challan", "fake fine", "incorrect violation", "e-challan"],
+    "applicable_law": "Motor Vehicles Act 1988 & Central Motor Vehicles Rules 1989",
+    "user_rights": "Right to contest incorrect traffic challans within specified time period.",
+    "steps": [
+      "Verify the challan details on official traffic police website",
+      "Check if vehicle was actually at location during violation time",
+      "File objection through official e-challan portal",
+      "Provide evidence of incorrect challan (photos, location proof)",
+      "Approach traffic court if objection is rejected"
+    ],
+    "authorities": ["Traffic Police", "Regional Transport Office (RTO)", "Motor Accident Claims Tribunal"],
+    "documents_required": ["Challan copy", "Vehicle registration", "Driving license", "Evidence proving innocence"],
+    "physical_visit_required": false,
+    "confidence": 97,
+    "isVerified": true
+  },
+  {
+    "id": "traffic_002",
+    "category": "Traffic & Vehicle Issues",
+    "problem_keywords": ["accident", "insurance claim", "third party", "compensation"],
+    "applicable_law": "Motor Vehicles Act 1988 & Insurance Act 1938",
+    "user_rights": "Right to claim compensation for accident damages and injuries through insurance.",
+    "steps": [
+      "File FIR immediately after accident",
+      "Inform insurance company within 24 hours",
+      "Collect evidence: photos, witness details, police report",
+      "Submit claim with all documents to insurance company",
+      "If claim rejected, approach Insurance Ombudsman",
+      "File case in Motor Accident Claims Tribunal for compensation"
+    ],
+    "authorities": ["Police", "Insurance Ombudsman", "Motor Accident Claims Tribunal", "RTO"],
+    "documents_required": ["FIR copy", "Insurance policy", "Driving license", "Vehicle registration", "Medical reports"],
+    "physical_visit_required": true,
+    "confidence": 95,
+    "isVerified": true
+  },
+  {
+    "id": "employment_001",
+    "category": "Employment & Labor Issues",
+    "problem_keywords": ["salary delay", "unpaid wages", "termination", "wrongful dismissal"],
+    "applicable_law": "Payment of Wages Act 1936 & Industrial Disputes Act 1947",
+    "user_rights": "Right to timely payment of wages and protection from wrongful termination.",
+    "steps": [
+      "Document all salary delays and unpaid amounts",
+      "Send formal written complaint to HR/management",
+      "File complaint with Labor Commissioner of your state",
+      "Approach Labor Court for unresolved disputes",
+      "File case under Industrial Disputes Act if terminated unfairly"
+    ],
+    "authorities": ["Labor Commissioner", "Labor Court", "Employee State Insurance Corporation", "Provident Fund Commissioner"],
+    "documents_required": ["Employment contract", "Salary slips", "Bank statements", "Communication with employer"],
+    "physical_visit_required": false,
+    "confidence": 92,
+    "isVerified": true
+  },
+  {
+    "id": "employment_002",
+    "category": "Employment & Labor Issues",
+    "problem_keywords": ["harassment", "discrimination", "workplace safety", "sexual harassment"],
+    "applicable_law": "Sexual Harassment of Women at Workplace Act 2013 & Equal Remuneration Act 1976",
+    "user_rights": "Right to safe workplace environment and protection from harassment/discrimination.",
+    "steps": [
+      "Document incidents with dates, times, witnesses",
+      "File complaint with Internal Complaints Committee (ICC)",
+      "If no action, approach Local Complaints Committee",
+      "File police complaint for criminal offenses",
+      "Approach Women's Commission for gender-based issues"
+    ],
+    "authorities": ["Internal Complaints Committee", "Local Complaints Committee", "Women's Commission", "Police"],
+    "documents_required": ["Incident documentation", "Witness statements", "Email evidence", "Complaint copies"],
+    "physical_visit_required": false,
+    "confidence": 94,
+    "isVerified": true
+  },
+  {
+    "id": "property_001",
+    "category": "Property & Real Estate",
+    "problem_keywords": ["builder delay", "possession", "refund", "rera complaint"],
+    "applicable_law": "Real Estate (Regulation and Development) Act 2016 (RERA)",
+    "user_rights": "Right to timely possession as per agreement and interest for delays.",
+    "steps": [
+      "Check project registration on RERA website",
+      "Document delay with possession agreement dates",
+      "File complaint on state RERA website",
+      "Claim interest for delay as per RERA rules",
+      "Approach RERA Appellate Tribunal if unsatisfied"
+    ],
+    "authorities": ["State RERA Authority", "RERA Appellate Tribunal", "Consumer Commission"],
+    "documents_required": ["Sale agreement", "Payment receipts", "RERA registration details", "Communication with builder"],
+    "physical_visit_required": false,
+    "confidence": 96,
+    "isVerified": true
+  },
+  {
+    "id": "property_002",
+    "category": "Property & Real Estate",
+    "problem_keywords": ["landlord", "rent agreement", "security deposit", "eviction"],
+    "applicable_law": "Rent Control Acts (State-specific) & Transfer of Property Act 1882",
+    "user_rights": "Protection against illegal eviction and right to timely refund of security deposit.",
+    "steps": [
+      "Review rent agreement terms carefully",
+      "Send legal notice for security deposit refund",
+      "File complaint in Rent Control Court/Authority",
+      "Approach Civil Court for eviction disputes",
+      "File case in Consumer Commission for unfair practices"
+    ],
+    "authorities": ["Rent Control Authority", "Civil Court", "Consumer Commission", "Legal Services Authority"],
+    "documents_required": ["Rent agreement", "Security deposit receipt", "Communication with landlord", "Bank statements"],
+    "physical_visit_required": false,
+    "confidence": 88,
+    "isVerified": true
+  },
+  {
+    "id": "education_001",
+    "category": "Education Issues",
+    "problem_keywords": ["capitation fee", "donation", "refund", "admission fraud"],
+    "applicable_law": "Prohibition of Unfair Practices in Technical Educational Institutions 2018",
+    "user_rights": "Right to admission without capitation fees and transparent admission process.",
+    "steps": [
+      "Document all fee payments and communications",
+      "File complaint with University Grants Commission (UGC)",
+      "Approach AICTE for technical institutions",
+      "File complaint on Consumer Helpline for refund issues",
+      "Approach Education Department of state government"
+    ],
+    "authorities": ["UGC", "AICTE", "State Education Department", "Consumer Commission"],
+    "documents_required": ["Fee receipts", "Admission documents", "Communication with institution", "Bank statements"],
+    "physical_visit_required": false,
+    "confidence": 93,
+    "isVerified": true
+  },
+  {
+    "id": "education_002",
+    "category": "Education Issues",
+    "problem_keywords": ["exam results", "evaluation", "revaluation", "unfair evaluation"],
+    "applicable_law": "Right to Information Act 2005 & University Regulations",
+    "user_rights": "Right to fair evaluation and access to evaluated answer sheets.",
+    "steps": [
+      "Apply for revaluation within university deadline",
+      "File RTI application to access answer sheets",
+      "Approach University Grievance Redressal Cell",
+      "File complaint with University Grants Commission",
+      "Approach High Court for serious evaluation issues"
+    ],
+    "authorities": ["University Grievance Cell", "UGC", "State Education Department", "High Court"],
+    "documents_required": ["Hall ticket", "Mark sheet", "Revaluation application", "RTI application copy"],
+    "physical_visit_required": false,
+    "confidence": 85,
+    "isVerified": true
+  },
+  {
+    "id": "telecom_001",
+    "category": "Telecom & Internet Issues",
+    "problem_keywords": ["wrong bill", "excess charges", "service termination", "network issues"],
+    "applicable_law": "Telecom Regulatory Authority of India (TRAI) Act 1997",
+    "user_rights": "Right to accurate billing and quality service as per TRAI regulations.",
+    "steps": [
+      "File complaint with telecom operator customer care",
+      "Escalate to appellate authority within operator",
+      "File complaint on TRAI grievance portal",
+      "Approach Consumer Commission for unresolved issues",
+      "Use Telecom Consumer Grievance Redressal Mechanism"
+    ],
+    "authorities": ["TRAI", "Consumer Commission", "Telecom Disputes Settlement Appellate Tribunal"],
+    "documents_required": ["Bill copies", "Complaint references", "Communication with operator", "Payment proof"],
+    "physical_visit_required": false,
+    "confidence": 94,
+    "isVerified": true
+  },
+  {
+    "id": "telecom_002",
+    "category": "Telecom & Internet Issues",
+    "problem_keywords": ["data breach", "privacy violation", "call recording", "spam"],
+    "applicable_law": "Information Technology Act 2000 & TRAI Regulations",
+    "user_rights": "Right to privacy and protection from unsolicited communications.",
+    "steps": [
+      "Report spam calls/messages to TRAI DND registry",
+      "File complaint on National Cyber Crime Reporting Portal",
+      "Approach Telecom Regulatory Authority for privacy violations",
+      "File police complaint for serious privacy breaches",
+      "Use Data Protection Bill provisions when enacted"
+    ],
+    "authorities": ["TRAI", "Cyber Crime Cell", "Police", "Consumer Commission"],
+    "documents_required": ["Call/message logs", "Privacy policy", "Complaint copies", "Evidence of breach"],
+    "physical_visit_required": false,
+    "confidence": 87,
+    "isVerified": true
+  }
+]

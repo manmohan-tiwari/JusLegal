@@ -1,0 +1,12 @@
+[
+  { "city": "Mumbai", "category": "E-commerce & Shopping", "outcome": "Got ₹12,000 refunded from Amazon", "law": "Consumer Protection Act 2019" },
+  { "city": "Delhi", "category": "Banking & UPI Fraud", "outcome": "Recovered ₹45,000 unauthorized UPI transfer", "law": "Information Technology Act 2000" },
+  { "city": "Bangalore", "category": "Flights & Travel Issues", "outcome": "Got full refund for cancelled IndiGo flight", "law": "Aircraft Rules 1937" },
+  { "city": "Pune", "category": "Restaurant & Food Billing", "outcome": "Restaurant removed illegal service charge", "law": "Consumer Protection Act 2019" },
+  { "city": "Chennai", "category": "Hospital Billing Problems", "outcome": "Overcharged bill reduced by ₹20,000", "law": "Consumer Protection Act 2019" },
+  { "city": "Hyderabad", "category": "Traffic & Vehicle Issues", "outcome": "Wrong challan cancelled", "law": "Motor Vehicles Act 1988" },
+  { "city": "Kolkata", "category": "Telecom & Internet Services", "outcome": "Got 3-month bill waiver for outage", "law": "TRAI Act 1997" },
+  { "city": "Ahmedabad", "category": "Education & Coaching Complaints", "outcome": "50% coaching fee refunded", "law": "Consumer Protection Act 2019" },
+  { "city": "Jaipur", "category": "Rental & Housing Issues", "outcome": "Security deposit of ₹30,000 returned", "law": "Transfer of Property Act 1882" },
+  { "city": "Lucknow", "category": "Government Service Problems", "outcome": "Birth certificate issued after delay", "law": "Right to Information Act 2005" }
+]
