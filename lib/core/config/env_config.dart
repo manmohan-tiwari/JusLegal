@@ -37,8 +37,8 @@
 //   --dart-define=OPENROUTER_API_KEY=your_openrouter_key
 // ```
 
-
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 
 /// Configuration status for debugging and validation.
 enum ConfigStatus {
@@ -55,60 +55,151 @@ enum ConfigStatus {
 class EnvConfig {
   EnvConfig._();
 
+  static final Map<String, String> _runtimeEnv = <String, String>{};
+  static bool _initialized = false;
+
+  static Future<void> initialize() async {
+    if (_initialized) return;
+    _initialized = true;
+
+    try {
+      final raw = await rootBundle.loadString('.env');
+      for (final line in raw.split('\n')) {
+        final trimmed = line.trim();
+        if (trimmed.isEmpty || trimmed.startsWith('#')) continue;
+
+        final separatorIndex = trimmed.indexOf('=');
+        if (separatorIndex <= 0) continue;
+
+        final key = trimmed.substring(0, separatorIndex).trim();
+        final value = trimmed.substring(separatorIndex + 1).trim();
+        _runtimeEnv[key] = value;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('[EnvConfig] No .env asset loaded: $e');
+      }
+    }
+  }
+
+  static String _getString(String key, String fallback) {
+    final runtimeValue = _runtimeEnv[key];
+    if (runtimeValue != null && runtimeValue.isNotEmpty) {
+      return runtimeValue;
+    }
+    return fallback;
+  }
+
+  static bool _getBool(String key, bool fallback) {
+    final runtimeValue = _runtimeEnv[key];
+    if (runtimeValue == null || runtimeValue.isEmpty) {
+      return fallback;
+    }
+
+    switch (runtimeValue.toLowerCase()) {
+      case 'true':
+      case '1':
+      case 'yes':
+      case 'on':
+        return true;
+      case 'false':
+      case '0':
+      case 'no':
+      case 'off':
+        return false;
+      default:
+        return fallback;
+    }
+  }
+
   // ==================== AI Provider API Keys ====================
   
    /// Google Gemini API key.
    /// Get from: https://aistudio.google.com/apikey
-   static const String geminiApiKey = 
-       String.fromEnvironment('GEMINI_API_KEY', defaultValue: '');
+   static String get geminiApiKey => _getString(
+         'GEMINI_API_KEY',
+         const String.fromEnvironment('GEMINI_API_KEY', defaultValue: ''),
+       );
 
    /// Groq API key.
    /// Get from: https://console.groq.com/keys
-   static const String groqApiKey = 
-       String.fromEnvironment('GROQ_API_KEY', defaultValue: '');
+   static String get groqApiKey => _getString(
+         'GROQ_API_KEY',
+         const String.fromEnvironment('GROQ_API_KEY', defaultValue: ''),
+       );
 
    /// OpenRouter API key.
    /// Get from: https://openrouter.ai/keys
-   static const String openRouterApiKey = 
-       String.fromEnvironment('OPENROUTER_API_KEY', defaultValue: '');
+   static String get openRouterApiKey => _getString(
+         'OPENROUTER_API_KEY',
+         const String.fromEnvironment('OPENROUTER_API_KEY', defaultValue: ''),
+       );
 
   // ==================== AI Proxy Configuration ====================
   
   /// Whether to use a proxy for AI requests.
-  static const bool useProxy = 
-      bool.fromEnvironment('JUSLEGAL_USE_AI_PROXY', defaultValue: false);
+  static bool get useProxy => _getBool(
+        'JUSLEGAL_USE_AI_PROXY',
+        const bool.fromEnvironment('JUSLEGAL_USE_AI_PROXY', defaultValue: false),
+      );
 
   /// Base URL for the AI proxy server.
-  static const String proxyBaseUrl = 
-      String.fromEnvironment('JUSLEGAL_AI_PROXY_BASE_URL', defaultValue: '');
+  static String get proxyBaseUrl => _getString(
+        'JUSLEGAL_AI_PROXY_BASE_URL',
+        const String.fromEnvironment(
+          'JUSLEGAL_AI_PROXY_BASE_URL',
+          defaultValue: '',
+        ),
+      );
 
   // ==================== Firebase Configuration ====================
   
   /// Firebase project ID.
   /// This should match your Firebase project.
-  static const String firebaseProjectId = 
-      String.fromEnvironment('FIREBASE_PROJECT_ID', defaultValue: 'juslegal-2196');
+  static String get firebaseProjectId => _getString(
+        'FIREBASE_PROJECT_ID',
+        const String.fromEnvironment(
+          'FIREBASE_PROJECT_ID',
+          defaultValue: 'juslegal-2196',
+        ),
+      );
 
   /// Firebase web API key (for web platform).
   /// Get from Firebase Console > Project Settings > General > Your apps > SDK setup and configuration
-  static const String firebaseWebApiKey = 
-      String.fromEnvironment('FIREBASE_WEB_API_KEY', defaultValue: '');
+  static String get firebaseWebApiKey => _getString(
+        'FIREBASE_WEB_API_KEY',
+        const String.fromEnvironment('FIREBASE_WEB_API_KEY', defaultValue: ''),
+      );
 
   /// Firebase web app ID.
-  static const String firebaseWebAppId = 
-      String.fromEnvironment('FIREBASE_WEB_APP_ID', defaultValue: '');
+  static String get firebaseWebAppId => _getString(
+        'FIREBASE_WEB_APP_ID',
+        const String.fromEnvironment('FIREBASE_WEB_APP_ID', defaultValue: ''),
+      );
 
   /// Firebase Android app ID.
-  static const String firebaseAndroidAppId = 
-      String.fromEnvironment('FIREBASE_ANDROID_APP_ID', defaultValue: '');
+  static String get firebaseAndroidAppId => _getString(
+        'FIREBASE_ANDROID_APP_ID',
+        const String.fromEnvironment(
+          'FIREBASE_ANDROID_APP_ID',
+          defaultValue: '',
+        ),
+      );
 
   /// Firebase iOS app ID.
-  static const String firebaseIOSAppId = 
-      String.fromEnvironment('FIREBASE_IOS_APP_ID', defaultValue: '');
+  static String get firebaseIOSAppId => _getString(
+        'FIREBASE_IOS_APP_ID',
+        const String.fromEnvironment('FIREBASE_IOS_APP_ID', defaultValue: ''),
+      );
 
   /// Firebase messaging sender ID.
-  static const String firebaseMessagingSenderId = 
-      String.fromEnvironment('FIREBASE_MESSAGING_SENDER_ID', defaultValue: '');
+  static String get firebaseMessagingSenderId => _getString(
+        'FIREBASE_MESSAGING_SENDER_ID',
+        const String.fromEnvironment(
+          'FIREBASE_MESSAGING_SENDER_ID',
+          defaultValue: '',
+        ),
+      );
 
   // ==================== Computed Properties ====================
 

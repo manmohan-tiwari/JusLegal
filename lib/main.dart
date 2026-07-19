@@ -18,6 +18,7 @@ import 'core/theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await EnvConfig.initialize();
 
   // Print configuration for debugging
   if (kDebugMode) EnvConfig.printConfig();

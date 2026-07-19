@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../core/constants/app_config.dart';
 import '../core/constants/categories.dart';
 import '../core/constants/app_colors.dart';
 import '../providers/auth_provider.dart';
@@ -101,28 +102,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   onSelected: _onTab,
                 )
               : AppBar(
+                  toolbarHeight: 76,
                   titleSpacing: 16,
-                  title: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'JusLegal',
-                        style: const TextStyle(
-                          color: Color(0xFF1F2937),
-                          fontSize: 20,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      Text(
-                        'Premium legal assistance',
-                        style: const TextStyle(
-                          color: Color(0xFF6B7280),
-                          fontSize: 11,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
+                  scrolledUnderElevation: 0,
+                  title: const Align(
+                    alignment: Alignment.centerLeft,
+                    child: _HeaderLogo(height: 36),
                   ),
                   actions: [
                     IconButton(
@@ -272,6 +257,9 @@ class _HomeContent extends StatelessWidget {
   final List<LegalCategory> categories;
   final bool isDesktop;
 
+  static const double _categorySectionTopSpacingDesktop = 48;
+  static const double _categorySectionTopSpacingMobile = 40;
+
   const _HomeContent({
     required this.categories,
     required this.isDesktop,
@@ -283,7 +271,11 @@ class _HomeContent extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _HeroSection(isDesktop: isDesktop),
-        SizedBox(height: isDesktop ? 36 : 32),
+        SizedBox(
+          height: isDesktop
+              ? _categorySectionTopSpacingDesktop
+              : _categorySectionTopSpacingMobile,
+        ),
 
         // ── Legal Categories ──────────────────────────────
         const _SectionLabel('EXPLORE LEGAL CATEGORIES'),
@@ -536,8 +528,8 @@ class _AiToolCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: _iconBg,
                       borderRadius: BorderRadius.circular(20),
@@ -552,9 +544,9 @@ class _AiToolCard extends StatelessWidget {
                             fontSize: 11,
                             fontWeight: FontWeight.w400,
                           ).copyWith(
-                                color: _accentColor,
-                                fontWeight: FontWeight.w700,
-                              ),
+                            color: _accentColor,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                         const SizedBox(width: 2),
                         Icon(
@@ -584,6 +576,9 @@ class _HeroSection extends StatelessWidget {
 
   const _HeroSection({required this.isDesktop});
 
+  static const Color _heroAccentTextColor = Color(0xFFFFC247);
+  static const Color _heroCtaColor = Color(0xFF111827);
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -607,67 +602,88 @@ class _HeroSection extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Know Your Rights.',
-            style: const TextStyle(
-              color: Color(0xFF1F2937),
-              fontSize: 24,
-              fontWeight: FontWeight.w700,
-            ).copyWith(
-                  color: Colors.white,
-                  fontSize: isDesktop ? 34 : 28,
-                  fontWeight: FontWeight.w800,
-                  height: 1.2,
+      child: isDesktop
+          ? Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Expanded(
+                  flex: 6,
+                  child: _HeroContent(isDesktop: true),
                 ),
+                const Spacer(),
+                Expanded(
+                  flex: 4,
+                  child: Align(
+                    alignment: Alignment.topRight,
+                    child: Container(
+                      constraints: const BoxConstraints(minHeight: 220),
+                    ),
+                  ),
+                ),
+              ],
+            )
+          : const _HeroContent(isDesktop: false),
+    );
+  }
+}
+
+class _HeroContent extends StatelessWidget {
+  final bool isDesktop;
+
+  const _HeroContent({required this.isDesktop});
+
+  @override
+  Widget build(BuildContext context) {
+    final headlineStyle = TextStyle(
+      color: Colors.white,
+      fontSize: isDesktop ? 34 : 28,
+      fontWeight: FontWeight.w800,
+      height: 1.2,
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Know Your Rights.', style: headlineStyle),
+        Text(
+          'Take Action.',
+          style: headlineStyle.copyWith(
+            color: _HeroSection._heroAccentTextColor,
           ),
-          Text(
-            'Take Action.',
-            style: const TextStyle(
-              color: Color(0xFF1F2937),
-              fontSize: 24,
-              fontWeight: FontWeight.w700,
-            ).copyWith(
-                  color: AppColors.legalGold,
-                  fontSize: isDesktop ? 34 : 28,
-                  fontWeight: FontWeight.w800,
-                  height: 1.2,
-                ),
+        ),
+        const SizedBox(height: 12),
+        const Text(
+          'Get instant AI-powered legal guidance for your consumer issues.',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            height: 1.5,
           ),
-          const SizedBox(height: 12),
-          Text(
-            'Get instant AI-powered legal guidance for your consumer issues.',
-            style: const TextStyle(
-              color: Color(0xFF1F2937),
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-            ).copyWith(
-                  color: Colors.white,
-                  height: 1.5,
-                ),
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: isDesktop ? 260 : double.infinity,
-            height: 52,
-            child: ElevatedButton(
-              onPressed: () => context.go('/home/analyzer'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: AppColors.primaryNavy,
-                elevation: 2,
-                shadowColor: Colors.black.withValues(alpha: 0.18),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
+        ),
+        const SizedBox(height: 20),
+        SizedBox(
+          width: isDesktop ? 220 : double.infinity,
+          child: ElevatedButton(
+            onPressed: () => context.go('/home/analyzer'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _HeroSection._heroCtaColor,
+              foregroundColor: Colors.white,
+              elevation: 2,
+              shadowColor: Colors.black.withValues(alpha: 0.18),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
               ),
-              child: const Text('Get Started'),
+              textStyle: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+              ),
             ),
+            child: const Text('Get Started'),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -675,6 +691,8 @@ class _HeroSection extends StatelessWidget {
 class _CategoryCard extends StatelessWidget {
   final LegalCategory category;
   final VoidCallback onTap;
+
+  static const double _titleBlockMinHeight = 40;
 
   const _CategoryCard({
     required this.category,
@@ -699,7 +717,7 @@ class _CategoryCard extends StatelessWidget {
             border: Border.all(color: AppColors.border),
           ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
                 width: 48,
@@ -715,32 +733,40 @@ class _CategoryCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              Text(
-                category.name,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: Color(0xFF1F2937),
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ).copyWith(
+              ConstrainedBox(
+                constraints:
+                    const BoxConstraints(minHeight: _titleBlockMinHeight),
+                child: Center(
+                  child: Text(
+                    category.name,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Color(0xFF1F2937),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ).copyWith(
                       color: AppColors.primaryNavy,
                       fontWeight: FontWeight.w700,
                     ),
+                  ),
+                ),
               ),
               const SizedBox(height: 6),
               Text(
                 category.description,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: Color(0xFF6B7280),
                   fontSize: 12,
                   fontWeight: FontWeight.w400,
                 ).copyWith(
-                      color: AppColors.textSecondary,
-                      height: 1.35,
-                    ),
+                  color: AppColors.textSecondary,
+                  height: 1.35,
+                ),
               ),
             ],
           ),
@@ -790,9 +816,9 @@ class _BenefitItem extends StatelessWidget {
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ).copyWith(
-                        color: AppColors.primaryNavy,
-                        fontWeight: FontWeight.w700,
-                      ),
+                    color: AppColors.primaryNavy,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
                 const SizedBox(height: 2),
                 Text(
@@ -802,8 +828,8 @@ class _BenefitItem extends StatelessWidget {
                     fontSize: 12,
                     fontWeight: FontWeight.w400,
                   ).copyWith(
-                        color: AppColors.textSecondary,
-                      ),
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ],
             ),
@@ -851,9 +877,9 @@ class _DisclaimerBanner extends StatelessWidget {
                       fontSize: 12,
                       fontWeight: FontWeight.w400,
                     ).copyWith(
-                          color: AppColors.primaryNavy,
-                          height: 1.4,
-                        ),
+                      color: AppColors.primaryNavy,
+                      height: 1.4,
+                    ),
                     children: const [
                       TextSpan(
                           text:
@@ -899,10 +925,10 @@ class _SectionLabel extends StatelessWidget {
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ).copyWith(
-                color: AppColors.primaryNavy,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0.5,
-              ),
+            color: AppColors.primaryNavy,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0.5,
+          ),
         ),
       ],
     );
@@ -921,31 +947,17 @@ class _DesktopHeader extends StatelessWidget implements PreferredSizeWidget {
   });
 
   @override
-  Size get preferredSize => const Size.fromHeight(76);
+  Size get preferredSize => const Size.fromHeight(88);
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
       toolbarHeight: preferredSize.height,
       titleSpacing: 28,
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('JusLegal',
-              style: const TextStyle(
-                color: Color(0xFF1F2937),
-                fontSize: 20,
-                fontWeight: FontWeight.w800,
-              )),
-          Text(
-            'Premium legal assistance',
-            style: const TextStyle(
-              color: Color(0xFF6B7280),
-              fontSize: 11,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ],
+      scrolledUnderElevation: 0,
+      title: const Align(
+        alignment: Alignment.centerLeft,
+        child: _HeaderLogo(height: 38),
       ),
       actions: [
         ...List.generate(items.length, (index) {
@@ -962,9 +974,10 @@ class _DesktopHeader extends StatelessWidget implements PreferredSizeWidget {
               style: TextButton.styleFrom(
                 foregroundColor:
                     selected ? AppColors.primaryNavy : AppColors.textSecondary,
-                backgroundColor: selected
-                    ? AppColors.trustBlue.withValues(alpha: 0.08)
-                    : Colors.transparent,
+                backgroundColor:
+                    selected ? const Color(0xFFDCEBFF) : Colors.transparent,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(999),
                 ),
@@ -974,6 +987,30 @@ class _DesktopHeader extends StatelessWidget implements PreferredSizeWidget {
         }),
         const SizedBox(width: 20),
       ],
+    );
+  }
+}
+
+class _HeaderLogo extends StatelessWidget {
+  final double height;
+
+  const _HeaderLogo({required this.height});
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset(
+      AppConfig.appLogoAsset,
+      height: height,
+      fit: BoxFit.contain,
+      alignment: Alignment.centerLeft,
+      errorBuilder: (context, error, stackTrace) => const Text(
+        'JusLegal',
+        style: TextStyle(
+          color: AppColors.primaryNavy,
+          fontSize: 20,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
     );
   }
 }
@@ -1050,13 +1087,12 @@ class _FloatingBottomNav extends StatelessWidget {
                               fontSize: 11,
                               fontWeight: FontWeight.w400,
                             ).copyWith(
-                                  color: selected
-                                      ? const Color(0xFF0052CC)
-                                      : const Color(0xFF6B7280),
-                                  fontWeight: selected
-                                      ? FontWeight.w700
-                                      : FontWeight.w600,
-                                ),
+                              color: selected
+                                  ? const Color(0xFF0052CC)
+                                  : const Color(0xFF6B7280),
+                              fontWeight:
+                                  selected ? FontWeight.w700 : FontWeight.w600,
+                            ),
                           ),
                         ],
                       ),

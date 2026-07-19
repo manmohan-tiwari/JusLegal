@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../core/constants/app_config.dart';
 import '../core/theme/app_theme.dart';
 import '../providers/auth_provider.dart';
 
@@ -146,21 +147,12 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(
-                      Icons.balance_rounded,
-                      size: 48,
-                      color: AppTheme.legalGold,
+                    Image.asset(
+                      AppConfig.appLogoAsset,
+                      height: 72,
+                      fit: BoxFit.contain,
                     ),
                     const SizedBox(height: 12),
-                    Text(
-                      "JusLegal",
-                      style: GoogleFonts.merriweather(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
                     Text(
                       "Your legal rights, protected",
                       style: const TextStyle(

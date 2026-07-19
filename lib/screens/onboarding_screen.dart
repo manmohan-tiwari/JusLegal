@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../core/constants/app_config.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -186,8 +187,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       context: context,
       backgroundColor: Colors.white,
       shape: RoundedRectangleBorder(
-        borderRadius:
-            BorderRadius.vertical(top: const Radius.circular(16)),
+        borderRadius: BorderRadius.vertical(top: const Radius.circular(16)),
       ),
       showDragHandle: true,
       isScrollControlled: true,
@@ -250,8 +250,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
         animation: _backgroundFade,
         builder: (context, child) {
           return Container(
-            color:
-                const Color(0xFF1F2937).withValues(alpha: _backgroundFade.value),
+            color: const Color(0xFF1F2937)
+                .withValues(alpha: _backgroundFade.value),
             child: SafeArea(
               child: LayoutBuilder(
                 builder: (context, constraints) {
@@ -308,14 +308,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>
           opacity: _titleFade,
           child: SlideTransition(
             position: _titleSlide,
-            child: Text(
-              'JusLegal',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.merriweather(
-                fontSize: 36,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
+            child: Image.asset(
+              AppConfig.appLogoAsset,
+              height: 86,
+              fit: BoxFit.contain,
             ),
           ),
         );
@@ -596,7 +592,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 width: 32,
                 height: 32,
                 decoration: const BoxDecoration(
-                  color: const Color(0xFF0052CC),
+                  color: Color(0xFF0052CC),
                   shape: BoxShape.circle,
                 ),
                 child: Center(

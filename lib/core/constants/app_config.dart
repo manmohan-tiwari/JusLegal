@@ -6,6 +6,7 @@ class AppConfig {
 
   // App Information
   static String get appName => 'JusLegal';
+  static String get appLogoAsset => 'assets/icon/juslegal icon.png';
   static String get appVersion => '1.0.0';
   static String get appBuildNumber => '1';
   static String get supportEmail => 'support@juslegal.app';
@@ -17,10 +18,11 @@ class AppConfig {
 
   // Legal Disclaimers
   static String get appTagline => 'Know Your Rights. Take Action.';
-  static String get onboardingDisclaimer => 
+  static String get onboardingDisclaimer =>
       'JusLegal provides general legal guidance based on Indian law. It does not replace professional legal advice. For complex or criminal matters, always consult a practicing advocate.';
-  static String get resultDisclaimer => 'ℹ️ General guidance only. Not legal advice.';
-  static String get documentDisclaimer => 
+  static String get resultDisclaimer =>
+      'ℹ️ General guidance only. Not legal advice.';
+  static String get documentDisclaimer =>
       'This document was generated for reference purposes. Review carefully before sending.';
 
   // External Service URLs
