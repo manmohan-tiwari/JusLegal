@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -21,6 +22,13 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
+  static const SystemUiOverlayStyle _lightSurfaceOverlayStyle =
+      SystemUiOverlayStyle(
+    statusBarColor: AppColors.surface,
+    statusBarIconBrightness: Brightness.dark,
+    statusBarBrightness: Brightness.light,
+  );
+
   int _tabIndex = 0;
   late ScrollController _scrollController;
 
@@ -90,6 +98,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isDesktop = constraints.maxWidth > 600;
+        final viewPadding = MediaQuery.paddingOf(context);
         final homeCategories =
             AppCategories.categories.take(4).toList(growable: false);
 
@@ -102,18 +111,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   onSelected: _onTab,
                 )
               : AppBar(
-                  toolbarHeight: 76,
+                  toolbarHeight: 64,
                   titleSpacing: 16,
                   scrolledUnderElevation: 0,
+                  centerTitle: false,
+                  systemOverlayStyle: _lightSurfaceOverlayStyle,
                   title: const Align(
                     alignment: Alignment.centerLeft,
-                    child: _HeaderLogo(height: 36),
+                    child: _HeaderLogo(iconHeight: 40),
                   ),
                   actions: [
                     IconButton(
                       icon: const Icon(Icons.settings_outlined),
                       onPressed: () => context.go('/home/settings'),
                       tooltip: 'Settings',
+                      constraints:
+                          const BoxConstraints(minWidth: 48, minHeight: 48),
                     ),
                   ],
                 ),
@@ -130,7 +143,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       isDesktop ? 32 : 16,
                       isDesktop ? 28 : 16,
                       isDesktop ? 32 : 16,
-                      isDesktop ? 36 : 112,
+                      isDesktop ? 36 : 132 + viewPadding.bottom,
                     ),
                     child: _HomeContent(
                       categories: homeCategories,
@@ -148,7 +161,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   items: _navItems,
                   onSelected: _onTab,
                 ),
-          floatingActionButton: _buildFloatingAIButton(),
+          floatingActionButton: Padding(
+            padding: EdgeInsets.only(
+              right: isDesktop ? 8 : 4,
+              bottom: isDesktop ? 12 : 84 + viewPadding.bottom,
+            ),
+            child: _buildFloatingAIButton(),
+          ),
           floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         );
       },
@@ -258,7 +277,7 @@ class _HomeContent extends StatelessWidget {
   final bool isDesktop;
 
   static const double _categorySectionTopSpacingDesktop = 48;
-  static const double _categorySectionTopSpacingMobile = 40;
+  static const double _categorySectionTopSpacingMobile = 48;
 
   const _HomeContent({
     required this.categories,
@@ -289,17 +308,24 @@ class _HomeContent extends StatelessWidget {
         else
           LayoutBuilder(
             builder: (context, constraints) {
-              final columns = isDesktop ? 4 : 2;
-              final childAspectRatio = isDesktop ? 1.1 : 0.85;
+              final columns =
+                  isDesktop ? 4 : (constraints.maxWidth < 340 ? 1 : 2);
+              final spacing = isDesktop ? 14.0 : 12.0;
+              final itemWidth =
+                  (constraints.maxWidth - (spacing * (columns - 1))) / columns;
+              final itemHeight = isDesktop
+                  ? 188.0
+                  : (columns == 1 ? 168.0 : (itemWidth < 170 ? 196.0 : 184.0));
+
               return GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: categories.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: columns,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: childAspectRatio,
+                  crossAxisSpacing: spacing,
+                  mainAxisSpacing: spacing,
+                  mainAxisExtent: itemHeight,
                 ),
                 itemBuilder: (context, index) {
                   return _CategoryCard(
@@ -415,7 +441,10 @@ class _AiToolsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final columns = isDesktop ? 4 : 2;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final columns = isDesktop ? 4 : (screenWidth < 340 ? 1 : 2);
+    final itemHeight = isDesktop ? 196.0 : (columns == 1 ? 184.0 : 208.0);
+
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -424,7 +453,7 @@ class _AiToolsGrid extends StatelessWidget {
         crossAxisCount: columns,
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
-        childAspectRatio: isDesktop ? 1.15 : 0.9,
+        mainAxisExtent: itemHeight,
       ),
       itemBuilder: (context, index) {
         return _AiToolCard(
@@ -581,11 +610,14 @@ class _HeroSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final horizontalPadding = isDesktop ? 28.0 : 18.0;
+    final verticalPadding = isDesktop ? 30.0 : 22.0;
+
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(
-        horizontal: isDesktop ? 28 : 16,
-        vertical: isDesktop ? 30 : 24,
+        horizontal: horizontalPadding,
+        vertical: verticalPadding,
       ),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
@@ -634,15 +666,24 @@ class _HeroContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final compactMobile = !isDesktop && screenWidth <= 360;
     final headlineStyle = TextStyle(
       color: Colors.white,
-      fontSize: isDesktop ? 34 : 28,
+      fontSize: isDesktop ? 34 : (compactMobile ? 25 : 28),
       fontWeight: FontWeight.w800,
-      height: 1.2,
+      height: compactMobile ? 1.15 : 1.2,
+    );
+    final bodyStyle = TextStyle(
+      color: Colors.white,
+      fontSize: compactMobile ? 13 : 14,
+      fontWeight: FontWeight.w400,
+      height: 1.5,
     );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Text('Know Your Rights.', style: headlineStyle),
         Text(
@@ -651,17 +692,12 @@ class _HeroContent extends StatelessWidget {
             color: _HeroSection._heroAccentTextColor,
           ),
         ),
-        const SizedBox(height: 12),
-        const Text(
+        SizedBox(height: compactMobile ? 10 : 12),
+        Text(
           'Get instant AI-powered legal guidance for your consumer issues.',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
-            height: 1.5,
-          ),
+          style: bodyStyle,
         ),
-        const SizedBox(height: 20),
+        SizedBox(height: compactMobile ? 18 : 20),
         SizedBox(
           width: isDesktop ? 220 : double.infinity,
           child: ElevatedButton(
@@ -671,6 +707,7 @@ class _HeroContent extends StatelessWidget {
               foregroundColor: Colors.white,
               elevation: 2,
               shadowColor: Colors.black.withValues(alpha: 0.18),
+              minimumSize: const Size.fromHeight(48),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
@@ -692,7 +729,8 @@ class _CategoryCard extends StatelessWidget {
   final LegalCategory category;
   final VoidCallback onTap;
 
-  static const double _titleBlockMinHeight = 40;
+  static const double _titleBlockMinHeight = 44;
+  static const double _descriptionBlockMinHeight = 34;
 
   const _CategoryCard({
     required this.category,
@@ -718,6 +756,7 @@ class _CategoryCard extends StatelessWidget {
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
                 width: 48,
@@ -754,18 +793,22 @@ class _CategoryCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 6),
-              Text(
-                category.description,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Color(0xFF6B7280),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                ).copyWith(
-                  color: AppColors.textSecondary,
-                  height: 1.35,
+              ConstrainedBox(
+                constraints:
+                    const BoxConstraints(minHeight: _descriptionBlockMinHeight),
+                child: Text(
+                  category.description,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Color(0xFF6B7280),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                  ).copyWith(
+                    color: AppColors.textSecondary,
+                    height: 1.35,
+                  ),
                 ),
               ),
             ],
@@ -947,17 +990,18 @@ class _DesktopHeader extends StatelessWidget implements PreferredSizeWidget {
   });
 
   @override
-  Size get preferredSize => const Size.fromHeight(88);
+  Size get preferredSize => const Size.fromHeight(72);
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      systemOverlayStyle: _HomeScreenState._lightSurfaceOverlayStyle,
       toolbarHeight: preferredSize.height,
-      titleSpacing: 28,
+      titleSpacing: 20,
       scrolledUnderElevation: 0,
       title: const Align(
         alignment: Alignment.centerLeft,
-        child: _HeaderLogo(height: 38),
+        child: _HeaderLogo(iconHeight: 42),
       ),
       actions: [
         ...List.generate(items.length, (index) {
@@ -976,8 +1020,9 @@ class _DesktopHeader extends StatelessWidget implements PreferredSizeWidget {
                     selected ? AppColors.primaryNavy : AppColors.textSecondary,
                 backgroundColor:
                     selected ? const Color(0xFFDCEBFF) : Colors.transparent,
+                minimumSize: const Size(48, 48),
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(999),
                 ),
@@ -992,25 +1037,37 @@ class _DesktopHeader extends StatelessWidget implements PreferredSizeWidget {
 }
 
 class _HeaderLogo extends StatelessWidget {
-  final double height;
+  final double iconHeight;
 
-  const _HeaderLogo({required this.height});
+  const _HeaderLogo({required this.iconHeight});
 
   @override
   Widget build(BuildContext context) {
-    return Image.asset(
-      AppConfig.appLogoAsset,
-      height: height,
-      fit: BoxFit.contain,
-      alignment: Alignment.centerLeft,
-      errorBuilder: (context, error, stackTrace) => const Text(
-        'JusLegal',
-        style: TextStyle(
-          color: AppColors.primaryNavy,
-          fontSize: 20,
-          fontWeight: FontWeight.w800,
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Image.asset(
+          AppConfig.appLogoAsset,
+          height: iconHeight,
+          fit: BoxFit.contain,
+          alignment: Alignment.centerLeft,
+          errorBuilder: (context, error, stackTrace) => Icon(
+            Icons.balance_rounded,
+            size: iconHeight,
+            color: AppColors.primaryNavy,
+          ),
         ),
-      ),
+        const SizedBox(width: 10),
+        Text(
+          'JusLegal',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: AppColors.legalGold,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.2,
+              ),
+        ),
+      ],
     );
   }
 }
@@ -1060,6 +1117,7 @@ class _FloatingBottomNav extends StatelessWidget {
                     onTap: () => onSelected(index),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 180),
+                      constraints: const BoxConstraints(minHeight: 48),
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       decoration: BoxDecoration(
                         color: selected

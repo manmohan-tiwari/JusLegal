@@ -4,7 +4,7 @@ import 'package:juslegal/screens/ai_legal_chat_screen.dart';
 
 /// Floating AI Assistant Button
 /// Place this widget in your Scaffold using a Stack or floatingActionButton
-/// 
+///
 /// Usage in any screen:
 /// ```dart
 /// Scaffold(
@@ -15,7 +15,7 @@ import 'package:juslegal/screens/ai_legal_chat_screen.dart';
 class FloatingAIButton extends StatefulWidget {
   final String userName;
 
-  const FloatingAIButton({Key? key, required this.userName}) : super(key: key);
+  const FloatingAIButton({super.key, required this.userName});
 
   @override
   State<FloatingAIButton> createState() => _FloatingAIButtonState();
@@ -68,7 +68,8 @@ class _FloatingAIButtonState extends State<FloatingAIButton>
             position: Tween<Offset>(
               begin: const Offset(0, 1),
               end: Offset.zero,
-            ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic)),
+            ).animate(
+                CurvedAnimation(parent: animation, curve: Curves.easeOutCubic)),
             child: child,
           );
         },
@@ -102,10 +103,10 @@ class _FloatingAIButtonState extends State<FloatingAIButton>
                         shape: BoxShape.circle,
                         gradient: SweepGradient(
                           colors: [
-                            const Color(0xFF1A237E).withOpacity(0),
+                            const Color(0xFF1A237E).withValues(alpha: 0),
                             const Color(0xFF3949AB),
                             const Color(0xFF7C4DFF),
-                            const Color(0xFF1A237E).withOpacity(0),
+                            const Color(0xFF1A237E).withValues(alpha: 0),
                           ],
                         ),
                       ),
@@ -128,7 +129,7 @@ class _FloatingAIButtonState extends State<FloatingAIButton>
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF3949AB).withOpacity(0.5),
+                          color: const Color(0xFF3949AB).withValues(alpha: 0.5),
                           blurRadius: 16,
                           spreadRadius: 2,
                           offset: const Offset(0, 4),
@@ -167,7 +168,7 @@ class _BotFacePainter extends CustomPainter {
     final white = Paint()..color = Colors.white;
     final accent = Paint()..color = const Color(0xFF7C4DFF);
     final glowPaint = Paint()
-      ..color = Colors.white.withOpacity(0.9)
+      ..color = Colors.white.withValues(alpha: 0.9)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2);
 
     // Head outline (rounded rect)
