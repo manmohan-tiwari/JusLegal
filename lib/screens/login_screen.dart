@@ -197,8 +197,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                     ),
                                     children: [
                                       const TextSpan(
-                                        text:
-                                            'By continuing you agree to our ',
+                                        text: 'By continuing you agree to our ',
                                       ),
                                       TextSpan(
                                         text: 'Terms',
