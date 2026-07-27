@@ -1,14 +1,15 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../core/constants/app_config.dart';
+import '../core/constants/app_animations.dart';
 import '../core/constants/categories.dart';
-import '../core/constants/app_colors.dart';
-import '../providers/auth_provider.dart';
+import '../core/config/theme_config.dart';
+import '../services/auth_handler.dart';
 import '../providers/rate_us_provider.dart';
 import '../widgets/empty_state_widget.dart';
 import '../widgets/floating_ai_button.dart';
@@ -27,6 +28,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     statusBarColor: AppColors.surface,
     statusBarIconBrightness: Brightness.dark,
     statusBarBrightness: Brightness.light,
+  );
+  static const SystemUiOverlayStyle _gradientOverlayStyle =
+      SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.light,
+    statusBarBrightness: Brightness.dark,
   );
 
   int _tabIndex = 0;
@@ -99,6 +106,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       builder: (context, constraints) {
         final isDesktop = constraints.maxWidth > 600;
         final viewPadding = MediaQuery.paddingOf(context);
+        final scrollPhysics =
+            defaultTargetPlatform == TargetPlatform.android && !kIsWeb
+                ? const BouncingScrollPhysics()
+                : const ClampingScrollPhysics();
         final homeCategories =
             AppCategories.categories.take(4).toList(growable: false);
 
@@ -113,9 +124,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               : AppBar(
                   toolbarHeight: 64,
                   titleSpacing: 16,
-                  scrolledUnderElevation: 0,
+                  elevation: 8,
+                  shadowColor: AppColors.shadowStrong,
+                  backgroundColor: Colors.transparent,
+                  foregroundColor: AppColors.white,
+                  surfaceTintColor: Colors.transparent,
+                  flexibleSpace: Container(
+                    decoration:
+                        const BoxDecoration(gradient: AppColors.appBarGradient),
+                  ),
                   centerTitle: false,
-                  systemOverlayStyle: _lightSurfaceOverlayStyle,
+                  systemOverlayStyle: _gradientOverlayStyle,
                   title: const Align(
                     alignment: Alignment.centerLeft,
                     child: _HeaderLogo(iconHeight: 40),
@@ -134,10 +153,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             top: false,
             child: SingleChildScrollView(
               controller: _scrollController,
+              physics: scrollPhysics,
               child: Center(
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
-                      maxWidth: isDesktop ? 1100 : double.infinity),
+                    maxWidth: isDesktop ? 1200 : double.infinity,
+                  ),
                   child: Padding(
                     padding: EdgeInsets.fromLTRB(
                       isDesktop ? 32 : 16,
@@ -182,9 +203,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 }
 
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // AI Feature Tool model
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _AiFeatureTool {
   final String title;
@@ -202,9 +223,9 @@ class _AiFeatureTool {
   });
 }
 
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Full feature list
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const List<_AiFeatureTool> _aiChatTools = [
   _AiFeatureTool(
@@ -254,7 +275,7 @@ const List<_AiFeatureTool> _documentTools = [
   ),
   _AiFeatureTool(
     title: 'Document Review',
-    description: 'Upload a doc — AI finds red flags & key clauses',
+    description: 'Upload a doc â€” AI finds red flags & key clauses',
     icon: Icons.fact_check_outlined,
     route: '/home/document-review',
     category: 'documents',
@@ -268,9 +289,9 @@ const List<_AiFeatureTool> _documentTools = [
   ),
 ];
 
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Home Content
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _HomeContent extends StatelessWidget {
   final List<LegalCategory> categories;
@@ -289,14 +310,17 @@ class _HomeContent extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _HeroSection(isDesktop: isDesktop),
+        AppAnimations.fadeSlideIn(
+          _HeroSection(isDesktop: isDesktop),
+          duration: const Duration(milliseconds: 520),
+        ),
         SizedBox(
           height: isDesktop
               ? _categorySectionTopSpacingDesktop
               : _categorySectionTopSpacingMobile,
         ),
 
-        // ── Legal Categories ──────────────────────────────
+        // â”€â”€ Legal Categories â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         const _SectionLabel('EXPLORE LEGAL CATEGORIES'),
         const SizedBox(height: 16),
         if (categories.isEmpty)
@@ -309,32 +333,28 @@ class _HomeContent extends StatelessWidget {
           LayoutBuilder(
             builder: (context, constraints) {
               final columns =
-                  isDesktop ? 4 : (constraints.maxWidth < 340 ? 1 : 2);
+                  isDesktop ? 4 : (constraints.maxWidth < 360 ? 1 : 2);
               final spacing = isDesktop ? 14.0 : 12.0;
               final itemWidth =
                   (constraints.maxWidth - (spacing * (columns - 1))) / columns;
-              final itemHeight = isDesktop
-                  ? 188.0
-                  : (columns == 1 ? 168.0 : (itemWidth < 170 ? 196.0 : 184.0));
 
-              return GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: categories.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: columns,
-                  crossAxisSpacing: spacing,
-                  mainAxisSpacing: spacing,
-                  mainAxisExtent: itemHeight,
-                ),
-                itemBuilder: (context, index) {
-                  return _CategoryCard(
-                    category: categories[index],
-                    onTap: () => context.go(
-                      '/home/analyzer?category=${Uri.encodeComponent(categories[index].name)}',
+              return Wrap(
+                spacing: spacing,
+                runSpacing: spacing,
+                children: List.generate(categories.length, (index) {
+                  return SizedBox(
+                    width: itemWidth,
+                    child: AppAnimations.staggeredListItem(
+                      _CategoryCard(
+                        category: categories[index],
+                        onTap: () => context.go(
+                          '/home/analyzer?category=${Uri.encodeComponent(categories[index].name)}',
+                        ),
+                      ),
+                      index,
                     ),
                   );
-                },
+                }),
               );
             },
           ),
@@ -353,7 +373,7 @@ class _HomeContent extends StatelessWidget {
           ),
         ),
 
-        // ── AI Chat & Analysis Tools ──────────────────────
+        // â”€â”€ AI Chat & Analysis Tools â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         SizedBox(height: isDesktop ? 32 : 28),
         const _SectionLabel('AI CHAT, LEGAL QUERIES AND ANALYSIS'),
         const SizedBox(height: 4),
@@ -371,9 +391,12 @@ class _HomeContent extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 14),
-        _AiToolsGrid(tools: _aiChatTools, isDesktop: isDesktop),
+        AppAnimations.fadeSlideIn(
+          _AiToolsGrid(tools: _aiChatTools, isDesktop: isDesktop),
+          delay: const Duration(milliseconds: 120),
+        ),
 
-        // ── Documents & Contracts Tools ───────────────────
+        // â”€â”€ Documents & Contracts Tools â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         SizedBox(height: isDesktop ? 32 : 28),
         const _SectionLabel('DOCUMENTS AND CONTRACTS'),
         const SizedBox(height: 4),
@@ -391,9 +414,12 @@ class _HomeContent extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 14),
-        _AiToolsGrid(tools: _documentTools, isDesktop: isDesktop),
+        AppAnimations.fadeSlideIn(
+          _AiToolsGrid(tools: _documentTools, isDesktop: isDesktop),
+          delay: const Duration(milliseconds: 180),
+        ),
 
-        // ── Why Choose JusLegal ───────────────────────────
+        // â”€â”€ Why Choose JusLegal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         SizedBox(height: isDesktop ? 28 : 24),
         const _SectionLabel('WHY CHOOSE JUSLEGAL'),
         const SizedBox(height: 16),
@@ -429,9 +455,9 @@ class _HomeContent extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // AI Tools Grid
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _AiToolsGrid extends StatelessWidget {
   final List<_AiFeatureTool> tools;
@@ -441,33 +467,37 @@ class _AiToolsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.sizeOf(context).width;
-    final columns = isDesktop ? 4 : (screenWidth < 340 ? 1 : 2);
-    final itemHeight = isDesktop ? 196.0 : (columns == 1 ? 184.0 : 208.0);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final columns = isDesktop ? 4 : (constraints.maxWidth < 360 ? 1 : 2);
+        const spacing = 12.0;
+        final itemWidth =
+            (constraints.maxWidth - (spacing * (columns - 1))) / columns;
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: tools.length,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: columns,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        mainAxisExtent: itemHeight,
-      ),
-      itemBuilder: (context, index) {
-        return _AiToolCard(
-          tool: tools[index],
-          onTap: () => context.push(tools[index].route),
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
+          children: List.generate(tools.length, (index) {
+            return SizedBox(
+              width: itemWidth,
+              child: AppAnimations.staggeredListItem(
+                _AiToolCard(
+                  tool: tools[index],
+                  onTap: () => context.push(tools[index].route),
+                ),
+                index,
+              ),
+            );
+          }),
         );
       },
     );
   }
 }
 
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // AI Tool Card
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _AiToolCard extends StatelessWidget {
   final _AiFeatureTool tool;
@@ -475,138 +505,128 @@ class _AiToolCard extends StatelessWidget {
 
   const _AiToolCard({required this.tool, required this.onTap});
 
-  // Documents category gets a gold accent, chat gets blue
   Color get _accentColor =>
       tool.category == 'documents' ? AppColors.legalGold : AppColors.trustBlue;
 
   Color get _iconBg => tool.category == 'documents'
-      ? AppColors.legalGold.withValues(alpha: 0.10)
-      : AppColors.trustBlue.withValues(alpha: 0.08);
+      ? AppColors.grey100
+      : AppColors.trustBlue.withValues(alpha: 0.12);
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: AppColors.surface,
-      elevation: 2,
-      shadowColor: AppColors.primaryNavy.withValues(alpha: 0.06),
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        splashColor: _accentColor.withValues(alpha: 0.08),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.border),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Icon circle
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: _iconBg,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  tool.icon,
-                  color: _accentColor,
-                  size: 24,
-                ),
+    final radius = BorderRadius.circular(18);
+    return AppAnimations.pressScale(
+      onTap: onTap,
+      borderRadius: radius,
+      splashColor: _accentColor.withValues(alpha: 0.08),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.cardBackground,
+          borderRadius: radius,
+          border: Border.all(color: AppColors.border),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.shadowBlack,
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Icon circle
+            Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                color: _iconBg,
+                shape: BoxShape.circle,
               ),
-              const SizedBox(height: 12),
-
-              // Title
-              Text(
-                tool.title,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: Color(0xFF1F2937),
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ).copyWith(
-                  color: AppColors.primaryNavy,
-                  fontWeight: FontWeight.w700,
-                ),
+              child: Icon(
+                tool.icon,
+                color: _accentColor,
+                size: 28,
               ),
-              const SizedBox(height: 6),
+            ),
+            const SizedBox(height: 12),
 
-              // Description
-              Text(
-                tool.description,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: Color(0xFF6B7280),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                ).copyWith(
-                  color: AppColors.textSecondary,
-                  height: 1.35,
-                ),
-              ),
-
-              const Spacer(),
-
-              // Bottom arrow chip
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: _iconBg,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Open',
-                          style: const TextStyle(
-                            color: Color(0xFF6B7280),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w400,
-                          ).copyWith(
-                            color: _accentColor,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const SizedBox(width: 2),
-                        Icon(
-                          Icons.arrow_forward_rounded,
-                          size: 12,
-                          color: _accentColor,
-                        ),
-                      ],
-                    ),
+            // Title
+            Text(
+              tool.title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: AppColors.primaryNavy,
+                    fontWeight: FontWeight.w800,
                   ),
-                ],
+            ),
+            const SizedBox(height: 6),
+
+            // Description
+            Text(
+              tool.description,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: AppColors.textSecondary,
+                    height: 1.35,
+                  ),
+            ),
+
+            // Bottom arrow chip
+            const SizedBox(height: 12),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Open',
+                      style: const TextStyle(
+                        color: Color(0xFF6B7280),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w400,
+                      ).copyWith(
+                        color: _accentColor,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(width: 2),
+                    Icon(
+                      Icons.arrow_forward_rounded,
+                      size: 12,
+                      color: _accentColor,
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-// ─────────────────────────────────────────────
-// Existing widgets below — unchanged
-// ─────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Existing widgets below â€” unchanged
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _HeroSection extends StatelessWidget {
   final bool isDesktop;
 
   const _HeroSection({required this.isDesktop});
 
-  static const Color _heroAccentTextColor = Color(0xFFFFC247);
-  static const Color _heroCtaColor = Color(0xFF111827);
+  static const Color _heroAccentTextColor = AppColors.legalGold;
 
   @override
   Widget build(BuildContext context) {
@@ -620,17 +640,18 @@ class _HeroSection extends StatelessWidget {
         vertical: verticalPadding,
       ),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [AppColors.primaryNavy, AppColors.trustBlue],
-        ),
-        borderRadius: BorderRadius.circular(20),
+        gradient: AppColors.heroGradient,
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryNavy.withValues(alpha: 0.16),
-            blurRadius: 26,
-            offset: const Offset(0, 14),
+            color: AppColors.primaryNavy.withValues(alpha: 0.28),
+            blurRadius: 32,
+            offset: const Offset(0, 16),
+          ),
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.18),
+            blurRadius: 18,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -703,14 +724,14 @@ class _HeroContent extends StatelessWidget {
           child: ElevatedButton(
             onPressed: () => context.go('/home/analyzer'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: _HeroSection._heroCtaColor,
-              foregroundColor: Colors.white,
-              elevation: 2,
-              shadowColor: Colors.black.withValues(alpha: 0.18),
+              backgroundColor: AppColors.primaryNavy,
+              foregroundColor: AppColors.white,
+              elevation: 8,
+              shadowColor: AppColors.shadow,
               minimumSize: const Size.fromHeight(48),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(24),
               ),
               textStyle: const TextStyle(
                 fontSize: 15,
@@ -729,9 +750,6 @@ class _CategoryCard extends StatelessWidget {
   final LegalCategory category;
   final VoidCallback onTap;
 
-  static const double _titleBlockMinHeight = 44;
-  static const double _descriptionBlockMinHeight = 34;
-
   const _CategoryCard({
     required this.category,
     required this.onTap,
@@ -739,80 +757,67 @@ class _CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: AppColors.surface,
-      elevation: 2,
-      shadowColor: AppColors.primaryNavy.withValues(alpha: 0.06),
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        splashColor: AppColors.trustBlue.withValues(alpha: 0.1),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.border),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: AppColors.trustBlue.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  category.icon,
-                  color: AppColors.primaryNavy,
-                  size: 24,
-                ),
+    final radius = BorderRadius.circular(18);
+    return AppAnimations.pressScale(
+      onTap: onTap,
+      borderRadius: radius,
+      splashColor: AppColors.trustBlue.withValues(alpha: 0.1),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: AppColors.cardBlueGradient,
+          borderRadius: radius,
+          border: Border.all(color: AppColors.border),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.shadowBlack,
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: AppColors.backgroundBlue,
+                shape: BoxShape.circle,
               ),
-              const SizedBox(height: 12),
-              ConstrainedBox(
-                constraints:
-                    const BoxConstraints(minHeight: _titleBlockMinHeight),
-                child: Center(
-                  child: Text(
-                    category.name,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Color(0xFF1F2937),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ).copyWith(
+              child: Icon(
+                category.icon,
+                color: AppColors.primaryNavy,
+                size: 30,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Center(
+              child: Text(
+                category.name,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
                       color: AppColors.primaryNavy,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w800,
                     ),
-                  ),
-                ),
               ),
-              const SizedBox(height: 6),
-              ConstrainedBox(
-                constraints:
-                    const BoxConstraints(minHeight: _descriptionBlockMinHeight),
-                child: Text(
-                  category.description,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Color(0xFF6B7280),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                  ).copyWith(
+            ),
+            const SizedBox(height: 6),
+            Text(
+              category.description,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: AppColors.textSecondary,
                     height: 1.35,
                   ),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -837,16 +842,31 @@ class _BenefitItem extends StatelessWidget {
     final color = isGold ? AppColors.legalGold : AppColors.primaryNavy;
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: AppColors.cardBackground,
         border: Border.all(color: AppColors.border),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadowBlack,
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: color, size: 24),
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.14),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(icon, color: color, size: 26),
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -854,25 +874,17 @@ class _BenefitItem extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: Color(0xFF1F2937),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ).copyWith(
-                    color: AppColors.primaryNavy,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: AppColors.primaryNavy,
+                        fontWeight: FontWeight.w800,
+                      ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   description,
-                  style: const TextStyle(
-                    color: Color(0xFF6B7280),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                  ).copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
                 ),
               ],
             ),
@@ -890,56 +902,59 @@ class _DisclaimerBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: AppColors.legalGold.withValues(alpha: 0.12),
-            border: Border.all(color: AppColors.legalGold),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Icon(
-                Icons.warning_rounded,
-                color: AppColors.legalGold,
-                size: 20,
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: RichText(
-                  text: TextSpan(
-                    style: const TextStyle(
-                      color: Color(0xFF6B7280),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                    ).copyWith(
-                      color: AppColors.primaryNavy,
-                      height: 1.4,
-                    ),
-                    children: const [
-                      TextSpan(
-                          text:
-                              'AI-generated guidance only. Not legal advice. '),
-                      TextSpan(
-                        text: 'Learn More ->',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.trustBlue,
-                        ),
-                      ),
-                    ],
+    return AppAnimations.pressScale(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: AppColors.cardBackground,
+          border: Border.all(color: AppColors.border),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.shadowBlack,
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(
+              Icons.warning_rounded,
+              color: AppColors.legalGold,
+              size: 20,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: RichText(
+                text: TextSpan(
+                  style: const TextStyle(
+                    color: Color(0xFF6B7280),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                  ).copyWith(
+                    color: AppColors.primaryNavy,
+                    height: 1.4,
                   ),
+                  children: const [
+                    TextSpan(
+                        text: 'AI-generated guidance only. Not legal advice. '),
+                    TextSpan(
+                      text: 'Learn More ->',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.trustBlue,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -956,21 +971,28 @@ class _SectionLabel extends StatelessWidget {
     return Row(
       children: [
         Container(
-          width: 3,
-          height: 14,
-          color: AppColors.trustBlue,
+          width: 4,
+          height: 20,
+          decoration: BoxDecoration(
+            gradient: AppColors.goldGradient,
+            borderRadius: BorderRadius.circular(999),
+          ),
         ),
         const SizedBox(width: 8),
-        Text(
-          title,
-          style: const TextStyle(
-            color: Color(0xFF0052CC),
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ).copyWith(
-            color: AppColors.primaryNavy,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 0.5,
+        Expanded(
+          child: Text(
+            title,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Color(0xFF0052CC),
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ).copyWith(
+              color: AppColors.primaryNavy,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0,
+            ),
           ),
         ),
       ],
@@ -1043,31 +1065,34 @@ class _HeaderLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Image.asset(
-          AppConfig.appLogoAsset,
-          height: iconHeight,
-          fit: BoxFit.contain,
-          alignment: Alignment.centerLeft,
-          errorBuilder: (context, error, stackTrace) => Icon(
-            Icons.balance_rounded,
-            size: iconHeight,
-            color: AppColors.primaryNavy,
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      alignment: Alignment.centerLeft,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox.square(
+            dimension: iconHeight,
+            child: Icon(
+              Icons.balance_rounded,
+              size: iconHeight,
+              color: AppColors.primaryNavy,
+            ),
           ),
-        ),
-        const SizedBox(width: 10),
-        Text(
-          'JusLegal',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: AppColors.legalGold,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0.2,
-              ),
-        ),
-      ],
+          const SizedBox(width: 10),
+          Text(
+            'JusLegal',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: AppColors.legalGold,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.2,
+                ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -1094,15 +1119,24 @@ class _FloatingBottomNav extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFFFFF).withValues(alpha: 0.92),
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFFFFFFFF), Color(0xFFF1F7FF)],
+              ),
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(
-                  color: const Color(0xFFE5E7EB).withValues(alpha: 0.8)),
+              border:
+                  Border.all(color: AppColors.white.withValues(alpha: 0.88)),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primaryNavy.withValues(alpha: 0.14),
-                  blurRadius: 32,
-                  offset: const Offset(0, -4),
+                  color: AppColors.primaryNavy.withValues(alpha: 0.20),
+                  blurRadius: 34,
+                  offset: const Offset(0, 10),
+                ),
+                BoxShadow(
+                  color: AppColors.shadowGold.withValues(alpha: 0.18),
+                  blurRadius: 18,
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
@@ -1121,9 +1155,18 @@ class _FloatingBottomNav extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       decoration: BoxDecoration(
                         color: selected
-                            ? AppColors.trustBlue.withValues(alpha: 0.08)
+                            ? AppColors.primaryNavy
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(20),
+                        boxShadow: selected
+                            ? [
+                                BoxShadow(
+                                  color: AppColors.shadow,
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ]
+                            : null,
                       ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -1131,8 +1174,8 @@ class _FloatingBottomNav extends StatelessWidget {
                           Icon(
                             selected ? item.selectedIcon : item.icon,
                             color: selected
-                                ? const Color(0xFF0052CC)
-                                : const Color(0xFF6B7280),
+                                ? AppColors.white
+                                : AppColors.textSecondary,
                             size: 24,
                           ),
                           const SizedBox(height: 4),
@@ -1146,8 +1189,8 @@ class _FloatingBottomNav extends StatelessWidget {
                               fontWeight: FontWeight.w400,
                             ).copyWith(
                               color: selected
-                                  ? const Color(0xFF0052CC)
-                                  : const Color(0xFF6B7280),
+                                  ? AppColors.white
+                                  : AppColors.textSecondary,
                               fontWeight:
                                   selected ? FontWeight.w700 : FontWeight.w600,
                             ),
@@ -1173,3 +1216,4 @@ class _BottomNavItem {
 
   const _BottomNavItem(this.label, this.icon, this.selectedIcon);
 }
+

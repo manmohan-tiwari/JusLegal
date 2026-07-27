@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import '../../core/constants/app_colors.dart';
+﻿import 'package:flutter/material.dart';
+import '../../core/config/theme_config.dart';
 
 class DocumentTypeChip extends StatelessWidget {
   final String label;

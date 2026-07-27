@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../core/theme/app_theme.dart';
+import '../core/config/theme_config.dart';
 import '../models/legal_result_model.dart';
 import '../models/saved_case_model.dart';
 
@@ -290,7 +290,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      errorMessage ?? 'Updating analysis…',
+                      errorMessage ?? 'Updating analysisâ€¦',
                       style: TextStyle(
                         color: errorMessage != null
                             ? Colors.white
@@ -441,7 +441,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('• ', style: TextStyle(fontSize: 16)),
+                      const Text('â€¢ ', style: TextStyle(fontSize: 16)),
                       Expanded(
                         child: Text(
                           r,
@@ -591,3 +591,4 @@ class _ReportCard extends StatelessWidget {
     );
   }
 }
+

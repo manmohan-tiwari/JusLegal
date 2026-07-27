@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 import '../core/constants/app_config.dart';
-import '../core/theme/app_theme.dart';
+import '../core/config/theme_config.dart';
 
 class PrivacyPolicyScreen extends StatelessWidget {
   const PrivacyPolicyScreen({super.key});
@@ -191,3 +191,4 @@ class PrivacyPolicyScreen extends StatelessWidget {
     );
   }
 }
+

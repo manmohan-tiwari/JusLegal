@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../core/theme/app_theme.dart';
+import '../core/config/theme_config.dart';
 import '../services/ai_service.dart';
 
-// ── Pre-built Q&A templates ───────────────────────────────────────────────────
+// â”€â”€ Pre-built Q&A templates â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _QTemplate {
   final String display;   // shown in list
@@ -59,7 +59,7 @@ const List<_QTemplate> _templates = [
   _QTemplate(
     display: 'Can I represent myself in this type of case?',
     prompt: 'Can I represent myself in the following type of case in Indian courts: {input}? What are the practical implications?',
-    hint: 'Describe the case type (e.g. consumer court complaint under ₹20 lakh)',
+    hint: 'Describe the case type (e.g. consumer court complaint under â‚¹20 lakh)',
     icon: Icons.person_outlined,
   ),
   _QTemplate(
@@ -82,7 +82,7 @@ const List<_QTemplate> _templates = [
   ),
 ];
 
-// ── Provider ──────────────────────────────────────────────────────────────────
+// â”€â”€ Provider â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 final _aiServiceProvider = Provider<AIService>((ref) {
   final svc = AIService();
@@ -90,7 +90,7 @@ final _aiServiceProvider = Provider<AIService>((ref) {
   return svc;
 });
 
-// ── Screen ────────────────────────────────────────────────────────────────────
+// â”€â”€ Screen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class LegalAdviceScreen extends ConsumerStatefulWidget {
   const LegalAdviceScreen({super.key});
@@ -185,11 +185,11 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── Disclaimer ─────────────────────────────
+              // â”€â”€ Disclaimer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
               _DisclaimerBanner(),
               const SizedBox(height: 20),
 
-              // ── Section label ───────────────────────────
+              // â”€â”€ Section label â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
               _SectionLabel(
                 _selected == null
                     ? 'SELECT A QUESTION'
@@ -197,7 +197,7 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
               ),
               const SizedBox(height: 12),
 
-              // ── Question list OR selected chip ──────────
+              // â”€â”€ Question list OR selected chip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
               if (_selected == null) ...[
                 ListView.separated(
                   shrinkWrap: true,
@@ -249,7 +249,7 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                // ── Input field ───────────────────────────
+                // â”€â”€ Input field â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                 _SectionLabel('YOUR DETAILS'),
                 const SizedBox(height: 10),
                 TextField(
@@ -279,7 +279,7 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // ── Submit button ─────────────────────────
+                // â”€â”€ Submit button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
                 SizedBox(
                   width: double.infinity,
                   height: 50,
@@ -309,7 +309,7 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
                 ),
               ],
 
-              // ── Error ───────────────────────────────────
+              // â”€â”€ Error â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
               if (_error != null) ...[
                 const SizedBox(height: 20),
                 Container(
@@ -343,7 +343,7 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
                 ),
               ],
 
-              // ── Result ──────────────────────────────────
+              // â”€â”€ Result â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
               if (_result != null) ...[
                 const SizedBox(height: 24),
                 Text(
@@ -381,7 +381,7 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
   }
 }
 
-// ── Question Tile ─────────────────────────────────────────────────────────────
+// â”€â”€ Question Tile â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _QuestionTile extends StatelessWidget {
   final _QTemplate template;
@@ -435,7 +435,7 @@ class _QuestionTile extends StatelessWidget {
   }
 }
 
-// ── Result Card ───────────────────────────────────────────────────────────────
+// â”€â”€ Result Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _ResultCard extends StatelessWidget {
   final Map<String, dynamic> result;
@@ -630,7 +630,7 @@ class _ResultCard extends StatelessWidget {
   }
 }
 
-// ── Info Block ────────────────────────────────────────────────────────────────
+// â”€â”€ Info Block â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _InfoBlock extends StatelessWidget {
   final IconData icon;
@@ -675,10 +675,10 @@ class _InfoBlock extends StatelessWidget {
   }
 }
 
-// ── Confidence Bar ────────────────────────────────────────────────────────────
+// â”€â”€ Confidence Bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _ConfidenceBar extends StatelessWidget {
-  final int score; // 0–100
+  final int score; // 0â€“100
 
   const _ConfidenceBar({required this.score});
 
@@ -735,7 +735,7 @@ class _ConfidenceBar extends StatelessWidget {
   }
 }
 
-// ── Section Label ─────────────────────────────────────────────────────────────
+// â”€â”€ Section Label â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _SectionLabel extends StatelessWidget {
   final String title;
@@ -761,7 +761,7 @@ class _SectionLabel extends StatelessWidget {
   }
 }
 
-// ── Disclaimer Banner ─────────────────────────────────────────────────────────
+// â”€â”€ Disclaimer Banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _DisclaimerBanner extends StatelessWidget {
   const _DisclaimerBanner();

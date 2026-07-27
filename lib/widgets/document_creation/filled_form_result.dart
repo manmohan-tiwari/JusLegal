@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../core/constants/app_colors.dart';
+import '../../core/config/theme_config.dart';
 import '../../models/form_template_model.dart';
 
 class FilledFormResult extends StatefulWidget {

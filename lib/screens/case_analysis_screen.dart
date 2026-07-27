@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../core/constants/app_colors.dart';
+import '../core/config/theme_config.dart';
 import '../services/ai_service.dart';
 
-// ── Provider ──────────────────────────────────────────────────────────────────
+// â”€â”€ Provider â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 final _aiServiceProvider = Provider<AIService>((ref) {
   final svc = AIService();
@@ -11,7 +11,7 @@ final _aiServiceProvider = Provider<AIService>((ref) {
   return svc;
 });
 
-// ── Case type suggestions ─────────────────────────────────────────────────────
+// â”€â”€ Case type suggestions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const List<String> _caseTypeSuggestions = [
   'Consumer dispute',
@@ -26,7 +26,7 @@ const List<String> _caseTypeSuggestions = [
   'Cyber fraud',
 ];
 
-// ── Screen ────────────────────────────────────────────────────────────────────
+// â”€â”€ Screen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class CaseAnalysisScreen extends ConsumerStatefulWidget {
   const CaseAnalysisScreen({super.key});
@@ -147,11 +147,11 @@ Provide a thorough legal analysis covering all the above points.
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── Disclaimer ──────────────────────────────
+              // â”€â”€ Disclaimer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
               _DisclaimerBanner(),
               const SizedBox(height: 20),
 
-              // ── Input section ───────────────────────────
+              // â”€â”€ Input section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
               if (_result == null) ...[
                 _SectionLabel('DESCRIBE YOUR CASE'),
                 const SizedBox(height: 12),
@@ -166,7 +166,7 @@ Provide a thorough legal analysis covering all the above points.
                             onTap: () {
                               final current = _caseController.text;
                               if (current.isEmpty) {
-                                _caseController.text = '$s — ';
+                                _caseController.text = '$s â€” ';
                               } else if (!current.contains(s)) {
                                 _caseController.text = '$current, $s';
                               }
@@ -242,13 +242,13 @@ Provide a thorough legal analysis covering all the above points.
                 ),
               ],
 
-              // ── Error ───────────────────────────────────
+              // â”€â”€ Error â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
               if (_error != null) ...[
                 const SizedBox(height: 20),
                 _ErrorCard(onRetry: _analyze),
               ],
 
-              // ── Result ──────────────────────────────────
+              // â”€â”€ Result â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
               if (_result != null) ...[
                 // Show original case description collapsed
                 _OriginalCaseCard(text: _caseController.text.trim()),
@@ -284,7 +284,7 @@ Provide a thorough legal analysis covering all the above points.
   }
 }
 
-// ── Original Case Card ────────────────────────────────────────────────────────
+// â”€â”€ Original Case Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _OriginalCaseCard extends StatefulWidget {
   final String text;
@@ -351,7 +351,7 @@ class _OriginalCaseCardState extends State<_OriginalCaseCard> {
   }
 }
 
-// ── Case Analysis Result ──────────────────────────────────────────────────────
+// â”€â”€ Case Analysis Result â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _CaseAnalysisResult extends StatelessWidget {
   final Map<String, dynamic> result;
@@ -386,7 +386,7 @@ class _CaseAnalysisResult extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ── Confidence + Strength ─────────────────────────
+        // â”€â”€ Confidence + Strength â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         if (confidence != null || strength.isNotEmpty)
           _InfoBlock(
             icon: Icons.bar_chart_rounded,
@@ -410,7 +410,7 @@ class _CaseAnalysisResult extends StatelessWidget {
           ),
         if (confidence != null || strength.isNotEmpty) const SizedBox(height: 12),
 
-        // ── Summary ───────────────────────────────────────
+        // â”€â”€ Summary â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         if (summary.isNotEmpty) ...[
           _InfoBlock(
             icon: Icons.summarize_outlined,
@@ -422,7 +422,7 @@ class _CaseAnalysisResult extends StatelessWidget {
           const SizedBox(height: 12),
         ],
 
-        // ── Strengths (Rights) ────────────────────────────
+        // â”€â”€ Strengths (Rights) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         if (rights.isNotEmpty) ...[
           _InfoBlock(
             icon: Icons.thumb_up_outlined,
@@ -442,7 +442,7 @@ class _CaseAnalysisResult extends StatelessWidget {
           const SizedBox(height: 12),
         ],
 
-        // ── Risk Factors (Weaknesses) ─────────────────────
+        // â”€â”€ Risk Factors (Weaknesses) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         if (riskFactors.isNotEmpty) ...[
           _InfoBlock(
             icon: Icons.warning_amber_outlined,
@@ -462,7 +462,7 @@ class _CaseAnalysisResult extends StatelessWidget {
           const SizedBox(height: 12),
         ],
 
-        // ── Legal Analysis ────────────────────────────────
+        // â”€â”€ Legal Analysis â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         if (analysis.isNotEmpty) ...[
           _InfoBlock(
             icon: Icons.balance_outlined,
@@ -474,7 +474,7 @@ class _CaseAnalysisResult extends StatelessWidget {
           const SizedBox(height: 12),
         ],
 
-        // ── Next Steps ────────────────────────────────────
+        // â”€â”€ Next Steps â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         if (steps.isNotEmpty) ...[
           _InfoBlock(
             icon: Icons.checklist_rounded,
@@ -523,7 +523,7 @@ class _CaseAnalysisResult extends StatelessWidget {
           const SizedBox(height: 12),
         ],
 
-        // ── Estimated Outcome ─────────────────────────────
+        // â”€â”€ Estimated Outcome â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         if (estimatedOutcome.isNotEmpty) ...[
           _InfoBlock(
             icon: Icons.flag_outlined,
@@ -535,7 +535,7 @@ class _CaseAnalysisResult extends StatelessWidget {
           const SizedBox(height: 12),
         ],
 
-        // ── Relevant Laws ─────────────────────────────────
+        // â”€â”€ Relevant Laws â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         if (laws is List && laws.isNotEmpty) ...[
           _InfoBlock(
             icon: Icons.menu_book_outlined,
@@ -570,7 +570,7 @@ class _CaseAnalysisResult extends StatelessWidget {
           const SizedBox(height: 12),
         ],
 
-        // ── Documents Required ────────────────────────────
+        // â”€â”€ Documents Required â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         if (docsRequired.isNotEmpty) ...[
           _InfoBlock(
             icon: Icons.folder_outlined,
@@ -589,7 +589,7 @@ class _CaseAnalysisResult extends StatelessWidget {
           const SizedBox(height: 12),
         ],
 
-        // ── Disclaimer ────────────────────────────────────
+        // â”€â”€ Disclaimer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
@@ -617,7 +617,7 @@ class _CaseAnalysisResult extends StatelessWidget {
   }
 }
 
-// ── Strength Badge ────────────────────────────────────────────────────────────
+// â”€â”€ Strength Badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _StrengthBadge extends StatelessWidget {
   final String strength;
@@ -661,7 +661,7 @@ class _StrengthBadge extends StatelessWidget {
   }
 }
 
-// ── Bullet Row ────────────────────────────────────────────────────────────────
+// â”€â”€ Bullet Row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _BulletRow extends StatelessWidget {
   final String text;
@@ -691,7 +691,7 @@ class _BulletRow extends StatelessWidget {
   }
 }
 
-// ── Confidence Bar ────────────────────────────────────────────────────────────
+// â”€â”€ Confidence Bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _ConfidenceBar extends StatelessWidget {
   final int score;
@@ -751,7 +751,7 @@ class _ConfidenceBar extends StatelessWidget {
   }
 }
 
-// ── Info Block ────────────────────────────────────────────────────────────────
+// â”€â”€ Info Block â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _InfoBlock extends StatelessWidget {
   final IconData icon;
@@ -802,7 +802,7 @@ class _InfoBlock extends StatelessWidget {
   }
 }
 
-// ── Error Card ────────────────────────────────────────────────────────────────
+// â”€â”€ Error Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _ErrorCard extends StatelessWidget {
   final VoidCallback onRetry;
@@ -837,7 +837,7 @@ class _ErrorCard extends StatelessWidget {
   }
 }
 
-// ── Suggestion Chip ───────────────────────────────────────────────────────────
+// â”€â”€ Suggestion Chip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _SuggestionChip extends StatelessWidget {
   final String label;
@@ -869,7 +869,7 @@ class _SuggestionChip extends StatelessWidget {
   }
 }
 
-// ── Section Label ─────────────────────────────────────────────────────────────
+// â”€â”€ Section Label â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _SectionLabel extends StatelessWidget {
   final String title;
@@ -894,7 +894,7 @@ class _SectionLabel extends StatelessWidget {
   }
 }
 
-// ── Disclaimer Banner ─────────────────────────────────────────────────────────
+// â”€â”€ Disclaimer Banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _DisclaimerBanner extends StatelessWidget {
   const _DisclaimerBanner();

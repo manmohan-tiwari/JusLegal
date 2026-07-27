@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import '../core/theme/app_theme.dart';
+﻿import 'package:flutter/material.dart';
+import '../core/config/theme_config.dart';
 
 class LoadingWidget extends StatefulWidget {
   final String? message;
@@ -256,3 +256,4 @@ class _PulsingLoadingWidgetState extends State<PulsingLoadingWidget>
     );
   }
 }
+

@@ -1,16 +1,16 @@
-import 'package:firebase_auth/firebase_auth.dart';
+﻿import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/constants/app_config.dart';
 import '../core/constants/app_strings.dart';
-import '../core/constants/app_colors.dart';
+import '../core/config/theme_config.dart';
 
 
 class SettingsScreen extends StatefulWidget {
@@ -337,3 +337,4 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 }
+

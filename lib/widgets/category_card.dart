@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
-import '../core/theme/app_theme.dart';
+﻿import 'package:flutter/material.dart';
+import '../core/constants/app_animations.dart';
+import '../core/config/theme_config.dart';
 
 class CategoryCard extends StatelessWidget {
   final IconData icon;
@@ -19,61 +20,76 @@ class CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    return Material(
-      color: AppTheme.background.withValues(alpha: 0),
-      borderRadius: BorderRadius.circular(8),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppTheme.background,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AppTheme.border, width: 1),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: iconColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Icon(
-                  icon,
-                  size: 24,
-                  color: iconColor,
-                ),
+    final radius = BorderRadius.circular(18);
+    return AppAnimations.pressScale(
+      onTap: onTap,
+      borderRadius: radius,
+      splashColor: iconColor.withValues(alpha: 0.14),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: AppTheme.cardGradientFor(iconColor),
+          borderRadius: radius,
+          border: Border.all(color: Colors.white.withValues(alpha: 0.88)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.13),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                color: iconColor.withValues(alpha: 0.14),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: iconColor.withValues(alpha: 0.22),
+                    blurRadius: 12,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
               ),
-              const SizedBox(height: 12),
-              Text(
-                title,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: AppTheme.darkText,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
+              child: Icon(
+                icon,
+                size: 30,
+                color: iconColor,
               ),
-              const SizedBox(height: 6),
-              Text(
-                subtitle,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: AppTheme.mediumText,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
-                ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: AppTheme.darkText,
+                fontSize: 15,
+                fontWeight: FontWeight.w800,
               ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              subtitle,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: AppTheme.mediumText,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                height: 1.35,
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
+

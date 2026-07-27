@@ -12,13 +12,13 @@ JusLegal is an AI-powered consumer legal assistant for Indian citizens, providin
 
 - **Structured Case Intake** - Collects incident category, date, disputed amount, involved party, reference number, and summary
 - **Supporting Document Attachment** - Attachment support for files (jpg, jpeg, png, pdf, doc, docx) using filepicker
-- **AI-Powered Legal Analysis** - Multi-service AI backend with Gemini, Groq, and OpenRouter using consolidated prompting
+- **AI-Powered Legal Analysis** - OpenRouter with Groq fallback, securely proxied through a Cloudflare Worker
 - **Consumer Law Focus** - Specialized for Indian consumer protection laws and regulations
 - **Step-by-Step Guidance** - Clear action steps for resolving legal issues
 - **Authority Directory** - Contact information for relevant regulatory bodies
 - **Professional Document Generation** - Generate complaint letters and legal documents using advanced LLMs
 - **Case Management** - Save and track your legal cases
-- **Cross-Platform** - Works on Android, iOS, and Web
+- **Cross-Platform** - Works on Android and Web
 - **Trust & Verification System** - Legal expert verification badges and transparent AI sourcing
 - **Real User Testimonials** - Social proof with actual case outcomes and success stories
 - **Streaming AI Responses** - Real-time analysis with better user experience
@@ -51,14 +51,11 @@ JusLegal addresses the fundamental trust issues in AI legal assistance through:
 - `firebase_crashlytics` - Error reporting
 - `file_picker` - Document upload integration
 
-## Proxy Setup
+## AI service setup
 
-This repository does not include worker proxy code. If you use a proxy endpoint for secure API calls, configure it separately in your deployment environment.
-
-**AI Services (Priority Order):**
-1. Gemini 2.0 Flash - Direct integration for legal analysis
-2. Groq - Fast fallback for analysis and letter generation
-3. OpenRouter - High-quality reasoning models as final fallback
+The app calls a Cloudflare Worker, which invokes OpenRouter first and Groq as
+a fallback. This works on Android and web without exposing provider credentials
+to the Flutter client.
 
 ## Prerequisites
 
@@ -82,17 +79,9 @@ Before setting up JusLegal, ensure you have:
    flutter pub get
    ```
 
-3. **Set up environment variables:**
-   - For production builds, manage API keys securely through your deployment environment.
-   - For local debug builds, pass direct provider keys with `--dart-define` instead of bundling a `.env` file.
-   - Example:
-     ```bash
-      flutter run \
-        --dart-define=JUSLEGAL_USE_AI_PROXY=false \
-        --dart-define=GEMINI_API_KEY=your_gemini_key \
-        --dart-define=GROQ_API_KEY=your_groq_key \
-        --dart-define=OPENROUTER_API_KEY=your_openrouter_key
-     ```
+3. **Configure Cloudflare Worker secrets:**
+    - Follow the server-side secret setup in [AI API security and deployment](#ai-api-security-and-deployment).
+    - Do not pass AI provider credentials to Flutter through `.env` or `--dart-define`.
 
 4. **Set up Firebase (optional):**
    - Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
@@ -153,24 +142,10 @@ Widget build(BuildContext context, WidgetRef ref) {
 
 ## Configuration
 
-### Environment Variables Setup
+### Server-side AI configuration
 
-API keys are not bundled into release builds. Production should use secure secret management, and direct keys are only for local debug runs:
-
-| Variable | Description | Required | Source |
-|----------|-------------|----------|--------|
-| `GEMINI_API_KEY` | Google Gemini API key for local debug runs | Debug only | [Google AI Studio](https://developers.generativeai.google.dev/gemini/docs/get-api-key) |
-| `GROQ_API_KEY` | Groq API key for local debug runs | Debug only | [Groq Console](https://console.groq.com) |
-| `OPENROUTER_API_KEY` | OpenRouter API key for local debug runs | Debug only | [OpenRouter](https://openrouter.ai) |
-
-**Setup Instructions:**
-```bash
-# Production:
-flutter build apk --dart-define=JUSLEGAL_AI_PROXY_BASE_URL=https://your-proxy.example.com
-
-# Local debug with direct vendor APIs:
-flutter run --dart-define=JUSLEGAL_USE_AI_PROXY=false --dart-define=GEMINI_API_KEY=your_key_here
-```
+Provider secrets are configured in the Cloudflare Worker and are never passed
+to the Flutter build. See the secret setup commands in the security section below.
 
 ### Firebase Setup (Optional)
 
@@ -218,11 +193,9 @@ juslegal/
 │   │   └── settings_screen.dart
 │   ├── services/             # Business logic services
 │   │   ├── ai_service.dart         # Orchestrates all AI services
-│   │   ├── gemini_service.dart     # Gemini integration
-│   │   ├── groq_service.dart       # Groq API integration
-│   │   ├── openrouter_service.dart # OpenRouter integration
+│   │   ├── groq_service.dart       # Groq Worker integration
+│   │   ├── openrouter_service.dart # OpenRouter Worker integration
 │   │   ├── lkb_service.dart        # Legal knowledge base
-│   │   ├── real_ai_service.dart    # Real AI implementation
 │   │   ├── legal_compliance_service.dart # Legal validation
 │   │   └── storage_service.dart    # Local database storage
 │   └── widgets/              # Reusable UI components
@@ -233,6 +206,24 @@ juslegal/
 ├── .env.example             # Environment variables template
 └── pubspec.yaml            # Dependencies and metadata
 ```
+
+## AI API security and deployment
+
+OpenRouter and Groq calls are made only by the Cloudflare Worker. The Flutter
+client contains no AI provider credentials; the Worker handles web CORS.
+
+Before the first deploy, set the server-side secrets from a trusted terminal:
+
+```bash
+cd juslegal-ai-proxy
+wrangler secret put OPENROUTER_API_KEY
+wrangler secret put GROQ_API_KEY
+wrangler deploy
+```
+
+Any former client-side provider credentials should be revoked and replaced.
+Never add provider keys, `.env` files, or service account JSON files to this
+repository.
 
 ## Contributing
 
@@ -276,9 +267,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Support:** [coming soon]  
 
 **Special Thanks:**
-- Google Gemini for advanced AI analysis capabilities
-- Groq for providing fast LLM inference
-- OpenRouter for providing high-quality reasoning models
+- OpenRouter (primary) and Groq (fallback), via the secure Cloudflare Worker proxy
 - Flutter community for the excellent framework
 - All contributors who help improve this project
 

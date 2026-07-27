@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import '../core/theme/app_theme.dart';
+﻿import 'package:flutter/material.dart';
+import '../core/config/theme_config.dart';
 
 class VerifiedBadge extends StatelessWidget {
   const VerifiedBadge({super.key});
@@ -23,3 +23,4 @@ class VerifiedBadge extends StatelessWidget {
     );
   }
 }
+

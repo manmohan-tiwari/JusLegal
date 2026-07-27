@@ -8,13 +8,26 @@ class RateLimitException implements Exception {
   String toString() => 'RateLimitException: $message (Provider: $providerName)';
 }
 
+/// Retained for UI error mapping. Credentials are server-side only.
 class ApiKeyException implements Exception {
   final String providerName;
 
   ApiKeyException(this.providerName);
 
   @override
-  String toString() => 'ApiKeyException: Invalid or missing API key for $providerName';
+  String toString() =>
+      'ApiKeyException: Invalid or missing server configuration for $providerName';
+}
+
+class AllProvidersFailedException implements Exception {
+  final String openRouterError;
+  final String groqError;
+
+  AllProvidersFailedException(this.openRouterError, this.groqError);
+
+  @override
+  String toString() =>
+      'AllProvidersFailedException: OpenRouter failed with "$openRouterError", Groq failed with "$groqError"';
 }
 
 class ParseException implements Exception {
@@ -24,16 +37,6 @@ class ParseException implements Exception {
 
   @override
   String toString() => 'ParseException: $message';
-}
-
-class AllProvidersFailedException implements Exception {
-  final String groqError;
-  final String openRouterError;
-
-  AllProvidersFailedException(this.groqError, this.openRouterError);
-
-  @override
-  String toString() => 'AllProvidersFailedException: Groq failed with "$groqError", OpenRouter failed with "$openRouterError"';
 }
 
 class NetworkException implements Exception {

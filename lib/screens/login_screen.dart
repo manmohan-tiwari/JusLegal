@@ -1,15 +1,16 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../core/constants/app_colors.dart';
+import '../core/config/theme_config.dart';
 import '../core/constants/app_config.dart';
-import '../providers/auth_provider.dart';
+import '../services/auth_handler.dart';
 import '../widgets/loading_widget.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -94,8 +95,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       await ref.read(authProvider.notifier).signInWithGoogle();
       if (!mounted) return;
       context.go('/home');
-    } catch (_) {
-      // Error is surfaced through provider state.
+    } catch (error) {
+      if (!mounted) return;
+      final message = ref.read(authProvider).error ?? error.toString();
+      setState(() {
+        _localError = message;
+      });
+      _showMessage(message);
     }
   }
 
@@ -117,13 +123,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       '+91$phoneText',
       (verificationId) {
         if (context.mounted) {
+          _showMessage('OTP sent successfully');
           context.push('/otp', extra: {
             'verificationId': verificationId,
             'phoneNumber': phoneText,
           });
         }
       },
-      (_) {},
+      (error) {
+        if (!mounted) return;
+        setState(() {
+          _localError = error;
+        });
+        _showMessage(error);
+      },
+      (_) {
+        if (context.mounted) {
+          _showMessage('Phone number verified successfully');
+          context.go('/home');
+        }
+      },
     );
   }
 
@@ -278,9 +297,10 @@ class _TopBrandLockup extends StatelessWidget {
             child: Container(
               color: Colors.white,
               padding: const EdgeInsets.all(12),
-              child: Image.asset(
-                AppConfig.appLogoAsset,
-                fit: BoxFit.contain,
+              child: const Icon(
+                Icons.balance_rounded,
+                color: AppColors.primaryNavy,
+                size: 42,
               ),
             ),
           ),
@@ -410,6 +430,10 @@ class _AuthCard extends StatelessWidget {
                       keyboardType: TextInputType.phone,
                       enabled: !isLoading,
                       maxLength: 10,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        LengthLimitingTextInputFormatter(10),
+                      ],
                       style: GoogleFonts.inter(
                         color: AppColors.textPrimary,
                         fontSize: 15,
@@ -934,3 +958,4 @@ class _LoadingMessage extends StatelessWidget {
     );
   }
 }
+

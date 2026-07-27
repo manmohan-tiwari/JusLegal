@@ -9,11 +9,13 @@ import '../../screens/email_auth_screen.dart';
 import '../../screens/home_screen.dart';
 import '../../screens/ai_legal_chat_screen.dart';
 import '../../screens/case_analysis_screen.dart';
+import '../../screens/document_creation_screen.dart';
+import '../../screens/document_review_screen.dart';
 import '../../screens/legal_advice_screen.dart';
 import '../../screens/legal_terms_screen.dart';
+import '../../screens/legal_writing_screen.dart';
 import '../../screens/login_screen.dart';
 import '../../screens/my_cases_screen.dart';
-import '../../screens/onboarding_screen.dart';
 import '../../screens/otp_screen.dart';
 import '../../screens/privacy_policy_screen.dart';
 import '../../screens/problem_analyzer_screen.dart';
@@ -23,7 +25,6 @@ import '../../screens/settings_screen.dart';
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
 class AppRouteNames {
-  static const String onboarding = 'onboarding';
   static const String login = 'login';
   static const String emailAuth = 'emailAuth';
   static const String otp = 'otp';
@@ -47,8 +48,7 @@ class AppRouteNames {
   static const String homeContractNegotiation = 'contractNegotiation';
 }
 
-
-GoRouter buildRouter({required bool seenOnboarding}) {
+GoRouter buildRouter() {
   return GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: '/',
@@ -63,10 +63,8 @@ GoRouter buildRouter({required bool seenOnboarding}) {
 
       // Handle root path redirect
       if (path == '/') {
-        if (user == null && seenOnboarding) {
+        if (user == null) {
           return '/login';
-        } else if (!seenOnboarding) {
-          return '/onboarding';
         } else {
           return '/home';
         }
@@ -79,11 +77,6 @@ GoRouter buildRouter({required bool seenOnboarding}) {
         path: '/privacy-policy',
         name: AppRouteNames.privacyPolicy,
         builder: (context, state) => const PrivacyPolicyScreen(),
-      ),
-      GoRoute(
-        path: '/onboarding',
-        name: AppRouteNames.onboarding,
-        builder: (context, state) => const OnboardingScreen(),
       ),
       GoRoute(
         path: '/login',
@@ -176,23 +169,23 @@ GoRouter buildRouter({required bool seenOnboarding}) {
           GoRoute(
             path: 'legal-writing',
             name: AppRouteNames.homeLegalWriting,
-            builder: (context, state) => const AILegalChatScreen(
-              userName: 'there',
-            ),
+            builder: (context, state) => const LegalWritingScreen(),
           ),
           GoRoute(
             path: 'document-creation',
             name: AppRouteNames.homeDocumentCreation,
-            builder: (context, state) => const AILegalChatScreen(
-              userName: 'there',
-            ),
+            builder: (context, state) => const DocumentCreationScreen(),
+          ),
+          GoRoute(
+            path: 'document-review',
+            name: AppRouteNames.homeDocumentReview,
+            builder: (context, state) => const DocumentReviewScreen(),
           ),
           GoRoute(
             path: 'contract-negotiation',
             name: AppRouteNames.homeContractNegotiation,
-            builder: (context, state) => const AILegalChatScreen(
-              userName: 'there',
-            ),
+            // Contract review is handled by the document-review workflow.
+            builder: (context, state) => const DocumentReviewScreen(),
           ),
         ],
       ),

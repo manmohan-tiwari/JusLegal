@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../core/theme/app_theme.dart';
+import '../core/config/theme_config.dart';
 
 class LegalDisclaimerBanner extends StatelessWidget {
   final EdgeInsetsGeometry? margin;
@@ -76,3 +76,4 @@ class LegalDisclaimer extends LegalDisclaimerBanner {
     super.padding,
   });
 }
+

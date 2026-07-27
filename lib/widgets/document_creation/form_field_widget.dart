@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../core/constants/app_colors.dart';
+import '../../core/config/theme_config.dart';
 import '../../models/form_field_model.dart';
 
 class FormFieldWidget extends StatelessWidget {
@@ -101,7 +101,7 @@ class FormFieldWidget extends StatelessWidget {
 
   Widget _buildDropdown(BuildContext context) {
     return DropdownButtonFormField<String>(
-      value: value.isEmpty ? null : value,
+      initialValue: value.isEmpty ? null : value,
       hint: Text(field.hint.isEmpty ? 'Select ${field.label}' : field.hint,
           style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
       items: field.options
@@ -172,3 +172,4 @@ class FormFieldWidget extends StatelessWidget {
     return [];
   }
 }
+

@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
+import '../core/config/theme_config.dart';
 
 class ComplaintButton extends StatelessWidget {
   final String label;
@@ -19,8 +20,23 @@ class ComplaintButton extends StatelessWidget {
       height: 52,
       child: ElevatedButton(
         onPressed: enabled ? onPressed : null,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.legalGold,
+          foregroundColor: AppColors.white,
+          elevation: 8,
+          shadowColor: AppColors.shadowGold,
+          minimumSize: const Size(48, 52),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(26),
+          ),
+          textStyle: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
         child: Text(label),
       ),
     );
   }
 }
+

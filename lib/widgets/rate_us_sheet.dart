@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../providers/rate_us_provider.dart';
-import '../core/theme/app_theme.dart';
+import '../core/config/theme_config.dart';
 
 class RateUsSheet extends ConsumerStatefulWidget {
   const RateUsSheet({super.key});
@@ -267,3 +267,4 @@ class _RateUsSheetState extends ConsumerState<RateUsSheet> {
     );
   }
 }
+

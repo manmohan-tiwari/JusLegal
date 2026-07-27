@@ -6,7 +6,6 @@ class AppConfig {
 
   // App Information
   static String get appName => 'JusLegal';
-  static String get appLogoAsset => 'assets/icon/juslegal icon.png';
   static String get appVersion => '1.0.0';
   static String get appBuildNumber => '1';
   static String get supportEmail => 'support@juslegal.app';

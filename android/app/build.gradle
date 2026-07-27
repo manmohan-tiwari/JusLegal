@@ -42,7 +42,9 @@ android {
 
     defaultConfig {
         applicationId "com.juslegal.app"
+        // Flutter currently resolves this to API 24, which supports multidex natively.
         minSdkVersion flutter.minSdkVersion
+        multiDexEnabled = true
         targetSdkVersion 36
         versionCode 1
         versionName "1.0.0"

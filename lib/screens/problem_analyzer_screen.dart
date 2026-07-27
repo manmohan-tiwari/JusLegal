@@ -1,10 +1,10 @@
-import 'package:file_picker/file_picker.dart';
+﻿import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../core/theme/app_theme.dart';
+import '../core/config/theme_config.dart';
 import '../core/constants/categories.dart';
 import '../models/problem_model.dart';
 import '../widgets/empty_state_widget.dart';
@@ -256,7 +256,7 @@ Summary: $summaryText
     Widget content = const SizedBox.shrink();
 
     if (_currentStep == 0) {
-      stepLabel = 'Step 0 — Choose Category';
+      stepLabel = 'Step 0 â€” Choose Category';
       content = _categories.isEmpty
           ? const EmptyStateWidget(
               icon: Icons.search_off_outlined,
@@ -305,7 +305,7 @@ Summary: $summaryText
         },
       );
     } else if (_currentStep == 1) {
-      stepLabel = 'Step 1 of 3 — Issue Details';
+      stepLabel = 'Step 1 of 3 â€” Issue Details';
       content = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -368,7 +368,7 @@ Summary: $summaryText
         ],
       );
     } else if (_currentStep == 2) {
-      stepLabel = 'Step 2 of 3 — Additional Information';
+      stepLabel = 'Step 2 of 3 â€” Additional Information';
       content = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -399,7 +399,7 @@ Summary: $summaryText
                           : null,
                   decoration: const InputDecoration(
                     labelText: 'Amount',
-                    hintText: 'e.g. ₹5000',
+                    hintText: 'e.g. â‚¹5000',
                   ),
                   keyboardType: TextInputType.number,
                 ),
@@ -435,7 +435,7 @@ Summary: $summaryText
         ],
       );
     } else if (_currentStep == 3) {
-      stepLabel = 'Step 3 of 3 — Summary & Evidence';
+      stepLabel = 'Step 3 of 3 â€” Summary & Evidence';
       content = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -478,7 +478,7 @@ Summary: $summaryText
             child: Column(
               children: [
                 const Icon(Icons.cloud_upload_outlined,
-                    color: const Color(0xFF0052CC), size: 32),
+                    color: Color(0xFF0052CC), size: 32),
                 const SizedBox(height: 8),
                 TextButton(
                   onPressed: () async {
@@ -542,8 +542,7 @@ Summary: $summaryText
                               color: Color(0xFF6B7280),
                               fontSize: 12,
                               fontWeight: FontWeight.w400,
-                            )
-                                ?.copyWith(color: const Color(0xFF1F2937)),
+                            ).copyWith(color: const Color(0xFF1F2937)),
                           ),
                           Text(
                             '${(file.size / 1024).toStringAsFixed(1)} KB',
@@ -551,8 +550,7 @@ Summary: $summaryText
                               color: Color(0xFF6B7280),
                               fontSize: 12,
                               fontWeight: FontWeight.w400,
-                            )
-                                ?.copyWith(color: const Color(0xFF6B7280)),
+                            ).copyWith(color: const Color(0xFF6B7280)),
                           ),
                         ],
                       ),
@@ -716,3 +714,4 @@ Summary: $summaryText
     );
   }
 }
+

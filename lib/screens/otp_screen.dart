@@ -1,10 +1,11 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../providers/auth_provider.dart';
+import '../services/auth_handler.dart';
 import '../widgets/loading_widget.dart';
 
 class OtpScreen extends ConsumerStatefulWidget {
@@ -81,6 +82,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   Future<void> _verifyOtp() async {
     final otpText = _otp;
     if (otpText.length != 6) {
+      _isAutoSubmitted = false;
       setState(() {
         _localError = "Please enter all 6 digits of the OTP";
       });
@@ -96,12 +98,21 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
             widget.verificationId,
             otpText,
           );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Phone number verified successfully')),
+      );
       goRouter.go('/home');
-    } catch (_) {
-      // Auth provider handles errors in state, but reset auto submit flag in case of retry
+    } catch (error) {
+      if (!mounted) return;
+      final message = ref.read(authProvider).error ?? error.toString();
       setState(() {
         _isAutoSubmitted = false;
+        _localError = message;
       });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
     }
   }
 
@@ -133,6 +144,17 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
           setState(() {
             _localError = error;
           });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(error)),
+          );
+        }
+      },
+      (_) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Phone number verified successfully')),
+          );
+          context.go('/home');
         }
       },
     );
@@ -174,10 +196,10 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                   Text(
                     "OTP sent to +91 ${widget.phoneNumber.replaceFirst('+91', '').trim()}",
                     style: const TextStyle(
-                          color: Color(0xFF6B7280),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                        ),
+                      color: Color(0xFF6B7280),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
                   const SizedBox(height: 32),
 
@@ -197,6 +219,10 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                                 textAlign: TextAlign.center,
                                 maxLength: 1,
                                 enabled: !isLoading,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                  LengthLimitingTextInputFormatter(1),
+                                ],
                                 style: GoogleFonts.inter(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
@@ -251,19 +277,19 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                       Text(
                         "Didn't receive OTP? ",
                         style: const TextStyle(
-                              color: Color(0xFF6B7280),
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                            ),
+                          color: Color(0xFF6B7280),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
                       _secondsRemaining > 0
                           ? Text(
                               "Resend in 0:${_secondsRemaining.toString().padLeft(2, '0')}",
                               style: const TextStyle(
-                                  color: Color(0xFF6B7280),
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                                color: Color(0xFF6B7280),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
                             )
                           : TextButton(
                               onPressed: isLoading ? null : _resendOtp,
@@ -342,3 +368,4 @@ class LoadingMessageWidget extends StatelessWidget {
     );
   }
 }
+

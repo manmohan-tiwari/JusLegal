@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import '../core/theme/app_theme.dart';
+﻿import 'package:flutter/material.dart';
+import '../core/config/theme_config.dart';
 
 class UserTestimonial extends StatelessWidget {
   final String userName;
@@ -216,3 +216,4 @@ class UserTestimonial extends StatelessWidget {
     );
   }
 }
+

@@ -6,9 +6,95 @@ import '../services/ai_service.dart';
 import '../core/exceptions/ai_exceptions.dart';
 import '../core/services/analytics_service.dart';
 import '../core/constants/app_strings.dart';
+import '../models/chat_message_model.dart';
 
 // Provider for AIService instance
 final aiServiceProvider = Provider<AIService>((ref) => AIService());
+
+class ChatState {
+  final List<ChatMessage> conversationHistory;
+  final bool isSending;
+  final String? error;
+
+  const ChatState({
+    this.conversationHistory = const [],
+    this.isSending = false,
+    this.error,
+  });
+
+  ChatState copyWith({
+    List<ChatMessage>? conversationHistory,
+    bool? isSending,
+    String? error,
+    bool clearError = false,
+  }) =>
+      ChatState(
+        conversationHistory: conversationHistory ?? this.conversationHistory,
+        isSending: isSending ?? this.isSending,
+        error: clearError ? null : error ?? this.error,
+      );
+}
+
+/// In-memory conversation state. It intentionally resets when the app closes.
+class ChatNotifier extends Notifier<ChatState> {
+  @override
+  ChatState build() => const ChatState();
+
+  List<ChatMessage> getHistory() => state.conversationHistory;
+
+  void addMessage(String role, String content) {
+    final trimmedContent = content.trim();
+    if (trimmedContent.isEmpty) return;
+    state = state.copyWith(
+      conversationHistory: List.unmodifiable([
+        ...state.conversationHistory,
+        ChatMessage(
+          role: role,
+          content: trimmedContent,
+          timestamp: DateTime.now(),
+        ),
+      ]),
+      clearError: true,
+    );
+  }
+
+  Future<void> sendUserMessage(String userMessage) async {
+    final trimmedMessage = userMessage.trim();
+    if (trimmedMessage.isEmpty || state.isSending) return;
+
+    addMessage('user', trimmedMessage);
+    state = state.copyWith(isSending: true, clearError: true);
+    final messagesForApi = state.conversationHistory
+        .map((message) => message.toMap())
+        .toList(growable: false);
+
+    try {
+      final response = await ref
+          .read(aiServiceProvider)
+          .sendMessage(trimmedMessage, messagesForApi);
+      addMessage('assistant', response);
+      state = state.copyWith(isSending: false, clearError: true);
+    } catch (error) {
+      state = state.copyWith(isSending: false, error: _friendlyError(error));
+      rethrow;
+    }
+  }
+
+  void clearHistory() => state = const ChatState();
+
+  String _friendlyError(Object error) {
+    if (error is AllProvidersFailedException) {
+      return 'AI services are unavailable. Please try again shortly.';
+    }
+    if (error is NetworkException) {
+      return 'Could not reach the AI service. Check your connection and try again.';
+    }
+    return 'Could not get an AI response. Please try again.';
+  }
+}
+
+final chatProvider =
+    NotifierProvider<ChatNotifier, ChatState>(ChatNotifier.new);
 
 // Analysis state
 class AnalysisState {
@@ -50,7 +136,8 @@ class AnalysisNotifier extends AsyncNotifier<AnalysisState> {
 
       if (kDebugMode) {
         print('[AnalysisNotifier] Starting analysis');
-        print('[AnalysisNotifier] category="${problem.category}" problemLength=${problem.summary.trim().length}');
+        print(
+            '[AnalysisNotifier] category="${problem.category}" problemLength=${problem.summary.trim().length}');
       }
 
       // Log analysis started event using SafeAnalytics
@@ -78,15 +165,18 @@ class AnalysisNotifier extends AsyncNotifier<AnalysisState> {
       );
 
       if (kDebugMode) {
-        print('[AnalysisNotifier] Raw AI response keys: ${analysisResult.keys.toList()}');
-        print('[AnalysisNotifier] Raw AI response preview: ${_debugPreview(analysisResult)}');
+        print(
+            '[AnalysisNotifier] Raw AI response keys: ${analysisResult.keys.toList()}');
+        print(
+            '[AnalysisNotifier] Raw AI response preview: ${_debugPreview(analysisResult)}');
       }
 
       // Convert Map to LegalResultModel
       final legalResult = _mapToLegalResultModel(analysisResult);
 
       if (kDebugMode) {
-        print('[AnalysisNotifier] Parsed LegalResultModel: ${_debugLegalResult(legalResult)}');
+        print(
+            '[AnalysisNotifier] Parsed LegalResultModel: ${_debugLegalResult(legalResult)}');
       }
 
       // Update both new and old providers
@@ -111,7 +201,7 @@ class AnalysisNotifier extends AsyncNotifier<AnalysisState> {
         print('[AnalysisNotifier] Analysis failed: $e');
         print('[AnalysisNotifier] StackTrace: $stackTrace');
       }
-      
+
       // Log analysis error event using SafeAnalytics
       await SafeAnalytics.logEvent(
         name: AppStrings.eventAnalysisError,
@@ -142,7 +232,8 @@ class AnalysisNotifier extends AsyncNotifier<AnalysisState> {
 
   LegalResultModel _mapToLegalResultModel(Map<String, dynamic> data) {
     if (kDebugMode) {
-      print('[AnalysisNotifier] Mapping AI payload with keys: ${data.keys.toList()}');
+      print(
+          '[AnalysisNotifier] Mapping AI payload with keys: ${data.keys.toList()}');
     }
 
     data = _normalizeAnalysisPayload(data);
@@ -175,13 +266,17 @@ class AnalysisNotifier extends AsyncNotifier<AnalysisState> {
       authorities: authorities,
       documentsRequired: _asStringList(data['documents_required']),
       physicalVisitRequired: _asBool(data['physical_visit_required']),
-      physicalVisitInstructions: _nullableString(data['physical_visit_instructions']),
+      physicalVisitInstructions:
+          _nullableString(data['physical_visit_instructions']),
       confidence: _asInt(data['confidence']),
       isVerified: _asBool(data['isVerified']),
       complaintHint: _asString(data['complaint_hint']),
       caseSummary: _nullableString(data['case_summary']),
-      legalPosition: data['legal_position'] != null ? _normalizeDynamicMap(data['legal_position']) : null,
-      strength: _asStrengthScore(data['strength'] ?? data['case_strength'] ?? data['confidence']),
+      legalPosition: data['legal_position'] != null
+          ? _normalizeDynamicMap(data['legal_position'])
+          : null,
+      strength: _asStrengthScore(
+          data['strength'] ?? data['case_strength'] ?? data['confidence']),
       legalAnalysis: _nullableString(data['legal_analysis']),
       relevantLaws: _asStringMapList(data['relevant_laws']),
       rightsAvailable: _asNullableStringList(data['rights_available']),
@@ -201,9 +296,11 @@ class AnalysisNotifier extends AsyncNotifier<AnalysisState> {
     );
   }
 
-  Map<String, dynamic> _normalizeAnalysisPayload(Map<String, dynamic> original) {
+  Map<String, dynamic> _normalizeAnalysisPayload(
+      Map<String, dynamic> original) {
     final data = Map<String, dynamic>.from(original);
-    final rawText = _firstString(data, ['analysis', 'response', 'text', 'content', 'raw', 'message']);
+    final rawText = _firstString(
+        data, ['analysis', 'response', 'text', 'content', 'raw', 'message']);
     if (rawText != null && rawText.trim().isNotEmpty) {
       data.addAll(_parseSectionsFromText(rawText));
     }
@@ -231,7 +328,8 @@ class AnalysisNotifier extends AsyncNotifier<AnalysisState> {
 
     if (data['evidence_checklist'] == null) {
       final available = data['evidenceAvailable'] ?? data['evidence_available'];
-      final recommended = data['evidenceRecommended'] ?? data['evidence_recommended'];
+      final recommended =
+          data['evidenceRecommended'] ?? data['evidence_recommended'];
       if (available != null || recommended != null) {
         data['evidence_checklist'] = {
           'available': available ?? <String>[],
@@ -241,14 +339,17 @@ class AnalysisNotifier extends AsyncNotifier<AnalysisState> {
     }
 
     data['case_summary'] = _sanitizeText(data['case_summary']);
-    data['legal_analysis'] = _sanitizeText(data['legal_analysis'] ?? data['law_summary']);
+    data['legal_analysis'] =
+        _sanitizeText(data['legal_analysis'] ?? data['law_summary']);
     data['applicable_law'] = _sanitizeText(data['applicable_law']);
-    data['law_summary'] = _sanitizeText(data['law_summary'] ?? data['legal_analysis']);
+    data['law_summary'] =
+        _sanitizeText(data['law_summary'] ?? data['legal_analysis']);
     data['user_rights'] = _sanitizeText(data['user_rights']);
     data['complaint_hint'] = _sanitizeText(data['complaint_hint']);
     data['estimated_outcome'] = _sanitizeText(data['estimated_outcome']);
     data['disclaimer'] = _sanitizeText(data['disclaimer']);
-    data['recommended_actions'] = _sanitizeList(data['recommended_actions'] ?? data['steps']);
+    data['recommended_actions'] =
+        _sanitizeList(data['recommended_actions'] ?? data['steps']);
     data['steps'] = _sanitizeList(data['steps'] ?? data['recommended_actions']);
     data['rights_available'] = _sanitizeList(data['rights_available']);
     data['risk_factors'] = _sanitizeList(data['risk_factors']);
@@ -257,24 +358,29 @@ class AnalysisNotifier extends AsyncNotifier<AnalysisState> {
     if (data['legal_position'] is! Map) {
       data['legal_position'] = {
         'standing': _sanitizeText(data['legal_position']),
-        'strength': _strengthLabel(_asStrengthScore(data['strength'] ?? data['confidence'])),
+        'strength': _strengthLabel(
+            _asStrengthScore(data['strength'] ?? data['confidence'])),
         'explanation': '',
       };
     } else {
       final legalPosition = _normalizeDynamicMap(data['legal_position']);
       legalPosition['standing'] = _sanitizeText(legalPosition['standing']);
       legalPosition['strength'] = _sanitizeText(legalPosition['strength']) ??
-          _strengthLabel(_asStrengthScore(data['strength'] ?? data['confidence']));
-      legalPosition['explanation'] = _sanitizeText(legalPosition['explanation']);
+          _strengthLabel(
+              _asStrengthScore(data['strength'] ?? data['confidence']));
+      legalPosition['explanation'] =
+          _sanitizeText(legalPosition['explanation']);
       data['legal_position'] = legalPosition;
     }
 
     data['strength'] = _asStrengthScore(data['strength'] ?? data['confidence']);
     data['relevant_laws'] = _sanitizeMapList(data['relevant_laws']);
-    data['authorities_detailed'] = _sanitizeAuthorityList(data['authorities_detailed'] ?? data['authorities']);
+    data['authorities_detailed'] = _sanitizeAuthorityList(
+        data['authorities_detailed'] ?? data['authorities']);
     data['authorities'] = _sanitizeAuthorityList(data['authorities']);
 
-    final evidence = _asEvidenceChecklist(data['evidence_checklist']) ?? <String, List<String>>{};
+    final evidence = _asEvidenceChecklist(data['evidence_checklist']) ??
+        <String, List<String>>{};
     data['evidence_checklist'] = {
       'available': _sanitizeList(evidence['available']) ?? <String>[],
       'recommended': _sanitizeList(evidence['recommended']) ?? <String>[],
@@ -352,7 +458,8 @@ class AnalysisNotifier extends AsyncNotifier<AnalysisState> {
     }
     flush();
 
-    if (result['evidence_available'] != null || result['evidence_recommended'] != null) {
+    if (result['evidence_available'] != null ||
+        result['evidence_recommended'] != null) {
       result['evidence_checklist'] = {
         'available': result.remove('evidence_available') ?? <String>[],
         'recommended': result.remove('evidence_recommended') ?? <String>[],
@@ -371,11 +478,13 @@ class AnalysisNotifier extends AsyncNotifier<AnalysisState> {
 
   String? _sanitizeText(dynamic value) {
     if (value == null) return null;
-    final text = value.toString()
+    final text = value
+        .toString()
         .replaceAll(RegExp(r'```(?:json)?|```'), '')
         .replaceAll(RegExp(r'\*\*|__|[*`#]'), '')
         .trim();
-    final withoutPrefix = text.replaceFirst(RegExp(r'^\s*(?:[-•]+|\d+(?:\.\d+)*[.)])\s*'), '');
+    final withoutPrefix =
+        text.replaceFirst(RegExp(r'^\s*(?:[-•]+|\d+(?:\.\d+)*[.)])\s*'), '');
     return withoutPrefix.replaceAll(RegExp(r'\s+'), ' ').trim().isEmpty
         ? null
         : withoutPrefix.replaceAll(RegExp(r'\s+'), ' ').trim();
@@ -383,7 +492,9 @@ class AnalysisNotifier extends AsyncNotifier<AnalysisState> {
 
   List<String>? _sanitizeList(dynamic value) {
     final items = _asStringList(value)
-        .expand((item) => item.contains('\n') ? _splitSanitizedLines(item) : [_sanitizeText(item)])
+        .expand((item) => item.contains('\n')
+            ? _splitSanitizedLines(item)
+            : [_sanitizeText(item)])
         .whereType<String>()
         .where((item) => item.isNotEmpty)
         .toList();
@@ -402,9 +513,13 @@ class AnalysisNotifier extends AsyncNotifier<AnalysisState> {
   List<Map<String, String>>? _sanitizeMapList(dynamic value) {
     final list = _asStringMapList(value);
     if (list == null) return null;
-    final sanitized = list.map((map) {
-      return map.map((key, entry) => MapEntry(key, _sanitizeText(entry) ?? ''));
-    }).where((map) => map.values.any((entry) => entry.isNotEmpty)).toList();
+    final sanitized = list
+        .map((map) {
+          return map
+              .map((key, entry) => MapEntry(key, _sanitizeText(entry) ?? ''));
+        })
+        .where((map) => map.values.any((entry) => entry.isNotEmpty))
+        .toList();
     return sanitized.isEmpty ? null : sanitized;
   }
 
@@ -412,11 +527,21 @@ class AnalysisNotifier extends AsyncNotifier<AnalysisState> {
     final list = _asStringMapList(value);
     if (list == null) return null;
     final sanitized = list.map((map) {
-      final name = _sanitizeText(map['name'] ?? map['authority'] ?? map['value']) ?? 'Authority';
-      final website = _sanitizeText(map['officialWebsite'] ?? map['official_website'] ?? map['website'] ?? map['contact']) ?? _defaultContactFor(name);
+      final name =
+          _sanitizeText(map['name'] ?? map['authority'] ?? map['value']) ??
+              'Authority';
+      final website = _sanitizeText(map['officialWebsite'] ??
+              map['official_website'] ??
+              map['website'] ??
+              map['contact']) ??
+          _defaultContactFor(name);
       return {
         'name': name,
-        'description': _sanitizeText(map['description'] ?? map['purpose'] ?? map['why_relevant'] ?? map['action']) ?? '',
+        'description': _sanitizeText(map['description'] ??
+                map['purpose'] ??
+                map['why_relevant'] ??
+                map['action']) ??
+            '',
         'official_website': website,
       };
     }).toList();
@@ -426,7 +551,9 @@ class AnalysisNotifier extends AsyncNotifier<AnalysisState> {
   int _asStrengthScore(dynamic value) {
     if (value is num) {
       final number = value.toInt();
-      return number > 10 ? (number / 10).round().clamp(1, 10).toInt() : number.clamp(1, 10).toInt();
+      return number > 10
+          ? (number / 10).round().clamp(1, 10).toInt()
+          : number.clamp(1, 10).toInt();
     }
     final text = value?.toString().toLowerCase() ?? '';
     final number = RegExp(r'\d+').firstMatch(text);
@@ -475,7 +602,10 @@ class AnalysisNotifier extends AsyncNotifier<AnalysisState> {
   List<String> _asStringList(dynamic value) {
     if (value == null) return [];
     if (value is List) {
-      return value.map((e) => e.toString()).where((e) => e.trim().isNotEmpty).toList();
+      return value
+          .map((e) => e.toString())
+          .where((e) => e.trim().isNotEmpty)
+          .toList();
     }
     if (value is String) {
       return value.trim().isEmpty ? [] : [value.trim()];
@@ -490,7 +620,8 @@ class AnalysisNotifier extends AsyncNotifier<AnalysisState> {
 
   Map<String, String> _normalizeStringMap(dynamic value) {
     if (value is Map) {
-      return value.map((key, entry) => MapEntry(key.toString(), entry == null ? '' : entry.toString()));
+      return value.map((key, entry) =>
+          MapEntry(key.toString(), entry == null ? '' : entry.toString()));
     }
     return {};
   }
@@ -525,7 +656,10 @@ class AnalysisNotifier extends AsyncNotifier<AnalysisState> {
         if (entry is List) {
           return MapEntry(
             key.toString(),
-            entry.map((e) => e.toString()).where((e) => e.trim().isNotEmpty).toList(),
+            entry
+                .map((e) => e.toString())
+                .where((e) => e.trim().isNotEmpty)
+                .toList(),
           );
         }
         if (entry == null) {
@@ -556,7 +690,9 @@ class AnalysisNotifier extends AsyncNotifier<AnalysisState> {
   }
 
   String _defaultActionFor(String name) {
-    if (name.contains('Helpline') || name.contains('Police')) return AppStrings.actionCallNow;
+    if (name.contains('Helpline') || name.contains('Police')) {
+      return AppStrings.actionCallNow;
+    }
     if (name.contains('Commission') ||
         name.contains('Portal') ||
         name.contains('DGCA') ||
@@ -583,9 +719,11 @@ class AnalysisNotifier extends AsyncNotifier<AnalysisState> {
       final message = error.toString();
       if (message.contains('unavailable') || message.contains('temporarily')) {
         return AppStrings.errServiceUnavailable;
-      } else if (message.contains('network') || message.contains('connection')) {
+      } else if (message.contains('network') ||
+          message.contains('connection')) {
         return AppStrings.errNoInternet;
-      } else if (message.contains('API key') || message.contains('configured')) {
+      } else if (message.contains('API key') ||
+          message.contains('configured')) {
         return AppStrings.errConfigError;
       } else {
         return AppStrings.errGenericError;
@@ -601,7 +739,8 @@ class AnalysisNotifier extends AsyncNotifier<AnalysisState> {
 }
 
 // Provider for the analysis notifier
-final analysisProvider = AsyncNotifierProvider<AnalysisNotifier, AnalysisState>(() {
+final analysisProvider =
+    AsyncNotifierProvider<AnalysisNotifier, AnalysisState>(() {
   return AnalysisNotifier();
 });
 
@@ -634,10 +773,12 @@ final analysisErrorProvider = Provider<String?>((ref) {
 class LastResultNotifier extends Notifier<LegalResultModel?> {
   @override
   LegalResultModel? build() => null;
-  
+
   void set(LegalResultModel? value) {
     state = value;
   }
 }
 
-final lastResultProvider = NotifierProvider<LastResultNotifier, LegalResultModel?>(LastResultNotifier.new);
+final lastResultProvider =
+    NotifierProvider<LastResultNotifier, LegalResultModel?>(
+        LastResultNotifier.new);

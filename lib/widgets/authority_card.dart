@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import '../core/theme/app_theme.dart';
+﻿import 'package:flutter/material.dart';
+import '../core/config/theme_config.dart';
 
 class AuthorityCard extends StatelessWidget {
   final String name;
@@ -19,18 +19,40 @@ class AuthorityCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.background,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.border),
+        gradient: AppTheme.cardGradientFor(AppTheme.primaryBlue),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.88)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.12),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       padding: const EdgeInsets.all(16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            Icons.account_balance_outlined,
-            size: 20,
-            color: AppTheme.primaryBlue,
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              gradient: AppTheme.heroGradient,
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.primaryBlue.withValues(alpha: 0.24),
+                  blurRadius: 12,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
+            child: const Icon(
+              Icons.account_balance_outlined,
+              size: 26,
+              color: Colors.white,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -40,20 +62,20 @@ class AuthorityCard extends StatelessWidget {
                 Text(
                   name,
                   style: TextStyle(
-                        color: AppTheme.darkText,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    color: AppTheme.darkText,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
                 if (purpose != null && purpose!.isNotEmpty) ...[
                   const SizedBox(height: 4),
                   Text(
                     purpose!,
                     style: TextStyle(
-                          color: AppTheme.mediumText,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                        ),
+                      color: AppTheme.mediumText,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ],
               ],
@@ -63,14 +85,15 @@ class AuthorityCard extends StatelessWidget {
             onPressed: onAction,
             style: TextButton.styleFrom(
               foregroundColor: AppTheme.primaryBlue,
+              minimumSize: const Size(48, 48),
             ),
             child: Text(
               action,
               style: TextStyle(
-                    color: AppTheme.primaryBlue,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
+                color: AppTheme.primaryBlue,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ],
@@ -78,3 +101,4 @@ class AuthorityCard extends StatelessWidget {
     );
   }
 }
+

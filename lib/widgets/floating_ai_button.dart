@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:juslegal/screens/ai_legal_chat_screen.dart';
+import '../core/config/theme_config.dart';
 
 /// Floating AI Assistant Button
 /// Place this widget in your Scaffold using a Stack or floatingActionButton
@@ -103,10 +104,10 @@ class _FloatingAIButtonState extends State<FloatingAIButton>
                         shape: BoxShape.circle,
                         gradient: SweepGradient(
                           colors: [
-                            const Color(0xFF1A237E).withValues(alpha: 0),
-                            const Color(0xFF3949AB),
-                            const Color(0xFF7C4DFF),
-                            const Color(0xFF1A237E).withValues(alpha: 0),
+                            AppColors.primaryDark.withValues(alpha: 0),
+                            AppColors.primaryLight,
+                            AppColors.legalGold,
+                            AppColors.primaryDark.withValues(alpha: 0),
                           ],
                         ),
                       ),
@@ -122,17 +123,17 @@ class _FloatingAIButtonState extends State<FloatingAIButton>
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          Color(0xFF1A237E),
-                          Color(0xFF3949AB),
-                          Color(0xFF5C6BC0),
+                          AppColors.legalGold,
+                          AppColors.amber,
+                          AppColors.amberDark,
                         ],
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF3949AB).withValues(alpha: 0.5),
-                          blurRadius: 16,
+                          color: AppColors.shadowGold.withValues(alpha: 0.9),
+                          blurRadius: 20,
                           spreadRadius: 2,
-                          offset: const Offset(0, 4),
+                          offset: const Offset(0, 8),
                         ),
                       ],
                     ),
@@ -166,7 +167,7 @@ class _BotFacePainter extends CustomPainter {
     final cx = size.width / 2;
     final cy = size.height / 2;
     final white = Paint()..color = Colors.white;
-    final accent = Paint()..color = const Color(0xFF7C4DFF);
+    final accent = Paint()..color = AppColors.primaryNavy;
     final glowPaint = Paint()
       ..color = Colors.white.withValues(alpha: 0.9)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2);
@@ -195,7 +196,7 @@ class _BotFacePainter extends CustomPainter {
     canvas.drawPath(
       smilePath,
       Paint()
-        ..color = const Color(0xFF7C4DFF)
+        ..color = AppColors.primaryNavy
         ..strokeWidth = 2.0
         ..style = PaintingStyle.stroke
         ..strokeCap = StrokeCap.round,
@@ -221,3 +222,4 @@ class _BotFacePainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
+

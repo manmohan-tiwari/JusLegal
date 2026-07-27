@@ -4,46 +4,62 @@ import 'package:file_picker/file_picker.dart';
 import '../core/constants/api_constants.dart';
 import '../core/constants/categories.dart';
 import '../core/exceptions/ai_exceptions.dart';
-import '../core/config/env_config.dart';
-import 'gemini_service.dart';
 import 'groq_service.dart';
 import 'openrouter_service.dart';
-import 'lkb_service.dart';
-import 'mock_ai_service.dart';
-import 'real_ai_service.dart';
-
 
 class AIService {
-  late final GeminiService _geminiService;
-  late final GroqService _groqService;
   late final OpenRouterService _openRouterService;
-  late final LKBService _lkbService;
-  late final RealAIService _realAIService;
-  MockAIService? _mockService;
+  late final GroqService _groqService;
 
   AIService() {
-    _geminiService = GeminiService();
-    _groqService = GroqService();
     _openRouterService = OpenRouterService();
-    _lkbService = LKBService();
-    _realAIService = RealAIService();
-    _mockService = MockAIService();
+    _groqService = GroqService();
   }
 
   Future<void> initialize() async {
-    try {
-      await _lkbService.load();
-      await _geminiService.initialize();
-    } catch (e) {
-      if (kDebugMode) debugPrint('[AIService] Some services failed to initialize: $e');
+    if (kDebugMode) {
+      debugPrint('[AIService] Initialized AI providers');
     }
   }
 
-  /// Use real AI if any key is configured, otherwise fall back to mock
-  bool get _useRealAI => EnvConfig.hasAnyApiKey();
+  /// Sends a chat message, preserving the local conversation context.
+  /// OpenRouter is preferred and Groq is used when it cannot respond.
+  Future<String> sendMessage(
+    String userMessage,
+    List<Map<String, String>> conversationHistory,
+  ) async {
+    String openRouterError = 'Unknown error';
+    try {
+      if (kDebugMode) {
+        debugPrint('[AIService] Sending chat message to OpenRouter');
+      }
+      return await _openRouterService.sendMessage(
+          userMessage, conversationHistory);
+    } catch (error) {
+      openRouterError = error.toString();
+      if (kDebugMode) {
+        debugPrint('[AIService] OpenRouter chat failed: $error');
+      }
+    }
+
+    String groqError = 'Unknown error';
+    try {
+      if (kDebugMode) {
+        debugPrint('[AIService] Sending chat message to Groq');
+      }
+      return await _groqService.sendMessage(userMessage, conversationHistory);
+    } catch (error) {
+      groqError = error.toString();
+      if (kDebugMode) {
+        debugPrint('[AIService] Groq chat failed: $error');
+      }
+    }
+    throw AllProvidersFailedException(openRouterError, groqError);
+  }
 
   /// Simplified analysis method for chat-based interactions
-  Future<Map<String, dynamic>> analyzeProblemFromText(String description) async {
+  Future<Map<String, dynamic>> analyzeProblemFromText(
+      String description) async {
     return await analyzeProblem(
       category: 'General',
       dateOfIncident: 'Not specified',
@@ -65,13 +81,21 @@ class AIService {
     required List<PlatformFile> attachedFiles,
     Map<String, String> dynamicFieldValues = const {},
   }) async {
-    // Use mock if no API keys configured
-    if (!_useRealAI) {
-      if (kDebugMode) debugPrint('[AIService] No API keys found — using MockAIService');
-      return await _mockService!.analyzeProblem(summary, category);
+    // Empty submissions cannot be analyzed remotely.
+    if (summary.trim().isEmpty) {
+      if (kDebugMode) {
+        debugPrint('[AIService] A problem description is required.');
+      }
+      throw ArgumentError.value(
+        summary,
+        'summary',
+        'A problem description is required.',
+      );
     }
 
-    if (kDebugMode) debugPrint('[AIService] API keys found — using RealAIService');
+    if (kDebugMode) {
+      debugPrint('[AIService] Using the Cloudflare Worker AI proxy');
+    }
 
     String dynamicFieldsText = '';
     if (dynamicFieldValues.isNotEmpty) {
@@ -98,34 +122,39 @@ Attached evidence count: ${attachedFiles.length} file(s)
 Provide: 1) Legal rights under Indian consumer law, 2) Step-by-step action plan, 3) Relevant laws/sections, 4) Authorities to contact, 5) Realistic outcome confidence score (0-100).
 """;
 
-    // 1. Try Gemini first
+    String openRouterError = 'Unknown error';
+
+    // 1. Try OpenRouter first.
     try {
-      if (kDebugMode) debugPrint('[AIService] Attempting Gemini...');
-      final result = await _geminiService.analyze(fullPrompt, category);
-      if (kDebugMode) debugPrint('[AIService] ✅ Gemini success');
+      if (kDebugMode) debugPrint('[AIService] Attempting OpenRouter...');
+      final result = await _tryWithRetry(
+        () => _openRouterService.analyze(
+          _buildStrictSystemPrompt(
+              'Consumer protection laws and regulations applicable to the case.'),
+          fullPrompt,
+          category: category,
+        ),
+        'OpenRouter',
+      );
+      if (kDebugMode) debugPrint('[AIService] OpenRouter success');
       return result;
     } catch (e) {
-      if (kDebugMode) debugPrint('[AIService] Gemini failed: $e');
+      openRouterError = e.toString();
+      if (kDebugMode) debugPrint('[AIService] OpenRouter failed: $e');
     }
 
-    // 2. Load legal context for fallback services
-    String legalContext;
-    try {
-      legalContext = await _lkbService.getContext(summary, category);
-    } catch (e) {
-      if (kDebugMode) debugPrint('[AIService] Failed to load legal context: $e');
-      legalContext = 'Consumer protection laws and regulations applicable to the case.';
-    }
+    const legalContext =
+        'Consumer protection laws and regulations applicable to the case.';
 
     final String systemPrompt = _buildStrictSystemPrompt(legalContext);
     String groqError = 'Unknown error';
-    String openRouterError = 'Unknown error';
 
-    // 3. Fallback to Groq
+    // 2. Fall back to Groq.
     try {
       if (kDebugMode) debugPrint('[AIService] Attempting Groq...');
       final result = await _tryWithRetry(
-        () => _groqService.analyze(systemPrompt, fullPrompt, category: category),
+        () =>
+            _groqService.analyze(systemPrompt, fullPrompt, category: category),
         'Groq',
       );
       if (kDebugMode) debugPrint('[AIService] ✅ Groq success');
@@ -135,21 +164,7 @@ Provide: 1) Legal rights under Indian consumer law, 2) Step-by-step action plan,
       if (kDebugMode) debugPrint('[AIService] Groq failed: $e');
     }
 
-    // 4. Fallback to OpenRouter
-    try {
-      if (kDebugMode) debugPrint('[AIService] Attempting OpenRouter...');
-      final result = await _tryWithRetry(
-        () => _openRouterService.analyze(systemPrompt, fullPrompt, category: category),
-        'OpenRouter',
-      );
-      if (kDebugMode) debugPrint('[AIService] ✅ OpenRouter success');
-      return result;
-    } catch (e) {
-      openRouterError = e.toString();
-      if (kDebugMode) debugPrint('[AIService] All providers failed: $e');
-    }
-
-    throw AllProvidersFailedException(groqError, openRouterError);
+    throw AllProvidersFailedException(openRouterError, groqError);
   }
 
   // Backward compatibility
@@ -200,14 +215,20 @@ Provide: 1) Legal rights under Indian consumer law, 2) Step-by-step action plan,
       incidentDate: incidentDate,
     );
 
-    // 1. Try Gemini
+    String openRouterError = 'Unknown error';
+    String groqError = 'Unknown error';
+
+    // 1. Try OpenRouter.
     try {
-      if (kDebugMode) debugPrint('[AIService] Generating letter with Gemini...');
-      final result = await _geminiService.generateRaw(prompt);
-      if (kDebugMode) debugPrint('[AIService] ✅ Gemini letter success');
+      if (kDebugMode) {
+        debugPrint('[AIService] Generating letter with OpenRouter...');
+      }
+      final result = await _openRouterService.generateRaw('', prompt);
+      if (kDebugMode) debugPrint('[AIService] OpenRouter letter success');
       return result;
     } catch (e) {
-      if (kDebugMode) debugPrint('[AIService] Gemini letter failed: $e');
+      openRouterError = e.toString();
+      if (kDebugMode) debugPrint('[AIService] OpenRouter letter failed: $e');
     }
 
     // 2. Try Groq
@@ -217,20 +238,17 @@ Provide: 1) Legal rights under Indian consumer law, 2) Step-by-step action plan,
       if (kDebugMode) debugPrint('[AIService] ✅ Groq letter success');
       return result;
     } catch (e) {
+      groqError = e.toString();
       if (kDebugMode) debugPrint('[AIService] Groq letter failed: $e');
     }
 
-    // 3. Try OpenRouter
-    try {
-      if (kDebugMode) debugPrint('[AIService] Generating letter with OpenRouter...');
-      final result = await _openRouterService.generateRaw('', prompt);
-      if (kDebugMode) debugPrint('[AIService] ✅ OpenRouter letter success');
-      return result;
-    } catch (e) {
-      if (kDebugMode) debugPrint('[AIService] OpenRouter letter failed: $e');
+    if (kDebugMode) {
+      debugPrint(
+        '[AIService] Letter generation failed. '
+        'OpenRouter: $openRouterError. Groq: $groqError.',
+      );
     }
-
-    throw Exception('All AI services failed to generate the letter. Check your internet connection and API keys.');
+    throw AllProvidersFailedException(openRouterError, groqError);
   }
 
   String _buildLetterPrompt({
@@ -246,18 +264,27 @@ Provide: 1) Legal rights under Indian consumer law, 2) Step-by-step action plan,
     required String incidentDate,
   }) {
     final typeLabel = {
-      'email': 'a formal consumer complaint email',
-      'police': 'a formal police complaint letter',
-      'consumer_court': 'a formal consumer court complaint draft',
-    }[letterType] ?? 'a formal complaint letter';
+          'email': 'a formal consumer complaint email',
+          'police': 'a formal police complaint letter',
+          'consumer_court': 'a formal consumer court complaint draft',
+        }[letterType] ??
+        'a formal complaint letter';
 
     final stepsText = steps.isNotEmpty
-        ? steps.asMap().entries.map((e) => '${e.key + 1}. ${e.value}').join('\n')
+        ? steps
+            .asMap()
+            .entries
+            .map((e) => '${e.key + 1}. ${e.value}')
+            .join('\n')
         : 'No specific steps provided.';
 
-    final effectiveSender = senderName.trim().isEmpty ? '[Your Full Name]' : senderName.trim();
-    final effectiveAddress = senderAddress.trim().isEmpty ? '[Your Address]' : senderAddress.trim();
-    final effectiveOpponent = opponentName.trim().isEmpty ? '[Respondent Name/Company]' : opponentName.trim();
+    final effectiveSender =
+        senderName.trim().isEmpty ? '[Your Full Name]' : senderName.trim();
+    final effectiveAddress =
+        senderAddress.trim().isEmpty ? '[Your Address]' : senderAddress.trim();
+    final effectiveOpponent = opponentName.trim().isEmpty
+        ? '[Respondent Name/Company]'
+        : opponentName.trim();
 
     return '''You are a professional Indian legal writer. Write $typeLabel based on the details below.
 
@@ -267,6 +294,7 @@ IMPORTANT RULES:
 - Fill in ALL details using the information provided below
 - If a piece of information is not provided, use a sensible placeholder like [Your Phone Number]
 - Include proper structure: To/From addresses, Subject, Date, Body paragraphs, Closing
+- Write a complete, detailed letter of at least 500 words with 4-6 body paragraphs; do not stop after headings or placeholders
 - Cite the specific law/act provided
 - Keep it professional and assertive but not aggressive
 - End with a clear demand and deadline (e.g., "respond within 7 days")
@@ -317,7 +345,8 @@ Now write the complete $typeLabel:''';
       }
     }
 
-    throw Exception('All retries failed for $providerName. Last error: $lastError');
+    throw Exception(
+        'All retries failed for $providerName. Last error: $lastError');
   }
 
   String _buildStrictSystemPrompt(String legalContext) {

@@ -1,15 +1,15 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../core/constants/app_colors.dart';
+import '../core/config/theme_config.dart';
 import '../models/document_category_model.dart';
 import '../models/document_type_model.dart';
-import '../providers/legal_writing_provider.dart';
+import '../services/legal_writing_handler.dart';
 import '../services/ai_service.dart';
 import '../widgets/legal_writing/category_step.dart';
 import '../widgets/legal_writing/form_step.dart';
 import '../widgets/legal_writing/result_step.dart';
 
-// ── Provider ──────────────────────────────────────────────────────────────────
+// â”€â”€ Provider â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 final _aiServiceProvider = Provider<AIService>((ref) {
   final svc = AIService();
@@ -17,7 +17,7 @@ final _aiServiceProvider = Provider<AIService>((ref) {
   return svc;
 });
 
-// ── Screen ────────────────────────────────────────────────────────────────────
+// â”€â”€ Screen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class LegalWritingScreen extends ConsumerStatefulWidget {
   const LegalWritingScreen({super.key});
@@ -124,14 +124,14 @@ $fieldsText
 ${extra.isNotEmpty ? '\nADDITIONAL DETAILS:\n$extra' : ''}
 
 INSTRUCTIONS:
-- Write ONLY the complete document — no explanations, no preamble, no notes after
+- Write ONLY the complete document â€” no explanations, no preamble, no notes after
 - Use proper legal formatting with headings, clauses, and sections as appropriate
 - Use formal legal language appropriate for India
 - Fill ALL details using the information above
 - For missing details use sensible placeholders like [Full Name], [Address], [Date]
 - Include proper signature blocks, witness sections where applicable
 - Cite relevant Indian law or act where appropriate
-- Make it ready to use — professionally formatted
+- Make it ready to use â€” professionally formatted
 - Tone: ${state.tone}
 
 Now write the complete ${type.label}:
@@ -199,12 +199,12 @@ Now write the complete ${type.label}:
       'Sender': 'Your full name',
       'Recipient': 'Full name or company name',
       'Dispute Details': 'Describe the dispute clearly',
-      'Relief Sought': 'e.g. Full refund of ₹5000',
+      'Relief Sought': 'e.g. Full refund of â‚¹5000',
       'Company Name': 'e.g. Amazon India Pvt Ltd',
       'Landlord': 'Full name of landlord',
       'Tenant': 'Full name of tenant',
       'Property Address': 'Complete property address',
-      'Rent': 'Monthly rent amount e.g. ₹15,000',
+      'Rent': 'Monthly rent amount e.g. â‚¹15,000',
       'Duration': 'e.g. 11 months from Jan 2024',
       'Party 1': 'First party full name',
       'Party 2': 'Second party full name',
@@ -326,3 +326,4 @@ Now write the complete ${type.label}:
     );
   }
 }
+

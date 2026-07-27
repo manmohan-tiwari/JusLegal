@@ -1,10 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../core/constants/app_colors.dart';
-import '../core/constants/form_templates.dart';
-import '../models/form_template_model.dart';
-import '../providers/document_creation_provider.dart';
-import '../widgets/document_creation/form_category_section.dart';
+import '../core/config/theme_config.dart';
+import '../core/config/templates.dart';
+import '../services/document_handler.dart';
 import '../widgets/document_creation/form_disclaimer_banner.dart';
 import '../widgets/document_creation/form_field_widget.dart';
 import '../widgets/document_creation/form_preview_card.dart';
@@ -26,119 +24,6 @@ class _DocumentCreationScreenState
   void dispose() {
     _scrollController.dispose();
     super.dispose();
-  }
-
-  void _showFormCategories() {
-    // Group forms by category
-    final categoriesMap = <String, (IconData, List<FormTemplateModel>)>{};
-
-    categoriesMap['Complaints & Notices'] = (
-      Icons.campaign_outlined,
-      [
-        FormTemplates.all[0], // Consumer Complaint
-        FormTemplates.all[1], // RTI
-        FormTemplates.all[2], // Cyber Crime
-        FormTemplates.all[9], // Cheque Bounce
-      ]
-    );
-
-    categoriesMap['Financial & Banking'] = (
-      Icons.account_balance_outlined,
-      [
-        FormTemplates.all[3], // Banking Ombudsman
-      ]
-    );
-
-    categoriesMap['Motor & Accident'] = (
-      Icons.two_wheeler_outlined,
-      [
-        FormTemplates.all[4], // Motor Accident Claim
-      ]
-    );
-
-    categoriesMap['Employment & Labour'] = (
-      Icons.business_center_outlined,
-      [
-        FormTemplates.all[5], // Labour Complaint
-      ]
-    );
-
-    categoriesMap['Legal Resolution'] = (
-      Icons.gavel_outlined,
-      [
-        FormTemplates.all[6], // Lok Adalat
-        FormTemplates.all[7], // Legal Aid
-      ]
-    );
-
-    categoriesMap['Property & Housing'] = (
-      Icons.home_outlined,
-      [
-        FormTemplates.all[8], // Rent Control
-      ]
-    );
-
-    // Build UI
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (context) => DraggableScrollableSheet(
-        expand: false,
-        builder: (context, scrollController) => SingleChildScrollView(
-          controller: scrollController,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Select Form Category',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: AppColors.primaryNavy,
-                        fontWeight: FontWeight.w700,
-                      ),
-                ),
-                const SizedBox(height: 16),
-                ...categoriesMap.entries.map((e) {
-                  final label = e.key;
-                  final icon = e.value.$1;
-                  final forms = e.value.$2;
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: FormCategorySection(
-                      categoryLabel: label,
-                      icon: icon,
-                      forms: forms,
-                      onFormSelected: (form) {
-                        Navigator.of(context).pop();
-                        ref
-                            .read(documentCreationProvider.notifier)
-                            .selectForm(form);
-                        Future.delayed(const Duration(milliseconds: 300),
-                            () {
-                          if (_scrollController.hasClients) {
-                            _scrollController.animateTo(
-                              _scrollController.position.maxScrollExtent,
-                              duration: const Duration(milliseconds: 400),
-                              curve: Curves.easeOut,
-                            );
-                          }
-                        });
-                      },
-                      initiallyExpanded: false,
-                    ),
-                  );
-                }).toList(),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
   }
 
   @override
@@ -178,7 +63,7 @@ class _DocumentCreationScreenState
     );
   }
 
-  // ── Step 0: Form Selection ──────────────────────────────────────────────
+  // â”€â”€ Step 0: Form Selection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   Widget _buildFormSelection() {
     return Column(
@@ -227,7 +112,7 @@ class _DocumentCreationScreenState
     );
   }
 
-  // ── Step 1: Form Filling ────────────────────────────────────────────────
+  // â”€â”€ Step 1: Form Filling â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   Widget _buildFormFilling(
     DocumentCreationState state,
@@ -321,7 +206,7 @@ class _DocumentCreationScreenState
               Switch(
                 value: state.useAI,
                 onChanged: (v) => notifier.toggleAI(v),
-                activeColor: AppColors.trustBlue,
+                activeThumbColor: AppColors.trustBlue,
               ),
             ],
           ),
@@ -346,7 +231,7 @@ class _DocumentCreationScreenState
               onChanged: (v) => notifier.updateField(field.key, v),
             ),
           );
-        }).toList(),
+        }),
 
         const SizedBox(height: 20),
 
@@ -386,7 +271,7 @@ class _DocumentCreationScreenState
     );
   }
 
-  // ── Step 2: Form Result ─────────────────────────────────────────────────
+  // â”€â”€ Step 2: Form Result â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   Widget _buildFormResult(
     DocumentCreationState state,
@@ -458,7 +343,7 @@ class _DocumentCreationScreenState
   }
 }
 
-// ── Section Label ─────────────────────────────────────────────────────────
+// â”€â”€ Section Label â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _SectionLabel extends StatelessWidget {
   final String title;

@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../core/constants/app_config.dart';
-import '../core/constants/app_colors.dart';
+import '../core/config/theme_config.dart';
 import '../widgets/empty_state_widget.dart';
 
 class AuthoritiesScreen extends StatefulWidget {
@@ -128,28 +128,55 @@ class _AuthoritiesScreenState extends State<AuthoritiesScreen> {
 
   Future<void> _launchCall(String phone) async {
     final Uri tel = Uri(scheme: 'tel', path: phone);
-    if (await canLaunchUrl(tel)) await launchUrl(tel);
+    await _launchExternal(tel,
+        failureMessage: 'No app is available to make calls.');
   }
 
   Future<void> _launchEmail(String email) async {
     final Uri mail = Uri(scheme: 'mailto', path: email.trim());
-    if (await canLaunchUrl(mail)) await launchUrl(mail);
+    await _launchExternal(mail,
+        failureMessage: 'No app is available to send email.');
   }
 
   Future<void> _launchUrl(String urlLike) async {
     final trimmed = urlLike.trim();
     if (trimmed.isEmpty) return;
 
-    final Uri url = trimmed.startsWith('http://') || trimmed.startsWith('https://')
-        ? Uri.parse(trimmed)
-        : Uri.parse('https://$trimmed');
+    final Uri url =
+        trimmed.startsWith('http://') || trimmed.startsWith('https://')
+            ? Uri.parse(trimmed)
+            : Uri.parse('https://$trimmed');
 
-    if (await canLaunchUrl(url)) await launchUrl(url);
+    await _launchExternal(url, failureMessage: 'Could not open this website.');
   }
 
   Future<void> _openNearest(String name) async {
-    final Uri maps = Uri.parse('${AppConfig.googleMapsUrl}/${Uri.encodeComponent(name)}');
-    if (await canLaunchUrl(maps)) await launchUrl(maps);
+    // HTTPS works in a browser even when no maps application is installed.
+    final maps = Uri.parse(
+      '${AppConfig.googleMapsUrl}/${Uri.encodeComponent(name)}',
+    );
+    await _launchExternal(maps, failureMessage: 'Could not open maps.');
+  }
+
+  Future<void> _launchExternal(
+    Uri uri, {
+    required String failureMessage,
+  }) async {
+    try {
+      final launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+      if (!launched) _showLaunchFailure(failureMessage);
+    } catch (_) {
+      _showLaunchFailure(failureMessage);
+    }
+  }
+
+  void _showLaunchFailure(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _copyText(String value) async {
@@ -221,56 +248,55 @@ class _AuthoritiesScreenState extends State<AuthoritiesScreen> {
                     ),
                   ],
                   const SizedBox(height: 16),
-
                   Wrap(
                     spacing: 10,
                     runSpacing: 10,
                     children: [
-                       if (isPhone || action == 'Call Now')
-                         _ContactActionIcon(
-                           icon: Icons.call,
-                           label: 'Phone',
-                           color: AppColors.textSecondary,
+                      if (isPhone || action == 'Call Now')
+                        _ContactActionIcon(
+                          icon: Icons.call,
+                          label: 'Phone',
+                          color: AppColors.textSecondary,
                           onPressed: () async {
                             Navigator.of(ctx).pop();
                             await _launchCall(contact);
                           },
                         ),
-                       if (isEmail)
-                         _ContactActionIcon(
-                           icon: Icons.email,
-                           label: 'Email',
-                           color: AppColors.textSecondary,
+                      if (isEmail)
+                        _ContactActionIcon(
+                          icon: Icons.email,
+                          label: 'Email',
+                          color: AppColors.textSecondary,
                           onPressed: () async {
                             Navigator.of(ctx).pop();
                             await _launchEmail(contact);
                           },
                         ),
-                       if (isWebsite)
-                         _ContactActionIcon(
-                           icon: Icons.open_in_browser,
-                           label: 'Website',
-                           color: AppColors.textSecondary,
+                      if (isWebsite)
+                        _ContactActionIcon(
+                          icon: Icons.open_in_browser,
+                          label: 'Website',
+                          color: AppColors.textSecondary,
                           onPressed: () async {
                             Navigator.of(ctx).pop();
                             await _launchUrl(contact);
                           },
                         ),
-                       if (action == 'Find Nearest')
-                         _ContactActionIcon(
-                           icon: Icons.location_on,
-                           label: 'Find Nearest',
-                           color: AppColors.textSecondary,
+                      if (action == 'Find Nearest')
+                        _ContactActionIcon(
+                          icon: Icons.location_on,
+                          label: 'Find Nearest',
+                          color: AppColors.textSecondary,
                           onPressed: () async {
                             Navigator.of(ctx).pop();
                             await _openNearest(name);
                           },
                         ),
-                       if (contact.isNotEmpty)
-                         _ContactActionIcon(
-                           icon: Icons.copy,
-                           label: 'Copy',
-                           color: AppColors.textSecondary,
+                      if (contact.isNotEmpty)
+                        _ContactActionIcon(
+                          icon: Icons.copy,
+                          label: 'Copy',
+                          color: AppColors.textSecondary,
                           onPressed: () async {
                             Navigator.of(ctx).pop();
                             await _copyText(contact);
@@ -278,9 +304,7 @@ class _AuthoritiesScreenState extends State<AuthoritiesScreen> {
                         ),
                     ],
                   ),
-
                   const SizedBox(height: 12),
-
                   if (isWebsite)
                     SizedBox(
                       width: double.infinity,
@@ -293,7 +317,6 @@ class _AuthoritiesScreenState extends State<AuthoritiesScreen> {
                         child: const Text('Visit Website'),
                       ),
                     ),
-
                   if (contact.isNotEmpty)
                     SizedBox(
                       width: double.infinity,
@@ -325,7 +348,7 @@ class _AuthoritiesScreenState extends State<AuthoritiesScreen> {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       elevation: 0,
       shadowColor: Colors.transparent,
-      color: AppColors.surface,
+      color: AppColors.cardBackground,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: const BorderSide(color: AppColors.border, width: 1),
@@ -481,3 +504,4 @@ class _ContactActionIcon extends StatelessWidget {
     );
   }
 }
+

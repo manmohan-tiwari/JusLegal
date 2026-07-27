@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import '../../core/constants/app_colors.dart';
+﻿import 'package:flutter/material.dart';
+import '../../core/config/theme_config.dart';
 import '../../models/form_template_model.dart';
 
 class FormPreviewCard extends StatelessWidget {

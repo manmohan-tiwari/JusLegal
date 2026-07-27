@@ -1,206 +1,167 @@
-import 'dart:convert';
+﻿import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import '../core/config/ai_runtime_config.dart';
-import '../core/constants/ai_constants.dart';
+
+import '../core/constants/api_constants.dart';
+import '../core/config/ai_config.dart';
 import '../core/exceptions/ai_exceptions.dart';
 
+/// Calls Groq only through the Cloudflare Worker proxy.
 class GroqService {
-  late final Dio _dio;
+  final Dio _dio;
 
-  GroqService() {
-    _dio = Dio(BaseOptions(
-      baseUrl: AiRuntimeConfig.proxyEnabled
-          ? AiRuntimeConfig.proxyBaseUrl
-          : AIConstants.groqBaseUrl,
-      connectTimeout: const Duration(seconds: AIConstants.timeoutSeconds),
-      receiveTimeout: const Duration(seconds: AIConstants.timeoutSeconds),
-      headers: {'Content-Type': 'application/json'},
-    ));
-  }
+  GroqService({Dio? dio})
+      : _dio = dio ??
+            Dio(BaseOptions(
+              baseUrl: WORKER_BASE_URL,
+              connectTimeout: ApiConstants.connectionTimeout,
+              receiveTimeout: ApiConstants.receiveTimeout,
+              headers: const {'Content-Type': 'application/json'},
+            ));
 
-  Future<String> _getApiKey() async {
-    if (AiRuntimeConfig.proxyEnabled) {
-      return '';
-    }
-
-    if (!AiRuntimeConfig.allowDirectVendorCalls) {
-      throw ApiKeyException('Direct Groq calls are disabled outside debug builds');
-    }
-
-    final apiKey = AiRuntimeConfig.groqApiKey;
-    if (apiKey.isEmpty) {
-      throw ApiKeyException('Groq API Key not found or invalid');
-    }
-    return apiKey;
-  }
-
-  Options _requestOptions(String apiKey) {
-    final headers = <String, dynamic>{
-      'X-JusLegal-Provider': 'groq',
-    };
-
-    if (!AiRuntimeConfig.proxyEnabled) {
-      headers['Authorization'] = 'Bearer $apiKey';
-    }
-
-    return Options(headers: headers);
-  }
-
-  Future<Map<String, dynamic>> analyze(String systemPrompt, String problemText, {String category = 'general'}) async {
+  Future<Map<String, dynamic>> analyze(
+    String systemPrompt,
+    String problemText, {
+    String category = 'general',
+  }) async {
+    final content = await _call(systemPrompt, problemText, jsonResponse: true);
     try {
-      final apiKey = await _getApiKey();
-      
-      final response = await _dio.post(
-        '', // URL is set in BaseOptions
-        options: _requestOptions(apiKey),
+      final parsed =
+          jsonDecode(_stripCodeFence(content)) as Map<String, dynamic>;
+      parsed['_model'] = GROQ_MODEL;
+      parsed['_provider'] = 'groq';
+      return parsed;
+    } on FormatException catch (error) {
+      throw ParseException('Failed to parse Groq response: $error');
+    }
+  }
+
+  Future<String> generateRaw(String systemPrompt, String prompt) => _call(
+        systemPrompt,
+        prompt,
+        jsonResponse: false,
+        maxTokens: ApiConstants.letterMaxTokens,
+      );
+
+  /// Sends a conversational request with JusLegal's chat context.
+  Future<String> sendMessage(
+    String userMessage,
+    List<Map<String, String>> conversationHistory,
+  ) =>
+      _sendChatRequest(userMessage, conversationHistory);
+
+  Future<String> _sendChatRequest(
+    String userMessage,
+    List<Map<String, String>> conversationHistory,
+  ) async {
+    try {
+      if (kDebugMode) {
+        debugPrint('[GroqService] Calling Worker /callGroq for chat');
+      }
+      final history =
+          _historyWithCurrentMessage(userMessage, conversationHistory);
+      final response = await _dio.post<Map<String, dynamic>>(
+        '/callGroq',
         data: {
-          'model': AIConstants.groqModel,
+          'model': GROQ_MODEL,
           'messages': [
-            {'role': 'system', 'content': systemPrompt},
-            {'role': 'user', 'content': problemText},
+            {'role': 'system', 'content': jusLegalChatSystemPrompt},
+            ...history,
           ],
-          'temperature': AIConstants.temperature,
-          'max_tokens': AIConstants.maxTokens,
-          'top_p': AIConstants.topP,
-          'response_format': {'type': 'json_object'},
+          'temperature': ApiConstants.temperature,
+          'max_tokens': ApiConstants.maxTokens,
           'stream': false,
         },
       );
-
-      if (kDebugMode) {
-        print('[GroqService] Raw API response: ${_debugPreview(response.data)}');
-      }
-      final parsed = _parseJsonResponse(response, 'groq', AIConstants.groqModel);
-      if (kDebugMode) {
-        print('[GroqService] Parsed response keys: ${parsed.keys.toList()}');
-        print('[GroqService] Parsed response preview: ${_debugPreview(parsed)}');
-      }
-      return parsed;
-    } catch (e) {
-      _handleDioError(e, 'Groq');
+      return _contentFrom(response.data, 'Groq');
+    } on DioException catch (error) {
+      _throwDioError(error, 'Groq');
     }
   }
 
-  Future<String> generateRaw(String systemPrompt, String prompt) async {
+  List<Map<String, String>> _historyWithCurrentMessage(
+    String userMessage,
+    List<Map<String, String>> history,
+  ) {
+    final messages = history
+        .where((message) => message['role'] != 'system')
+        .map(Map<String, String>.from)
+        .toList();
+    if (messages.isEmpty ||
+        messages.last['role'] != 'user' ||
+        messages.last['content'] != userMessage) {
+      messages.add({'role': 'user', 'content': userMessage});
+    }
+    return messages;
+  }
+
+  Future<String> _call(
+    String systemPrompt,
+    String prompt, {
+    required bool jsonResponse,
+    int? maxTokens,
+  }) async {
     try {
-      final apiKey = await _getApiKey();
-      
-      final response = await _dio.post(
-        '', // URL is set in BaseOptions
-        options: _requestOptions(apiKey),
+      if (kDebugMode) debugPrint('[GroqService] Calling Worker /callGroq');
+      final response = await _dio.post<Map<String, dynamic>>(
+        '/callGroq',
         data: {
-          'model': AIConstants.groqModel,
+          'model': GROQ_MODEL,
           'messages': [
-            if (systemPrompt.isNotEmpty) {'role': 'system', 'content': systemPrompt},
+            if (systemPrompt.isNotEmpty)
+              {'role': 'system', 'content': systemPrompt},
             {'role': 'user', 'content': prompt},
           ],
-          'temperature': AIConstants.temperature,
-          'max_tokens': AIConstants.maxTokens,
-          'top_p': AIConstants.topP,
+          'temperature': ApiConstants.temperature,
+          'max_tokens': maxTokens ?? ApiConstants.maxTokens,
+          if (jsonResponse) 'response_format': {'type': 'json_object'},
           'stream': false,
         },
       );
-
-      if (kDebugMode) {
-        print('[GroqService] Raw API response (letter): ${_debugPreview(response.data)}');
-      }
-      return _parseRawResponse(response);
-    } catch (e) {
-      _handleDioError(e, 'Groq');
+      return _contentFrom(response.data, 'Groq');
+    } on DioException catch (error) {
+      _throwDioError(error, 'Groq');
     }
   }
 
-  Map<String, dynamic> _parseJsonResponse(Response response, String provider, String modelName) {
-    if (response.statusCode == 200) {
-      final data = response.data;
-      final choices = data['choices'] as List?;
-      if (choices == null || choices.isEmpty) {
-        throw ParseException('No choices returned from $provider API');
-      }
-      
-      final content = _extractContent(choices[0]['message']['content']);
-      String cleanContent = content;
-      
-      if (cleanContent.startsWith('```json')) {
-        cleanContent = cleanContent.substring(7);
-      }
-      if (cleanContent.endsWith('```')) {
-        cleanContent = cleanContent.substring(0, cleanContent.length - 3);
-      }
-      cleanContent = cleanContent.trim();
-      if (kDebugMode) {
-        print('[GroqService] Clean JSON content: ${_debugPreview(cleanContent)}');
-      }
-
-      try {
-        final parsedJson = jsonDecode(cleanContent) as Map<String, dynamic>;
-        parsedJson['_model'] = modelName;
-        parsedJson['_provider'] = provider;
-        return parsedJson;
-      } catch (e) {
-        throw ParseException('Failed to parse JSON response: $e');
-      }
-    } else {
-      throw NetworkException('HTTP Error: ${response.statusCode}');
+  String _contentFrom(Map<String, dynamic>? data, String provider) {
+    final choices = data?['choices'];
+    if (choices is! List || choices.isEmpty || choices.first is! Map) {
+      throw ParseException('No choices returned from $provider');
     }
+    final message = Map<String, dynamic>.from(choices.first as Map)['message'];
+    if (message is! Map || message['content'] is! String) {
+      throw ParseException('Unexpected $provider response format');
+    }
+    final content = message['content'] as String;
+    if (kDebugMode) {
+      final finishReason =
+          Map<String, dynamic>.from(choices.first as Map)['finish_reason'];
+      debugPrint(
+          '[$provider] Response (${content.length} chars, finish: $finishReason): $content');
+    }
+    return content;
   }
 
-  String _parseRawResponse(Response response) {
-    if (response.statusCode == 200) {
-      final data = response.data;
-      final choices = data['choices'] as List?;
-      if (choices == null || choices.isEmpty) {
-        throw ParseException('No choices returned from API');
-      }
-      final content = _extractContent(choices[0]['message']['content']).trim();
-      if (kDebugMode) {
-        print('[GroqService] Raw letter content: ${_debugPreview(content)}');
-      }
-      return content;
-    } else {
-      throw NetworkException('HTTP Error: ${response.statusCode}');
-    }
+  String _stripCodeFence(String value) {
+    var result = value.trim();
+    if (result.startsWith('```json')) result = result.substring(7);
+    if (result.startsWith('```')) result = result.substring(3);
+    if (result.endsWith('```')) result = result.substring(0, result.length - 3);
+    return result.trim();
   }
 
-  String _extractContent(dynamic content) {
-    if (content is String) return content;
-    if (content is List) {
-      final buffer = StringBuffer();
-      for (final item in content) {
-        if (item is Map && item['text'] is String) {
-          buffer.write(item['text']);
-        } else if (item is String) {
-          buffer.write(item);
-        }
-      }
-      return buffer.toString();
+  Never _throwDioError(DioException error, String provider) {
+    if (error.type == DioExceptionType.connectionTimeout ||
+        error.type == DioExceptionType.receiveTimeout) {
+      throw NetworkException('$provider request timed out');
     }
-    if (content is Map && content['text'] is String) {
-      return content['text'] as String;
+    if (error.response?.statusCode == 429) {
+      throw RateLimitException('$provider rate limit exceeded', provider);
     }
-    return content.toString();
-  }
-
-  String _debugPreview(dynamic value) {
-    final text = value.toString();
-    return text.length > 700 ? '${text.substring(0, 700)}...' : text;
-  }
-
-  Never _handleDioError(dynamic e, String provider) {
-    if (e is DioException) {
-      if (e.type == DioExceptionType.connectionTimeout || e.type == DioExceptionType.receiveTimeout) {
-        throw NetworkException('Request timeout');
-      } else if (e.response?.statusCode == 429) {
-        throw RateLimitException('Rate limit exceeded', provider);
-      } else if (e.response?.statusCode == 401) {
-        throw ApiKeyException('Invalid $provider API Key');
-      } else {
-        throw NetworkException('Network error: ${e.message}');
-      }
-    } else if (e is RateLimitException || e is ApiKeyException || e is ParseException || e is NetworkException) {
-      throw e;
-    }
-    throw ParseException('Unexpected error: $e');
+    throw NetworkException(
+        '$provider request failed (${error.response?.statusCode ?? 'network error'})');
   }
 }
+

@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
-import '../../core/constants/app_colors.dart';
+import '../../core/config/theme_config.dart';
 import '../../models/document_category_model.dart';
 import '../../models/document_type_model.dart';
 import 'field_label.dart';

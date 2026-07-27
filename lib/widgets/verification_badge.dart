@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import '../core/theme/app_theme.dart';
+﻿import 'package:flutter/material.dart';
+import '../core/config/theme_config.dart';
 
 enum VerificationType {
   ai,
@@ -120,3 +120,4 @@ class VerificationBadge extends StatelessWidget {
     }
   }
 }
+

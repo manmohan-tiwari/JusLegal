@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
-import '../core/theme/app_theme.dart';
+﻿import 'package:flutter/material.dart';
+import '../core/config/theme_config.dart';
 
 class StepCard extends StatelessWidget {
   final int index;
@@ -15,31 +15,44 @@ class StepCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppTheme.background,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: AppTheme.border, width: 1),
+        gradient: AppTheme.cardGradientFor(AppTheme.primaryBlue),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.88)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.10),
+            blurRadius: 16,
+            offset: const Offset(0, 7),
+          ),
+        ],
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 32,
-            height: 32,
+            width: 48,
+            height: 48,
             decoration: BoxDecoration(
-              color: AppTheme.primaryBlue,
+              gradient: AppTheme.heroGradient,
               borderRadius: BorderRadius.circular(999),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.primaryBlue.withValues(alpha: 0.24),
+                  blurRadius: 12,
+                  offset: const Offset(0, 5),
+                ),
+              ],
             ),
             alignment: Alignment.center,
             child: Text(
               '${index + 1}',
               style: TextStyle(
-                color: AppTheme.background,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
               ),
             ),
           ),
@@ -53,8 +66,8 @@ class StepCard extends StatelessWidget {
                     title!,
                     style: TextStyle(
                       color: AppTheme.darkText,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -64,7 +77,8 @@ class StepCard extends StatelessWidget {
                   style: TextStyle(
                     color: AppTheme.mediumText,
                     fontSize: 14,
-                    fontWeight: FontWeight.w400,
+                    fontWeight: FontWeight.w500,
+                    height: 1.4,
                   ),
                 ),
               ],
@@ -75,3 +89,4 @@ class StepCard extends StatelessWidget {
     );
   }
 }
+

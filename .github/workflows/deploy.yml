@@ -13,10 +13,10 @@ jobs:
       - run: flutter pub get
       - run: flutter analyze --fatal-infos
       - run: flutter test
-      - run: flutter build web --release --dart-define=GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
-      - uses: FirebaseExtended/action-hosting-deploy@v0
+      - run: flutter build web --release
+      - name: Deploy Firebase Hosting
+        uses: w9jds/firebase-action@v13.31.0
         with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          channelId: live
-          projectId: juslegal-2196
+          args: deploy --only hosting --project juslegal-2196
+        env:
+          GCP_SA_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}

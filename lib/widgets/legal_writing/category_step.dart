@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
-import '../../core/constants/legal_document_templates.dart';
+import '../../core/config/templates.dart';
 import '../../models/document_category_model.dart';
 import '../../models/document_type_model.dart';
 import 'category_section.dart';

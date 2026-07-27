@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-import '../core/theme/app_theme.dart';
+import '../core/config/theme_config.dart';
 import '../models/legal_result_model.dart';
 import '../models/saved_case_model.dart';
 import '../providers/ai_provider.dart';
@@ -312,4 +312,5 @@ class _CaseCard extends StatelessWidget {
     );
   }
 }
+
 

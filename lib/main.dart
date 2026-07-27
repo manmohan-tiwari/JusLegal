@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -13,8 +12,7 @@ import 'core/constants/firebase_options.dart';
 import 'core/config/env_config.dart';
 import 'core/router/app_router.dart';
 import 'core/services/analytics_service.dart';
-import 'services/legal_compliance_service.dart';
-import 'core/theme/app_theme.dart';
+import 'core/config/theme_config.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -90,9 +88,6 @@ Future<void> main() async {
   // Initialize configuration
   await AppConfig.initialize();
 
-  // Initialize legal compliance service
-  await LegalComplianceService.initialize();
-
   // Log app start
   await SafeAnalytics.logEvent(
     name: 'app_started',
@@ -103,19 +98,15 @@ Future<void> main() async {
     },
   );
 
-  final prefs = await SharedPreferences.getInstance();
-  final seenOnboarding = prefs.getBool('seen_onboarding') ?? false;
-
-runApp(ProviderScope(child: JusLegalApp(showOnboarding: !seenOnboarding)));
+runApp(const ProviderScope(child: JusLegalApp()));
 }
 
 class JusLegalApp extends StatelessWidget {
-  final bool showOnboarding;
-  const JusLegalApp({super.key, required this.showOnboarding});
+  const JusLegalApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final router = buildRouter(seenOnboarding: showOnboarding);
+    final router = buildRouter();
     return MaterialApp.router(
       title: 'JusLegal',
       theme: AppTheme.lightTheme,
@@ -126,3 +117,4 @@ class JusLegalApp extends StatelessWidget {
     );
   }
 }
+

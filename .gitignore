@@ -53,4 +53,3 @@ app.*.map.json
 
 # Firebase / Google service files (keep credentials out of source control)
 /android/app/google-services.json
-/ios/Runner/GoogleService-Info.plist

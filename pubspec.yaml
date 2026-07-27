@@ -11,7 +11,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  speech_to_text: ^6.6.0
+  speech_to_text: ^7.0.0
   flutter_riverpod: ^3.3.1
   go_router: ^17.2.3
   hive_flutter: ^1.1.0
@@ -27,6 +27,7 @@ dependencies:
   shimmer: ^3.0.0
   connectivity_plus: ^4.0.0
   device_preview: ^1.2.0
+  flutter_markdown: ^0.7.7+1
 
   firebase_core: ^4.9.0
   firebase_analytics: ^12.4.1
@@ -46,30 +47,4 @@ flutter:
   uses-material-design: true
 
   assets:
-    - .env
     - assets/legal_kb.json
-    - assets/legal_kb_expanded.json
-    - assets/community_wins.json
-    - assets/icon/
-
-flutter_launcher_icons:
-  android: true
-  ios: true
-  image_path: assets/icon/juslegal icon.png
-  adaptive_icon_background: "#1A237E"
-  adaptive_icon_foreground: assets/icon/juslegal icon.png
-  min_sdk_android: 21
-  remove_alpha_ios: true
-  background_color_ios: "#1A237E"
-
-flutter_native_splash:
-  color: "#1A237E"
-  color_dark: "#101A5E"
-  image: assets/icon/juslegal icon.png
-  web: false
-  android_12:
-    color: "#1A237E"
-    color_dark: "#101A5E"
-    image: assets/icon/juslegal icon.png
-    icon_background_color: "#1A237E"
-    icon_background_color_dark: "#101A5E"

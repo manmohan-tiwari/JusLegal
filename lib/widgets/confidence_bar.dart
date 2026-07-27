@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../core/utils/confidence_utils.dart';
+import '../core/config/theme_config.dart';
 
 class ConfidenceBar extends StatelessWidget {
   final int confidence;
@@ -7,8 +7,8 @@ class ConfidenceBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = ConfidenceUtils.colorFor(confidence);
-    final disclaimer = ConfidenceUtils.disclaimerFor(confidence);
+    final color = _colorFor(confidence);
+    final disclaimer = _disclaimerFor(confidence);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -26,5 +26,21 @@ class ConfidenceBar extends StatelessWidget {
             style: TextStyle(color: color, fontWeight: FontWeight.w600)),
       ],
     );
+  }
+
+  Color _colorFor(int confidence) {
+    if (confidence >= 85) return AppColors.success;
+    if (confidence >= 60) return Colors.amber[700]!;
+    return AppColors.error;
+  }
+
+  String _disclaimerFor(int confidence) {
+    if (confidence >= 85) {
+      return 'High confidence guidance based on verified sources.';
+    }
+    if (confidence >= 60) {
+      return 'Some details may vary. Verify with a legal expert.';
+    }
+    return 'This case is complex. We recommend consulting a lawyer.';
   }
 }
