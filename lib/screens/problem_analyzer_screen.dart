@@ -1,4 +1,4 @@
-﻿import 'package:file_picker/file_picker.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,8 +23,7 @@ class ProblemAnalyzerScreen extends ConsumerStatefulWidget {
       _ProblemAnalyzerScreenState();
 }
 
-class _ProblemAnalyzerScreenState
-    extends ConsumerState<ProblemAnalyzerScreen> {
+class _ProblemAnalyzerScreenState extends ConsumerState<ProblemAnalyzerScreen> {
   final _formKey = GlobalKey<FormState>();
 
   late final ScrollController _scrollController;
@@ -70,12 +69,13 @@ class _ProblemAnalyzerScreenState
     _partyController = TextEditingController();
     _refController = TextEditingController();
 
-    final hasCategoryParam =
-        widget.initialCategory != null && widget.initialCategory!.trim().isNotEmpty;
+    final hasCategoryParam = widget.initialCategory != null &&
+        widget.initialCategory!.trim().isNotEmpty;
     _minStep = hasCategoryParam ? 1 : 0;
     _currentStep = _minStep;
 
-    _category = hasCategoryParam ? _safeInitialCategory(widget.initialCategory) : '';
+    _category =
+        hasCategoryParam ? _safeInitialCategory(widget.initialCategory) : '';
 
     // Set initial category once state is ready.
     if (hasCategoryParam) {
@@ -197,7 +197,8 @@ Amount: ${_amountController.text}
 Involved Party: ${_partyController.text}
 Reference Number: ${_refController.text}
 Summary: $summaryText
-'''.trim();
+'''
+          .trim();
 
       ref.read(problemProvider.notifier).setDescription(fullDescription);
 
@@ -256,7 +257,7 @@ Summary: $summaryText
     Widget content = const SizedBox.shrink();
 
     if (_currentStep == 0) {
-      stepLabel = 'Step 0 â€” Choose Category';
+      stepLabel = 'Step 0 - Choose Category';
       content = _categories.isEmpty
           ? const EmptyStateWidget(
               icon: Icons.search_off_outlined,
@@ -268,52 +269,53 @@ Summary: $summaryText
                 final crossAxisCount = constraints.maxWidth > 900
                     ? 4
                     : (constraints.maxWidth > 600 ? 3 : 2);
-          final childAspectRatio = constraints.maxWidth > 900
-              ? 1.15
-              : (constraints.maxWidth > 600 ? 0.95 : 0.85);
+                final childAspectRatio = constraints.maxWidth > 900
+                    ? 1.15
+                    : (constraints.maxWidth > 600 ? 0.95 : 0.85);
 
-          return GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: _categories.length,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: crossAxisCount,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              childAspectRatio: childAspectRatio,
-            ),
-            itemBuilder: (context, index) {
-              final category = _categories[index];
-              return CategoryCard(
-                icon: category.icon,
-                title: category.name,
-                subtitle: category.description,
-                iconColor: const Color(0xFF0052CC),
-                onTap: () {
-                  HapticFeedback.lightImpact();
-                  setState(() {
-                    _category = category.name;
-                    _currentStep = 1;
-                  });
-                  ref
-                      .read(problemProvider.notifier)
-                      .setCategory(category.name);
-                },
-              );
-            },
-          );
-        },
-      );
+                return GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _categories.length,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: childAspectRatio,
+                  ),
+                  itemBuilder: (context, index) {
+                    final category = _categories[index];
+                    return CategoryCard(
+                      icon: category.icon,
+                      title: category.name,
+                      subtitle: category.description,
+                      iconColor: const Color(0xFF0052CC),
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        setState(() {
+                          _category = category.name;
+                          _currentStep = 1;
+                        });
+                        ref
+                            .read(problemProvider.notifier)
+                            .setCategory(category.name);
+                      },
+                    );
+                  },
+                );
+              },
+            );
     } else if (_currentStep == 1) {
-      stepLabel = 'Step 1 of 3 â€” Issue Details';
+      stepLabel = 'Step 1 of 3 - Issue Details';
       content = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           DropdownButtonFormField<String>(
             initialValue: _category.isEmpty ? null : _category,
             focusNode: _categoryFocusNode,
-            validator: (value) =>
-                (value == null || value.isEmpty) ? 'Please select a category' : null,
+            validator: (value) => (value == null || value.isEmpty)
+                ? 'Please select a category'
+                : null,
             items: _categories
                 .map(
                   (category) => DropdownMenuItem(
@@ -337,11 +339,13 @@ Summary: $summaryText
             hint: const Text('Select a category'),
             decoration: const InputDecoration(labelText: 'Category'),
           ),
-          if (_category.isNotEmpty && AppCategories.categoryFields.containsKey(_category)) ...[
+          if (_category.isNotEmpty &&
+              AppCategories.categoryFields.containsKey(_category)) ...[
             const SizedBox(height: 16),
             ...AppCategories.categoryFields[_category]!.map((field) {
               if (!_dynamicFieldControllers.containsKey(field.fieldKey)) {
-                _dynamicFieldControllers[field.fieldKey] = TextEditingController();
+                _dynamicFieldControllers[field.fieldKey] =
+                    TextEditingController();
               }
               final controller = _dynamicFieldControllers[field.fieldKey]!;
               return Padding(
@@ -355,7 +359,8 @@ Summary: $summaryText
                           : null
                       : null,
                   decoration: InputDecoration(
-                    labelText: field.required ? '${field.label} *' : field.label,
+                    labelText:
+                        field.required ? '${field.label} *' : field.label,
                     hintText: field.hint,
                   ),
                   onChanged: (value) {
@@ -368,7 +373,7 @@ Summary: $summaryText
         ],
       );
     } else if (_currentStep == 2) {
-      stepLabel = 'Step 2 of 3 â€” Additional Information';
+      stepLabel = 'Step 2 of 3 - Additional Information';
       content = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -378,10 +383,9 @@ Summary: $summaryText
                 child: TextFormField(
                   controller: _dateController,
                   focusNode: _dateFocusNode,
-                  validator: (value) =>
-                      (value == null || value.trim().isEmpty)
-                          ? 'Please enter the date'
-                          : null,
+                  validator: (value) => (value == null || value.trim().isEmpty)
+                      ? 'Please enter the date'
+                      : null,
                   decoration: const InputDecoration(
                     labelText: 'Date',
                     hintText: 'DD/MM/YYYY',
@@ -393,13 +397,12 @@ Summary: $summaryText
                 child: TextFormField(
                   controller: _amountController,
                   focusNode: _amountFocusNode,
-                  validator: (value) =>
-                      (value == null || value.trim().isEmpty)
-                          ? 'Please enter the amount'
-                          : null,
+                  validator: (value) => (value == null || value.trim().isEmpty)
+                      ? 'Please enter the amount'
+                      : null,
                   decoration: const InputDecoration(
                     labelText: 'Amount',
-                    hintText: 'e.g. â‚¹5000',
+                    hintText: 'e.g. Rs.5000',
                   ),
                   keyboardType: TextInputType.number,
                 ),
@@ -410,10 +413,9 @@ Summary: $summaryText
           TextFormField(
             controller: _partyController,
             focusNode: _partyFocusNode,
-            validator: (value) =>
-                (value == null || value.trim().isEmpty)
-                    ? 'Please enter the involved party'
-                    : null,
+            validator: (value) => (value == null || value.trim().isEmpty)
+                ? 'Please enter the involved party'
+                : null,
             decoration: const InputDecoration(
               labelText: 'Involved Party',
               hintText: 'e.g. Vendor name, Bank name',
@@ -423,10 +425,9 @@ Summary: $summaryText
           TextFormField(
             controller: _refController,
             focusNode: _refFocusNode,
-            validator: (value) =>
-                (value == null || value.trim().isEmpty)
-                    ? 'Please enter the reference number'
-                    : null,
+            validator: (value) => (value == null || value.trim().isEmpty)
+                ? 'Please enter the reference number'
+                : null,
             decoration: const InputDecoration(
               labelText: 'Reference Number',
               hintText: 'e.g. Order ID, Transaction ID',
@@ -435,7 +436,7 @@ Summary: $summaryText
         ],
       );
     } else if (_currentStep == 3) {
-      stepLabel = 'Step 3 of 3 â€” Summary & Evidence';
+      stepLabel = 'Step 3 of 3 - Summary & Evidence';
       content = Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -458,11 +459,12 @@ Summary: $summaryText
             ),
           ),
           const SizedBox(height: 24),
-          Text('Evidence', style: const TextStyle(
-            color: Color(0xFF1F2937),
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          )),
+          Text('Evidence',
+              style: const TextStyle(
+                color: Color(0xFF1F2937),
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              )),
           const SizedBox(height: 8),
           Container(
             width: double.infinity,
@@ -666,8 +668,7 @@ Summary: $summaryText
                   key: _formKey,
                   child: SingleChildScrollView(
                     controller: _scrollController,
-                    padding:
-                        EdgeInsets.only(bottom: bottomInset > 0 ? 16 : 32),
+                    padding: EdgeInsets.only(bottom: bottomInset > 0 ? 16 : 32),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -714,4 +715,3 @@ Summary: $summaryText
     );
   }
 }
-

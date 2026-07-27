@@ -1,10 +1,10 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/config/theme_config.dart';
 import '../services/ai_service.dart';
 
-// â”€â”€ AIService provider â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- AIService provider --------------------------------------------------------
 
 final _aiServiceProvider = Provider<AIService>((ref) {
   final svc = AIService();
@@ -12,7 +12,7 @@ final _aiServiceProvider = Provider<AIService>((ref) {
   return svc;
 });
 
-// â”€â”€ Popular terms shown on load â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Popular terms shown on load -----------------------------------------------
 
 const List<String> _popularTerms = [
   'Affidavit',
@@ -37,7 +37,7 @@ const List<String> _popularTerms = [
   'Consumer Forum',
 ];
 
-// â”€â”€ Result model â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Result model --------------------------------------------------------------
 
 class _TermResult {
   final String term;
@@ -53,7 +53,7 @@ class _TermResult {
   });
 }
 
-// â”€â”€ Screen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Screen --------------------------------------------------------------------
 
 class LegalTermsScreen extends ConsumerStatefulWidget {
   const LegalTermsScreen({super.key});
@@ -163,7 +163,7 @@ If the term is not a legal term, return:
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // â”€â”€ Search bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+              // -- Search bar ------------------------------
               Container(
                 decoration: BoxDecoration(
                   color: AppColors.surface,
@@ -192,8 +192,7 @@ If the term is not a legal term, return:
                         decoration: const InputDecoration(
                           hintText: 'Search a legal term...',
                           border: InputBorder.none,
-                          contentPadding:
-                              EdgeInsets.symmetric(vertical: 14),
+                          contentPadding: EdgeInsets.symmetric(vertical: 14),
                         ),
                       ),
                     ),
@@ -230,7 +229,7 @@ If the term is not a legal term, return:
 
               const SizedBox(height: 20),
 
-              // â”€â”€ Popular terms â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+              // -- Popular terms ---------------------------
               if (_result == null && !_loading && _error == null) ...[
                 _SectionLabel('POPULAR TERMS'),
                 const SizedBox(height: 12),
@@ -251,7 +250,7 @@ If the term is not a legal term, return:
                 _DisclaimerBanner(),
               ],
 
-              // â”€â”€ Loading â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+              // -- Loading ---------------------------------
               if (_loading) ...[
                 const SizedBox(height: 32),
                 Center(
@@ -271,7 +270,7 @@ If the term is not a legal term, return:
                 ),
               ],
 
-              // â”€â”€ Error â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+              // -- Error -----------------------------------
               if (_error != null) ...[
                 const SizedBox(height: 20),
                 Container(
@@ -304,7 +303,7 @@ If the term is not a legal term, return:
                 ),
               ],
 
-              // â”€â”€ Result â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+              // -- Result ----------------------------------
               if (_result != null) ...[
                 _TermResultCard(
                   result: _result!,
@@ -337,14 +336,13 @@ If the term is not a legal term, return:
   }
 }
 
-// â”€â”€ Term Result Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Term Result Card ----------------------------------------------------------
 
 class _TermResultCard extends StatelessWidget {
   final _TermResult result;
   final ValueChanged<String> onSearchRelated;
 
-  const _TermResultCard(
-      {required this.result, required this.onSearchRelated});
+  const _TermResultCard({required this.result, required this.onSearchRelated});
 
   @override
   Widget build(BuildContext context) {
@@ -374,15 +372,11 @@ class _TermResultCard extends StatelessWidget {
                   children: [
                     Text(
                       result.term,
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleLarge
-                          ?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w800),
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: Colors.white, fontWeight: FontWeight.w800),
                     ),
                     Text(
-                      'Legal Term Â· Indian Law',
+                      'Legal Term - Indian Law',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: Colors.white.withValues(alpha: 0.75)),
                     ),
@@ -470,7 +464,7 @@ class _TermResultCard extends StatelessWidget {
   }
 }
 
-// â”€â”€ Term Chip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Term Chip -----------------------------------------------------------------
 
 class _TermChip extends StatelessWidget {
   final String label;
@@ -510,7 +504,7 @@ class _TermChip extends StatelessWidget {
   }
 }
 
-// â”€â”€ Info Block â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Info Block ----------------------------------------------------------------
 
 class _InfoBlock extends StatelessWidget {
   final IconData icon;
@@ -555,7 +549,7 @@ class _InfoBlock extends StatelessWidget {
   }
 }
 
-// â”€â”€ Section Label â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Section Label -------------------------------------------------------------
 
 class _SectionLabel extends StatelessWidget {
   final String title;
@@ -581,7 +575,7 @@ class _SectionLabel extends StatelessWidget {
   }
 }
 
-// â”€â”€ Disclaimer Banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Disclaimer Banner ---------------------------------------------------------
 
 class _DisclaimerBanner extends StatelessWidget {
   const _DisclaimerBanner();

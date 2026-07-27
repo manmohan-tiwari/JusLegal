@@ -17,16 +17,36 @@ class CasesNotifier extends Notifier<List<SavedCaseModel>> {
     final box = await _box;
     final items = <SavedCaseModel>[];
     for (final key in box.keys) {
-      final raw = Map<String, dynamic>.from(box.get(key));
-      items.add(SavedCaseModel(
-        id: key.toString(),
-        category: raw['category'] as String,
-        problemSnippet: raw['problemSnippet'] as String,
-        date: DateTime.parse(raw['date'] as String),
-        status: raw['status'] as String,
-        resultJson:
-            json.decode(raw['resultJson'] as String) as Map<String, dynamic>,
-      ));
+      final value = box.get(key);
+      if (value is! Map) continue;
+      try {
+        final raw = Map<String, dynamic>.from(value);
+        final category = raw['category'];
+        final problemSnippet = raw['problemSnippet'];
+        final status = raw['status'];
+        final date =
+            raw['date'] is String ? DateTime.tryParse(raw['date']) : null;
+        final decodedResult = raw['resultJson'] is String
+            ? json.decode(raw['resultJson'] as String)
+            : null;
+        if (category is! String ||
+            problemSnippet is! String ||
+            status is! String ||
+            date == null ||
+            decodedResult is! Map) {
+          continue;
+        }
+        items.add(SavedCaseModel(
+          id: key.toString(),
+          category: category,
+          problemSnippet: problemSnippet,
+          date: date,
+          status: status,
+          resultJson: Map<String, dynamic>.from(decodedResult),
+        ));
+      } on FormatException {
+        // Corrupt locally stored cases are skipped so they cannot crash the UI.
+      }
     }
     state = items;
   }
@@ -40,7 +60,7 @@ class CasesNotifier extends Notifier<List<SavedCaseModel>> {
       'status': c.status,
       'resultJson': json.encode(c.resultJson),
     });
-    
+
     // Log case saved event using SafeAnalytics
     await SafeAnalytics.logEvent(
       name: 'case_saved',
@@ -49,7 +69,7 @@ class CasesNotifier extends Notifier<List<SavedCaseModel>> {
         'status': c.status,
       },
     );
-    
+
     await _load();
   }
 
@@ -61,11 +81,14 @@ class CasesNotifier extends Notifier<List<SavedCaseModel>> {
 
   Future<void> markResolved(String id) async {
     final box = await _box;
-    final raw = Map<String, dynamic>.from(box.get(id));
+    final value = box.get(id);
+    if (value is! Map) return;
+    final raw = Map<String, dynamic>.from(value);
     raw['status'] = 'Resolved';
     await box.put(id, raw);
     await _load();
   }
 }
 
-final casesProvider = NotifierProvider<CasesNotifier, List<SavedCaseModel>>(CasesNotifier.new);
+final casesProvider =
+    NotifierProvider<CasesNotifier, List<SavedCaseModel>>(CasesNotifier.new);

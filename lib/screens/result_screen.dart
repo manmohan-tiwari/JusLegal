@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -205,10 +205,10 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                 Text(
                   'Something went wrong',
                   style: const TextStyle(
-            color: Color(0xFF1F2937),
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
+                    color: Color(0xFF1F2937),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
@@ -290,7 +290,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      errorMessage ?? 'Updating analysisâ€¦',
+                      errorMessage ?? 'Updating analysis...',
                       style: TextStyle(
                         color: errorMessage != null
                             ? Colors.white
@@ -348,10 +348,10 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
           ),
           Container(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-          decoration: const BoxDecoration(
-            color: AppTheme.background,
-            border: Border(top: BorderSide(color: AppTheme.border)),
-          ),
+            decoration: const BoxDecoration(
+              color: AppTheme.background,
+              border: Border(top: BorderSide(color: AppTheme.border)),
+            ),
             child: Row(
               children: [
                 Expanded(
@@ -441,7 +441,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('â€¢ ', style: TextStyle(fontSize: 16)),
+                      const Text('- ', style: TextStyle(fontSize: 16)),
                       Expanded(
                         child: Text(
                           r,
@@ -550,7 +550,6 @@ class _ReportCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Card(
       color: AppTheme.background,
       clipBehavior: Clip.antiAlias,
@@ -591,4 +590,3 @@ class _ReportCard extends StatelessWidget {
     );
   }
 }
-

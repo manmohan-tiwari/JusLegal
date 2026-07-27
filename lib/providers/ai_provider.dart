@@ -135,9 +135,8 @@ class AnalysisNotifier extends AsyncNotifier<AnalysisState> {
       state = const AsyncValue.loading();
 
       if (kDebugMode) {
-        print('[AnalysisNotifier] Starting analysis');
-        print(
-            '[AnalysisNotifier] category="${problem.category}" problemLength=${problem.summary.trim().length}');
+        debugPrint('[AnalysisNotifier] analysis started '
+            '(category=${problem.category}, problemLength=${problem.summary.trim().length})');
       }
 
       // Log analysis started event using SafeAnalytics
@@ -165,18 +164,16 @@ class AnalysisNotifier extends AsyncNotifier<AnalysisState> {
       );
 
       if (kDebugMode) {
-        print(
-            '[AnalysisNotifier] Raw AI response keys: ${analysisResult.keys.toList()}');
-        print(
-            '[AnalysisNotifier] Raw AI response preview: ${_debugPreview(analysisResult)}');
+        debugPrint('[AnalysisNotifier] provider response received '
+            '(fieldCount=${analysisResult.length})');
       }
 
       // Convert Map to LegalResultModel
       final legalResult = _mapToLegalResultModel(analysisResult);
 
       if (kDebugMode) {
-        print(
-            '[AnalysisNotifier] Parsed LegalResultModel: ${_debugLegalResult(legalResult)}');
+        debugPrint('[AnalysisNotifier] analysis response parsed '
+            '(confidence=${legalResult.confidence})');
       }
 
       // Update both new and old providers
@@ -196,10 +193,10 @@ class AnalysisNotifier extends AsyncNotifier<AnalysisState> {
       ));
 
       return legalResult;
-    } catch (e, stackTrace) {
+    } catch (e) {
       if (kDebugMode) {
-        print('[AnalysisNotifier] Analysis failed: $e');
-        print('[AnalysisNotifier] StackTrace: $stackTrace');
+        debugPrint('[AnalysisNotifier] analysis failed '
+            '(category=${e.runtimeType})');
       }
 
       // Log analysis error event using SafeAnalytics
@@ -217,23 +214,10 @@ class AnalysisNotifier extends AsyncNotifier<AnalysisState> {
     }
   }
 
-  String _debugPreview(Map<String, dynamic> data) {
-    final sanitized = Map<String, dynamic>.from(data);
-    return sanitized.toString().length > 600
-        ? '${sanitized.toString().substring(0, 600)}...'
-        : sanitized.toString();
-  }
-
-  String _debugLegalResult(LegalResultModel result) {
-    return 'category=${result.category}, law=${result.applicableLaw}, summaryLen=${result.lawSummary.length}, '
-        'steps=${result.steps.length}, authorities=${result.authorities.length}, confidence=${result.confidence}, '
-        'verified=${result.isVerified}, complaintHintLen=${result.complaintHint.length}';
-  }
-
   LegalResultModel _mapToLegalResultModel(Map<String, dynamic> data) {
     if (kDebugMode) {
-      print(
-          '[AnalysisNotifier] Mapping AI payload with keys: ${data.keys.toList()}');
+      debugPrint('[AnalysisNotifier] mapping provider response '
+          '(fieldCount=${data.length})');
     }
 
     data = _normalizeAnalysisPayload(data);

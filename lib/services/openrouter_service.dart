@@ -1,9 +1,10 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
 import '../core/constants/api_constants.dart';
+import '../core/config/env_config.dart';
 import '../core/config/ai_config.dart';
 import '../core/exceptions/ai_exceptions.dart';
 
@@ -17,7 +18,11 @@ class OpenRouterService {
               baseUrl: WORKER_BASE_URL,
               connectTimeout: ApiConstants.connectionTimeout,
               receiveTimeout: ApiConstants.receiveTimeout,
-              headers: const {'Content-Type': 'application/json'},
+              headers: {
+                'Content-Type': 'application/json',
+                if (EnvConfig.proxyAuthToken.isNotEmpty)
+                  'Authorization': 'Bearer ${EnvConfig.proxyAuthToken}',
+              },
             ));
 
   Future<Map<String, dynamic>> analyze(
@@ -139,10 +144,8 @@ class OpenRouterService {
     }
     final content = message['content'] as String;
     if (kDebugMode) {
-      final finishReason =
-          Map<String, dynamic>.from(choices.first as Map)['finish_reason'];
-      debugPrint(
-          '[OpenRouterService] Response (${content.length} chars, finish: $finishReason): $content');
+      debugPrint('[OpenRouterService] chat response received '
+          '(length=${content.length})');
     }
     return content;
   }
@@ -167,4 +170,3 @@ class OpenRouterService {
         'OpenRouter request failed (${error.response?.statusCode ?? 'network error'})');
   }
 }
-

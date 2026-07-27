@@ -1,4 +1,4 @@
-﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/form_field_model.dart';
 import '../models/form_template_model.dart';
 import '../core/config/templates.dart';
@@ -46,13 +46,14 @@ class DocumentCreationService {
     buffer.writeln();
     buffer.writeln('Signature: _______________');
     buffer.writeln();
-    buffer.writeln('Name: ${values['complainant_name'] ?? values['applicant_name'] ?? values['claimant_name'] ?? values['worker_name'] ?? '[Name]'}');
+    buffer.writeln(
+        'Name: ${values['complainant_name'] ?? values['applicant_name'] ?? values['claimant_name'] ?? values['worker_name'] ?? '[Name]'}');
     buffer.writeln('=' * 60);
 
     return buffer.toString();
   }
 
-  // AI-enhanced version â€” fills gaps, improves language
+  // AI-enhanced version - fills gaps, improves language
   Future<String> buildAIEnhancedForm({
     required FormTemplateModel template,
     required Map<String, String> values,
@@ -107,7 +108,7 @@ Write ONLY the complete filled form document. No explanations.
     }
   }
 
-  // Validate form â€” returns map of fieldKey -> error message
+  // Validate form - returns map of fieldKey -> error message
   Map<String, String> validateForm({
     required FormTemplateModel template,
     required Map<String, String> values,
@@ -147,8 +148,7 @@ Write ONLY the complete filled form document. No explanations.
   }
 }
 
-
-// â”€â”€ AI Service provider â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- AI Service provider -------------------------------------------------------
 
 final _aiServiceProvider = Provider<AIService>((ref) {
   final svc = AIService();
@@ -156,13 +156,14 @@ final _aiServiceProvider = Provider<AIService>((ref) {
   return svc;
 });
 
-// â”€â”€ Document Creation Service provider â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Document Creation Service provider ---------------------------------------
 
-final documentCreationServiceProvider = Provider<DocumentCreationService>((ref) {
+final documentCreationServiceProvider =
+    Provider<DocumentCreationService>((ref) {
   return DocumentCreationService(ref.read(_aiServiceProvider));
 });
 
-// â”€â”€ State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- State ---------------------------------------------------------------------
 
 enum DocumentCreationStatus { idle, loading, success, error }
 
@@ -202,7 +203,8 @@ class DocumentCreationState {
       fieldValues: fieldValues ?? this.fieldValues,
       fieldErrors: clearErrors ? {} : (fieldErrors ?? this.fieldErrors),
       status: status ?? this.status,
-      generatedText: clearGenerated ? null : (generatedText ?? this.generatedText),
+      generatedText:
+          clearGenerated ? null : (generatedText ?? this.generatedText),
       errorMessage: errorMessage ?? this.errorMessage,
       useAI: useAI ?? this.useAI,
     );
@@ -215,7 +217,7 @@ class DocumentCreationState {
   bool get hasGenerated => generatedText != null && generatedText!.isNotEmpty;
 }
 
-// â”€â”€ Notifier â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Notifier ------------------------------------------------------------------
 
 class DocumentCreationNotifier extends Notifier<DocumentCreationState> {
   late final DocumentCreationService _service;
@@ -324,9 +326,8 @@ class DocumentCreationNotifier extends Notifier<DocumentCreationState> {
   }
 }
 
-// â”€â”€ Provider â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Provider ------------------------------------------------------------------
 
 final documentCreationProvider =
-    NotifierProvider<DocumentCreationNotifier, DocumentCreationState>(DocumentCreationNotifier.new);
-
-
+    NotifierProvider<DocumentCreationNotifier, DocumentCreationState>(
+        DocumentCreationNotifier.new);

@@ -36,6 +36,7 @@ class AppRouteNames {
   static const String authorities = 'authorities';
   static const String settings = 'settings';
   static const String privacyPolicy = 'privacyPolicy';
+  static const String firebaseUnavailable = 'firebaseUnavailable';
 
   // Legal utilities
   static const String aiLawyerChat = 'aiLawyerChat';
@@ -48,12 +49,18 @@ class AppRouteNames {
   static const String homeContractNegotiation = 'contractNegotiation';
 }
 
-GoRouter buildRouter() {
+GoRouter buildRouter({required bool firebaseAvailable}) {
   return GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: '/',
     redirect: (context, state) {
       final path = state.uri.path;
+      if (!firebaseAvailable) {
+        if (path == '/privacy-policy' || path == '/firebase-unavailable') {
+          return null;
+        }
+        return '/firebase-unavailable';
+      }
       final user = FirebaseAuth.instance.currentUser;
 
       // If path starts with /home and user is not authenticated, redirect to login
@@ -77,6 +84,11 @@ GoRouter buildRouter() {
         path: '/privacy-policy',
         name: AppRouteNames.privacyPolicy,
         builder: (context, state) => const PrivacyPolicyScreen(),
+      ),
+      GoRoute(
+        path: '/firebase-unavailable',
+        name: AppRouteNames.firebaseUnavailable,
+        builder: (context, state) => const _FirebaseUnavailableScreen(),
       ),
       GoRoute(
         path: '/login',
@@ -191,4 +203,22 @@ GoRouter buildRouter() {
       ),
     ],
   );
+}
+
+class _FirebaseUnavailableScreen extends StatelessWidget {
+  const _FirebaseUnavailableScreen();
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(title: const Text('Service unavailable')),
+        body: const Center(
+          child: Padding(
+            padding: EdgeInsets.all(24),
+            child: Text(
+              'Sign-in features are temporarily unavailable. Please try again later.',
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      );
 }

@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/config/theme_config.dart';
 import '../models/document_category_model.dart';
@@ -9,7 +9,7 @@ import '../widgets/legal_writing/category_step.dart';
 import '../widgets/legal_writing/form_step.dart';
 import '../widgets/legal_writing/result_step.dart';
 
-// â”€â”€ Provider â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Provider ------------------------------------------------------------------
 
 final _aiServiceProvider = Provider<AIService>((ref) {
   final svc = AIService();
@@ -17,14 +17,13 @@ final _aiServiceProvider = Provider<AIService>((ref) {
   return svc;
 });
 
-// â”€â”€ Screen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Screen --------------------------------------------------------------------
 
 class LegalWritingScreen extends ConsumerStatefulWidget {
   const LegalWritingScreen({super.key});
 
   @override
-  ConsumerState<LegalWritingScreen> createState() =>
-      _LegalWritingScreenState();
+  ConsumerState<LegalWritingScreen> createState() => _LegalWritingScreenState();
 }
 
 class _LegalWritingScreenState extends ConsumerState<LegalWritingScreen> {
@@ -52,7 +51,7 @@ class _LegalWritingScreenState extends ConsumerState<LegalWritingScreen> {
 
   void _syncControllersWithState() {
     final state = ref.watch(legalWritingProvider);
-    
+
     // Sync result controller
     if (_resultController.text != state.result) {
       _resultController.text = state.result;
@@ -69,7 +68,8 @@ class _LegalWritingScreenState extends ConsumerState<LegalWritingScreen> {
         if (!_fieldControllers.containsKey(field)) {
           _fieldControllers[field] = TextEditingController();
         }
-        if (_fieldControllers[field]!.text != (state.fieldValues[field] ?? '')) {
+        if (_fieldControllers[field]!.text !=
+            (state.fieldValues[field] ?? '')) {
           _fieldControllers[field]!.text = state.fieldValues[field] ?? '';
         }
       }
@@ -78,7 +78,7 @@ class _LegalWritingScreenState extends ConsumerState<LegalWritingScreen> {
 
   void _selectType(DocumentCategory category, DocumentType type) {
     ref.read(legalWritingProvider.notifier).selectType(category, type);
-    
+
     // Initialize controllers for new type
     _initializeControllers(type);
   }
@@ -107,7 +107,8 @@ class _LegalWritingScreenState extends ConsumerState<LegalWritingScreen> {
   String _buildPrompt(LegalWritingState state) {
     final type = state.type!;
     final fieldsText = type.requiredFields
-        .map((field) => '$field: ${(state.fieldValues[field] ?? '').trim().isEmpty ? "Not provided" : (state.fieldValues[field] ?? '').trim()}')
+        .map((field) =>
+            '$field: ${(state.fieldValues[field] ?? '').trim().isEmpty ? "Not provided" : (state.fieldValues[field] ?? '').trim()}')
         .join('\n');
     final extra = state.extraDetails.trim();
 
@@ -124,14 +125,14 @@ $fieldsText
 ${extra.isNotEmpty ? '\nADDITIONAL DETAILS:\n$extra' : ''}
 
 INSTRUCTIONS:
-- Write ONLY the complete document â€” no explanations, no preamble, no notes after
+- Write ONLY the complete document - no explanations, no preamble, no notes after
 - Use proper legal formatting with headings, clauses, and sections as appropriate
 - Use formal legal language appropriate for India
 - Fill ALL details using the information above
 - For missing details use sensible placeholders like [Full Name], [Address], [Date]
 - Include proper signature blocks, witness sections where applicable
 - Cite relevant Indian law or act where appropriate
-- Make it ready to use â€” professionally formatted
+- Make it ready to use - professionally formatted
 - Tone: ${state.tone}
 
 Now write the complete ${type.label}:
@@ -148,14 +149,13 @@ Now write the complete ${type.label}:
     await Future.delayed(const Duration(milliseconds: 100));
     if (_scrollController.hasClients) {
       _scrollController.animateTo(0,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut);
+          duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
     }
 
     try {
       final firstField = state.type!.requiredFields.first;
       final firstValue = state.fieldValues[firstField] ?? '';
-      
+
       // Use generateLetter with the full custom prompt
       final result = await ref.read(_aiServiceProvider).generateLetter(
             letterType: state.type!.id,
@@ -199,12 +199,12 @@ Now write the complete ${type.label}:
       'Sender': 'Your full name',
       'Recipient': 'Full name or company name',
       'Dispute Details': 'Describe the dispute clearly',
-      'Relief Sought': 'e.g. Full refund of â‚¹5000',
+      'Relief Sought': 'e.g. Full refund of Rs.5000',
       'Company Name': 'e.g. Amazon India Pvt Ltd',
       'Landlord': 'Full name of landlord',
       'Tenant': 'Full name of tenant',
       'Property Address': 'Complete property address',
-      'Rent': 'Monthly rent amount e.g. â‚¹15,000',
+      'Rent': 'Monthly rent amount e.g. Rs.15,000',
       'Duration': 'e.g. 11 months from Jan 2024',
       'Party 1': 'First party full name',
       'Party 2': 'Second party full name',
@@ -226,8 +226,7 @@ Now write the complete ${type.label}:
   InputDecoration _inputDecoration(String hint) {
     return InputDecoration(
       hintText: hint,
-      hintStyle:
-          TextStyle(color: AppColors.textSecondary, fontSize: 13),
+      hintStyle: TextStyle(color: AppColors.textSecondary, fontSize: 13),
       filled: true,
       fillColor: AppColors.surface,
       border: OutlineInputBorder(
@@ -240,8 +239,7 @@ Now write the complete ${type.label}:
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide:
-            BorderSide(color: AppColors.trustBlue, width: 1.5),
+        borderSide: BorderSide(color: AppColors.trustBlue, width: 1.5),
       ),
       contentPadding: const EdgeInsets.all(12),
     );
@@ -250,7 +248,7 @@ Now write the complete ${type.label}:
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(legalWritingProvider);
-    
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -295,11 +293,15 @@ Now write the complete ${type.label}:
                         onGenerate: _generate,
                         onFieldChanged: (field) {
                           return (value) {
-                            ref.read(legalWritingProvider.notifier).setFieldValue(field, value);
+                            ref
+                                .read(legalWritingProvider.notifier)
+                                .setFieldValue(field, value);
                           };
                         },
                         onExtraDetailsChanged: (details) {
-                          ref.read(legalWritingProvider.notifier).setExtraDetails(details);
+                          ref
+                              .read(legalWritingProvider.notifier)
+                              .setExtraDetails(details);
                         },
                         fieldHintBuilder: _fieldHint,
                         inputDecorationBuilder: _inputDecoration,
@@ -313,11 +315,15 @@ Now write the complete ${type.label}:
                         resultController: _resultController,
                         isEditing: state.isEditing,
                         onToggleEditing: () {
-                          ref.read(legalWritingProvider.notifier).toggleEditing();
+                          ref
+                              .read(legalWritingProvider.notifier)
+                              .toggleEditing();
                         },
                         onRegenerate: _generate,
                         onNewDocument: () {
-                          ref.read(legalWritingProvider.notifier).resetToCategory();
+                          ref
+                              .read(legalWritingProvider.notifier)
+                              .resetToCategory();
                         },
                       ),
           ),
@@ -326,4 +332,3 @@ Now write the complete ${type.label}:
     );
   }
 }
-

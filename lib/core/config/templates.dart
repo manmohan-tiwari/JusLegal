@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import '../../models/document_category_model.dart';
 import '../../models/document_type_model.dart';
@@ -7,8 +7,9 @@ import '../../models/form_template_model.dart';
 
 class ComplaintTemplates {
   static Map<String, Map<String, String>> get templates => {
-    'E-commerce & Shopping': {
-      'email': '''Subject: Formal Complaint Regarding [Issue Type] - Order #[Order Number]
+        'E-commerce & Shopping': {
+          'email':
+              '''Subject: Formal Complaint Regarding [Issue Type] - Order #[Order Number]
 
 Date: [Current Date]
 
@@ -53,8 +54,7 @@ Sincerely,
 [Your Address]
 [Your Phone Number]
 [Your Email Address]''',
-
-      'police': '''To,
+          'police': '''To,
 The Officer-in-Charge
 [Police Station Name]
 [Police Station Address]
@@ -101,8 +101,7 @@ Yours faithfully,
 [Your Phone Number]
 [Your Email Address]
 [Aadhaar Number]''',
-
-      'consumer_court': '''IN THE CONSUMER DISPUTES REDRESSAL COMMISSION
+          'consumer_court': '''IN THE CONSUMER DISPUTES REDRESSAL COMMISSION
 [District/State Name]
 
 Consumer Complaint No.: [To be filled by Court]
@@ -140,16 +139,16 @@ The cause of action arose on [Incident Date] and continues till date.
 **Relief Claimed:**
 The complainant prays for the following reliefs:
 
-1. Refund of â‚¹[Amount] paid for the product/service
-2. Compensation of â‚¹[Amount] for mental agony and harassment
-3. Litigation costs of â‚¹[Amount]
+1. Refund of Rs.[Amount] paid for the product/service
+2. Compensation of Rs.[Amount] for mental agony and harassment
+3. Litigation costs of Rs.[Amount]
 4. Any other relief this Hon'ble Commission deems fit
 
 **Particulars of Claim:**
-- Principal Amount: â‚¹[Amount]
-- Compensation for Mental Agony: â‚¹[Amount]
-- Litigation Costs: â‚¹[Amount]
-- **Total:** â‚¹[Total Amount]
+- Principal Amount: Rs.[Amount]
+- Compensation for Mental Agony: Rs.[Amount]
+- Litigation Costs: Rs.[Amount]
+- **Total:** Rs.[Total Amount]
 
 **Verification:**
 Verified at [City] on [Date] that the contents of this complaint are true to the best of my knowledge and belief.
@@ -157,10 +156,10 @@ Verified at [City] on [Date] that the contents of this complaint are true to the
 **Complainant**
 (Signature)
 [Your Name]'''
-    },
-
-    'Banking & UPI Fraud': {
-      'email': '''Subject: Urgent Complaint Regarding Unauthorized Transaction - Account #[Account Number]
+        },
+        'Banking & UPI Fraud': {
+          'email':
+              '''Subject: Urgent Complaint Regarding Unauthorized Transaction - Account #[Account Number]
 
 Date: [Current Date]
 
@@ -175,7 +174,7 @@ I, [Your Name], account holder [Account Number], wish to report an unauthorized 
 
 **Date of Incident:** [Incident Date]
 **Time of Incident:** [Transaction Time]
-**Transaction Amount:** â‚¹[Amount]
+**Transaction Amount:** Rs.[Amount]
 **Transaction ID:** [Transaction ID]
 **Type of Transaction:** [UPI/NEFT/RTGS/IMPS]
 
@@ -200,8 +199,7 @@ Sincerely,
 [Your Phone Number]
 [Your Email Address]
 Account Number: [Account Number]''',
-
-      'police': '''To,
+          'police': '''To,
 The Officer-in-Charge
 [Police Station Name]
 [Police Station Address]
@@ -216,7 +214,7 @@ I, [Your Name], residing at [Your Address], wish to file an FIR for online banki
 
 **Date of Incident:** [Incident Date]
 **Time of Incident:** [Transaction Time]
-**Amount Fraudulently Debited:** â‚¹[Amount]
+**Amount Fraudulently Debited:** Rs.[Amount]
 
 **Bank Details:**
 - Bank Name: [Bank Name]
@@ -252,8 +250,7 @@ Yours faithfully,
 [Your Address]
 [Your Phone Number]
 [Your Email Address]''',
-
-      'consumer_court': '''IN THE CONSUMER DISPUTES REDRESSAL COMMISSION
+          'consumer_court': '''IN THE CONSUMER DISPUTES REDRESSAL COMMISSION
 [District/State Name]
 
 Consumer Complaint No.: [To be filled by Court]
@@ -277,7 +274,7 @@ Phone: [Bank's Contact Number]
 
 **Facts of the Case:**
 1. That the complainant maintains a savings/current account #[Account Number] with the opposite party.
-2. That on [Incident Date], an unauthorized transaction of â‚¹[Amount] occurred.
+2. That on [Incident Date], an unauthorized transaction of Rs.[Amount] occurred.
 3. That despite immediate notification, the opposite party failed to take timely action.
 4. That the opposite party is liable for the loss as per RBI guidelines.
 
@@ -288,12 +285,12 @@ Phone: [Bank's Contact Number]
 The cause of action arose on [Incident Date] and continues till date.
 
 **Relief Claimed:**
-1. Refund of the unauthorized amount of â‚¹[Amount]
-2. Compensation of â‚¹[Amount] for mental harassment
+1. Refund of the unauthorized amount of Rs.[Amount]
+2. Compensation of Rs.[Amount] for mental harassment
 3. Interest on the amount from date of incident
 4. Litigation costs
 
-**Total Claim:** â‚¹[Total Amount]
+**Total Claim:** Rs.[Total Amount]
 
 **Verification:**
 Verified at [City] on [Date] that the contents are true to my knowledge.
@@ -301,10 +298,10 @@ Verified at [City] on [Date] that the contents are true to my knowledge.
 **Complainant**
 (Signature)
 [Your Name]'''
-    },
-
-    'Flights & Travel Issues': {
-      'email': '''Subject: Formal Complaint Regarding [Issue Type] - Booking Ref #[Booking Reference]
+        },
+        'Flights & Travel Issues': {
+          'email':
+              '''Subject: Formal Complaint Regarding [Issue Type] - Booking Ref #[Booking Reference]
 
 Date: [Current Date]
 
@@ -346,8 +343,7 @@ Sincerely,
 [Your Address]
 [Your Phone Number]
 [Your Email Address]''',
-
-      'police': '''To,
+          'police': '''To,
 The Officer-in-Charge
 [Police Station Name]
 [Police Station Address]
@@ -365,7 +361,7 @@ I, [Your Name], residing at [Your Address], wish to file an FIR against [Airline
 
 **Booking Details:**
 - Booking Reference: [Booking Reference]
-- Amount Paid: â‚¹[Amount]
+- Amount Paid: Rs.[Amount]
 - Payment Date: [Payment Date]
 
 **Detailed Description:**
@@ -388,8 +384,7 @@ Yours faithfully,
 [Your Name]
 [Your Address]
 [Your Phone Number]''',
-
-      'consumer_court': '''IN THE CONSUMER DISPUTES REDRESSAL COMMISSION
+          'consumer_court': '''IN THE CONSUMER DISPUTES REDRESSAL COMMISSION
 [District/State Name]
 
 Consumer Complaint No.: [To be filled by Court]
@@ -423,12 +418,12 @@ Address: [Registered Office Address]
 The cause of action arose on [Incident Date].
 
 **Relief Claimed:**
-1. Refund of â‚¹[Amount]
-2. Compensation for harassment: â‚¹[Amount]
-3. Litigation costs: â‚¹[Amount]
+1. Refund of Rs.[Amount]
+2. Compensation for harassment: Rs.[Amount]
+3. Litigation costs: Rs.[Amount]
 4. Any other relief
 
-**Total Claim:** â‚¹[Total Amount]
+**Total Claim:** Rs.[Total Amount]
 
 **Verification:**
 Verified at [City] on [Date].
@@ -436,10 +431,10 @@ Verified at [City] on [Date].
 **Complainant**
 (Signature)
 [Your Name]'''
-    },
-
-    'Restaurant & Food Billing': {
-      'email': '''Subject: Complaint Regarding Overcharging/Fake GST - Bill #[Bill Number]
+        },
+        'Restaurant & Food Billing': {
+          'email':
+              '''Subject: Complaint Regarding Overcharging/Fake GST - Bill #[Bill Number]
 
 Date: [Current Date]
 
@@ -456,7 +451,7 @@ I, [Your Name], visited your restaurant on [Incident Date] and wish to complain 
 - Date of Visit: [Incident Date]
 - Bill Number: [Bill Number]
 - Table Number: [Table Number]
-- Amount Charged: â‚¹[Amount]
+- Amount Charged: Rs.[Amount]
 
 **Detailed Description of the Problem:**
 [User Problem Description]
@@ -477,8 +472,7 @@ Sincerely,
 [Your Address]
 [Your Phone Number]
 [Your Email Address]''',
-
-      'police': '''To,
+          'police': '''To,
 The Officer-in-Charge
 [Police Station Name]
 [Police Station Address]
@@ -493,7 +487,7 @@ I, [Your Name], wish to file FIR against [Restaurant Name] for overcharging and 
 
 **Date of Incident:** [Incident Date]
 **Restaurant Address:** [Restaurant Address]
-**Bill Amount:** â‚¹[Amount]
+**Bill Amount:** Rs.[Amount]
 
 **Detailed Description:**
 [User Problem Description]
@@ -514,8 +508,7 @@ Yours faithfully,
 [Your Name]
 [Your Address]
 [Your Phone Number]''',
-
-      'consumer_court': '''IN THE CONSUMER DISPUTES REDRESSAL COMMISSION
+          'consumer_court': '''IN THE CONSUMER DISPUTES REDRESSAL COMMISSION
 [District/State Name]
 
 Consumer Complaint No.: [To be filled by Court]
@@ -534,18 +527,18 @@ Address: [Restaurant Address]
 
 **Facts:**
 1. Complainant visited restaurant on [Incident Date]
-2. Was overcharged â‚¹[Amount] with fake GST
+2. Was overcharged Rs.[Amount] with fake GST
 3. Restaurant refused to correct the bill
 
 **Detailed Description:**
 [User Problem Description]
 
 **Relief Claimed:**
-1. Refund of excess amount: â‚¹[Amount]
-2. Compensation: â‚¹[Amount]
-3. Costs: â‚¹[Amount]
+1. Refund of excess amount: Rs.[Amount]
+2. Compensation: Rs.[Amount]
+3. Costs: Rs.[Amount]
 
-**Total:** â‚¹[Total Amount]
+**Total:** Rs.[Total Amount]
 
 **Verification:**
 Verified at [City] on [Date].
@@ -553,10 +546,10 @@ Verified at [City] on [Date].
 **Complainant**
 (Signature)
 [Your Name]'''
-    },
-
-    'Hospital Billing Problems': {
-      'email': '''Subject: Complaint Regarding Excessive Billing - IP No. [IP Number]
+        },
+        'Hospital Billing Problems': {
+          'email':
+              '''Subject: Complaint Regarding Excessive Billing - IP No. [IP Number]
 
 Date: [Current Date]
 
@@ -574,7 +567,7 @@ I, [Your Name], wish to complain about excessive billing for treatment.
 - IP Number: [IP Number]
 - Admission Date: [Admission Date]
 - Discharge Date: [Discharge Date]
-- Total Bill: â‚¹[Amount]
+- Total Bill: Rs.[Amount]
 
 **Date of Incident:** [Incident Date]
 
@@ -596,8 +589,7 @@ Sincerely,
 [Your Name]
 [Your Address]
 [Your Phone Number]''',
-
-      'police': '''To,
+          'police': '''To,
 The Officer-in-Charge
 [Police Station Name]
 
@@ -613,7 +605,7 @@ I, [Your Name], wish to file FIR against [Hospital Name] for medical billing fra
 - Hospital: [Hospital Name]
 - Patient: [Patient Name]
 - IP Number: [IP Number]
-- Fraud Amount: â‚¹[Amount]
+- Fraud Amount: Rs.[Amount]
 
 **Detailed Description:**
 [User Problem Description]
@@ -633,8 +625,7 @@ Register FIR and investigate this medical fraud case.
 Yours faithfully,
 [Your Name]
 [Your Address]''',
-
-      'consumer_court': '''IN THE CONSUMER DISPUTES REDRESSAL COMMISSION
+          'consumer_court': '''IN THE CONSUMER DISPUTES REDRESSAL COMMISSION
 [District/State Name]
 
 Consumer Complaint No.: [To be filled by Court]
@@ -653,18 +644,18 @@ Address: [Hospital Address]
 
 **Facts:**
 1. Patient [Patient Name] admitted on [Date]
-2. Excessive billing of â‚¹[Amount]
+2. Excessive billing of Rs.[Amount]
 3. Charges for services not rendered
 
 **Detailed Description:**
 [User Problem Description]
 
 **Relief Claimed:**
-1. Refund: â‚¹[Amount]
-2. Compensation: â‚¹[Amount]
-3. Legal costs: â‚¹[Amount]
+1. Refund: Rs.[Amount]
+2. Compensation: Rs.[Amount]
+3. Legal costs: Rs.[Amount]
 
-**Total:** â‚¹[Total Amount]
+**Total:** Rs.[Total Amount]
 
 **Verification:**
 Verified at [City] on [Date].
@@ -672,10 +663,10 @@ Verified at [City] on [Date].
 **Complainant**
 (Signature)
 [Your Name]'''
-    },
-
-    'Traffic & Vehicle Issues': {
-      'email': '''Subject: Appeal Against Wrong Traffic Challan - Challan No. [Challan Number]
+        },
+        'Traffic & Vehicle Issues': {
+          'email':
+              '''Subject: Appeal Against Wrong Traffic Challan - Challan No. [Challan Number]
 
 Date: [Current Date]
 
@@ -693,7 +684,7 @@ I, [Your Name], wish to appeal against an incorrect traffic challan.
 - Vehicle Number: [Vehicle Number]
 - Date of Violation: [Date on Challan]
 - Location: [Location on Challan]
-- Amount: â‚¹[Amount]
+- Amount: Rs.[Amount]
 
 **Date of Incident:** [Incident Date]
 
@@ -715,8 +706,7 @@ Sincerely,
 [Your Name]
 [Your Address]
 [Your Phone Number]''',
-
-      'police': '''To,
+          'police': '''To,
 The Officer-in-Charge
 [Police Station Name]
 
@@ -731,7 +721,7 @@ I, [Your Name], wish to complain about an incorrect traffic challan.
 **Challan Details:**
 - Number: [Challan Number]
 - Vehicle: [Vehicle Number]
-- Amount: â‚¹[Amount]
+- Amount: Rs.[Amount]
 
 **Detailed Description:**
 [User Problem Description]
@@ -750,8 +740,7 @@ Investigate and cancel the incorrect challan.
 Yours faithfully,
 [Your Name]
 [Your Address]''',
-
-      'consumer_court': '''IN THE CONSUMER DISPUTES REDRESSAL COMMISSION
+          'consumer_court': '''IN THE CONSUMER DISPUTES REDRESSAL COMMISSION
 [District/State Name]
 
 Consumer Complaint No.: [To be filled by Court]
@@ -771,17 +760,17 @@ Address: [Traffic Police Office Address]
 **Facts:**
 1. Wrong traffic challan issued
 2. Vehicle [Vehicle Number] not at location
-3. Challan amount: â‚¹[Amount]
+3. Challan amount: Rs.[Amount]
 
 **Detailed Description:**
 [User Problem Description]
 
 **Relief Claimed:**
 1. Cancellation of challan
-2. Refund if paid: â‚¹[Amount]
-3. Compensation: â‚¹[Amount]
+2. Refund if paid: Rs.[Amount]
+3. Compensation: Rs.[Amount]
 
-**Total:** â‚¹[Total Amount]
+**Total:** Rs.[Total Amount]
 
 **Verification:**
 Verified at [City] on [Date].
@@ -789,10 +778,10 @@ Verified at [City] on [Date].
 **Complainant**
 (Signature)
 [Your Name]'''
-    },
-
-    'Telecom & Internet Services': {
-      'email': '''Subject: Complaint Regarding Service Issues - Account #[Account Number]
+        },
+        'Telecom & Internet Services': {
+          'email':
+              '''Subject: Complaint Regarding Service Issues - Account #[Account Number]
 
 Date: [Current Date]
 
@@ -822,7 +811,7 @@ As per TRAI Regulations and Consumer Protection Act:
 
 **Relief Sought:**
 1. Immediate resolution of service issue
-2. Refund for downtime: â‚¹[Amount]
+2. Refund for downtime: Rs.[Amount]
 3. Compensation for inconvenience
 
 I expect resolution within 3 days or will approach TRAI and Consumer Forum.
@@ -831,8 +820,7 @@ Sincerely,
 [Your Name]
 [Your Address]
 [Your Phone Number]''',
-
-      'police': '''To,
+          'police': '''To,
 The Officer-in-Charge
 [Police Station Name]
 
@@ -847,7 +835,7 @@ I, [Your Name], wish to file FIR against [Telecom Company].
 **Account Details:**
 - Account Number: [Account Number]
 - Mobile Number: [Mobile Number]
-- Fraud Amount: â‚¹[Amount]
+- Fraud Amount: Rs.[Amount]
 
 **Detailed Description:**
 [User Problem Description]
@@ -867,8 +855,7 @@ Register FIR and investigate this telecom fraud.
 Yours faithfully,
 [Your Name]
 [Your Address]''',
-
-      'consumer_court': '''IN THE CONSUMER DISPUTES REDRESSAL COMMISSION
+          'consumer_court': '''IN THE CONSUMER DISPUTES REDRESSAL COMMISSION
 [District/State Name]
 
 Consumer Complaint No.: [To be filled by Court]
@@ -888,17 +875,17 @@ Address: [Company Address]
 **Facts:**
 1. Customer since [Date]
 2. Service issues since [Date]
-3. Financial loss: â‚¹[Amount]
+3. Financial loss: Rs.[Amount]
 
 **Detailed Description:**
 [User Problem Description]
 
 **Relief Claimed:**
-1. Refund: â‚¹[Amount]
-2. Compensation: â‚¹[Amount]
-3. Legal costs: â‚¹[Amount]
+1. Refund: Rs.[Amount]
+2. Compensation: Rs.[Amount]
+3. Legal costs: Rs.[Amount]
 
-**Total:** â‚¹[Total Amount]
+**Total:** Rs.[Total Amount]
 
 **Verification:**
 Verified at [City] on [Date].
@@ -906,10 +893,10 @@ Verified at [City] on [Date].
 **Complainant**
 (Signature)
 [Your Name]'''
-    },
-
-    'Education & Coaching Complaints': {
-      'email': '''Subject: Complaint Regarding [Issue Type] - Enrollment #[Enrollment Number]
+        },
+        'Education & Coaching Complaints': {
+          'email':
+              '''Subject: Complaint Regarding [Issue Type] - Enrollment #[Enrollment Number]
 
 Date: [Current Date]
 
@@ -926,7 +913,7 @@ I, [Your Name], student/enrollee #[Enrollment Number], wish to complain about in
 - Enrollment Number: [Enrollment Number]
 - Course: [Course Name]
 - Batch: [Batch Details]
-- Fees Paid: â‚¹[Amount]
+- Fees Paid: Rs.[Amount]
 
 **Date of Incident:** [Incident Date]
 
@@ -948,8 +935,7 @@ Sincerely,
 [Your Name]
 [Your Address]
 [Your Phone Number]''',
-
-      'police': '''To,
+          'police': '''To,
 The Officer-in-Charge
 [Police Station Name]
 
@@ -965,7 +951,7 @@ I, [Your Name], wish to file FIR against [Institution Name].
 - Name: [Institution Name]
 - Address: [Institution Address]
 - Course: [Course Name]
-- Fees Paid: â‚¹[Amount]
+- Fees Paid: Rs.[Amount]
 
 **Detailed Description:**
 [User Problem Description]
@@ -985,8 +971,7 @@ Register FIR and investigate this educational fraud.
 Yours faithfully,
 [Your Name]
 [Your Address]''',
-
-      'consumer_court': '''IN THE CONSUMER DISPUTES REDRESSAL COMMISSION
+          'consumer_court': '''IN THE CONSUMER DISPUTES REDRESSAL COMMISSION
 [District/State Name]
 
 Consumer Complaint No.: [To be filled by Court]
@@ -1005,18 +990,18 @@ Address: [Institution Address]
 
 **Facts:**
 1. Enrolled in course on [Date]
-2. Fees paid: â‚¹[Amount]
+2. Fees paid: Rs.[Amount]
 3. [Details of issue]
 
 **Detailed Description:**
 [User Problem Description]
 
 **Relief Claimed:**
-1. Refund: â‚¹[Amount]
-2. Compensation: â‚¹[Amount]
-3. Legal costs: â‚¹[Amount]
+1. Refund: Rs.[Amount]
+2. Compensation: Rs.[Amount]
+3. Legal costs: Rs.[Amount]
 
-**Total:** â‚¹[Total Amount]
+**Total:** Rs.[Total Amount]
 
 **Verification:**
 Verified at [City] on [Date].
@@ -1024,10 +1009,10 @@ Verified at [City] on [Date].
 **Complainant**
 (Signature)
 [Your Name]'''
-    },
-
-    'Rental & Housing Issues': {
-      'email': '''Subject: Complaint Regarding [Issue Type] - Property at [Property Address]
+        },
+        'Rental & Housing Issues': {
+          'email':
+              '''Subject: Complaint Regarding [Issue Type] - Property at [Property Address]
 
 Date: [Current Date]
 
@@ -1041,9 +1026,9 @@ I, [Your Name], tenant of property at [Property Address], wish to complain about
 
 **Property Details:**
 - Property Address: [Property Address]
-- Rent Amount: â‚¹[Amount]
+- Rent Amount: Rs.[Amount]
 - Lease Period: [Start Date] to [End Date]
-- Security Deposit: â‚¹[Amount]
+- Security Deposit: Rs.[Amount]
 
 **Date of Incident:** [Incident Date]
 
@@ -1065,8 +1050,7 @@ Sincerely,
 [Your Name]
 [Your Address]
 [Your Phone Number]''',
-
-      'police': '''To,
+          'police': '''To,
 The Officer-in-Charge
 [Police Station Name]
 
@@ -1101,8 +1085,7 @@ Register FIR and investigate housing violations.
 Yours faithfully,
 [Your Name]
 [Your Address]''',
-
-      'consumer_court': '''IN THE CONSUMER DISPUTES REDRESSAL COMMISSION
+          'consumer_court': '''IN THE CONSUMER DISPUTES REDRESSAL COMMISSION
 [District/State Name]
 
 Consumer Complaint No.: [To be filled by Court]
@@ -1128,11 +1111,11 @@ Address: [Property Address]
 [User Problem Description]
 
 **Relief Claimed:**
-1. [Specific Relief 1]: â‚¹[Amount]
-2. [Specific Relief 2]: â‚¹[Amount]
-3. Legal costs: â‚¹[Amount]
+1. [Specific Relief 1]: Rs.[Amount]
+2. [Specific Relief 2]: Rs.[Amount]
+3. Legal costs: Rs.[Amount]
 
-**Total:** â‚¹[Total Amount]
+**Total:** Rs.[Total Amount]
 
 **Verification:**
 Verified at [City] on [Date].
@@ -1140,10 +1123,10 @@ Verified at [City] on [Date].
 **Complainant**
 (Signature)
 [Your Name]'''
-    },
-
-    'Government Service Problems': {
-      'email': '''Subject: Complaint Regarding [Service Type] - Application #[Application Number]
+        },
+        'Government Service Problems': {
+          'email':
+              '''Subject: Complaint Regarding [Service Type] - Application #[Application Number]
 
 Date: [Current Date]
 
@@ -1183,8 +1166,7 @@ Sincerely,
 [Your Name]
 [Your Address]
 [Your Phone Number]''',
-
-      'police': '''To,
+          'police': '''To,
 The Officer-in-Charge
 [Police Station Name]
 
@@ -1220,8 +1202,7 @@ Register FIR and investigate official negligence.
 Yours faithfully,
 [Your Name]
 [Your Address]''',
-
-      'consumer_court': '''IN THE CONSUMER DISPUTES REDRESSAL COMMISSION
+          'consumer_court': '''IN THE CONSUMER DISPUTES REDRESSAL COMMISSION
 [District/State Name]
 
 Consumer Complaint No.: [To be filled by Court]
@@ -1248,10 +1229,10 @@ Address: [Department Address]
 
 **Relief Claimed:**
 1. Service delivery: [Specific]
-2. Compensation: â‚¹[Amount]
-3. Legal costs: â‚¹[Amount]
+2. Compensation: Rs.[Amount]
+3. Legal costs: Rs.[Amount]
 
-**Total:** â‚¹[Total Amount]
+**Total:** Rs.[Total Amount]
 
 **Verification:**
 Verified at [City] on [Date].
@@ -1259,21 +1240,23 @@ Verified at [City] on [Date].
 **Complainant**
 (Signature)
 [Your Name]'''
-    }
-  };
+        }
+      };
 
   static String getTemplate(String category, String type) {
-    return templates[category]?[type] ?? templates['E-commerce & Shopping']![type]!;
+    return templates[category]?[type] ??
+        templates['E-commerce & Shopping']![type]!;
   }
 }
 
 class FormTemplates {
   static const List<FormTemplateModel> all = [
-    // â”€â”€ 1. Consumer Complaint â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- 1. Consumer Complaint -----------------------------------------------
     FormTemplateModel(
       id: 'consumer_complaint',
       title: 'Consumer Complaint',
-      subtitle: 'File a complaint against defective goods or deficient services',
+      subtitle:
+          'File a complaint against defective goods or deficient services',
       authority: 'District Consumer Disputes Redressal Commission',
       actReference: 'Consumer Protection Act, 2019',
       instructions:
@@ -1286,22 +1269,93 @@ class FormTemplates {
         'Bank statement showing payment',
       ],
       fields: [
-        FormFieldModel(key: 'complainant_name', label: 'Complainant Full Name', type: FormFieldType.text, required: true, hint: 'Your full legal name'),
-        FormFieldModel(key: 'complainant_address', label: 'Complainant Address', type: FormFieldType.textarea, required: true, hint: 'Full address with pin code', maxLines: 3),
-        FormFieldModel(key: 'complainant_phone', label: 'Phone Number', type: FormFieldType.phone, required: true, hint: '10-digit mobile number'),
-        FormFieldModel(key: 'complainant_email', label: 'Email Address', type: FormFieldType.email, hint: 'your@email.com'),
-        FormFieldModel(key: 'opposite_party_name', label: 'Opposite Party (Company/Person)', type: FormFieldType.text, required: true, hint: 'Full name of company or person'),
-        FormFieldModel(key: 'opposite_party_address', label: 'Opposite Party Address', type: FormFieldType.textarea, required: true, hint: 'Registered address of company', maxLines: 3),
-        FormFieldModel(key: 'complaint_category', label: 'Nature of Complaint', type: FormFieldType.dropdown, required: true, options: ['Defective Goods', 'Deficient Services', 'Unfair Trade Practice', 'Overcharging', 'Misleading Advertisement', 'Other']),
-        FormFieldModel(key: 'purchase_date', label: 'Date of Purchase / Service', type: FormFieldType.date, required: true, hint: 'DD/MM/YYYY'),
-        FormFieldModel(key: 'amount', label: 'Amount Paid (â‚¹)', type: FormFieldType.number, required: true, hint: 'e.g. 5000', prefix: 'â‚¹'),
-        FormFieldModel(key: 'complaint_details', label: 'Details of Complaint', type: FormFieldType.textarea, required: true, hint: 'Describe the issue in detail â€” what happened, when, and how', maxLines: 6),
-        FormFieldModel(key: 'relief_sought', label: 'Relief / Compensation Sought', type: FormFieldType.textarea, required: true, hint: 'What do you want â€” refund, replacement, compensation?', maxLines: 3),
-        FormFieldModel(key: 'previous_complaints', label: 'Previous Complaints to Company', type: FormFieldType.textarea, hint: 'Mention any emails, calls, or complaints already made', maxLines: 3),
+        FormFieldModel(
+            key: 'complainant_name',
+            label: 'Complainant Full Name',
+            type: FormFieldType.text,
+            required: true,
+            hint: 'Your full legal name'),
+        FormFieldModel(
+            key: 'complainant_address',
+            label: 'Complainant Address',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'Full address with pin code',
+            maxLines: 3),
+        FormFieldModel(
+            key: 'complainant_phone',
+            label: 'Phone Number',
+            type: FormFieldType.phone,
+            required: true,
+            hint: '10-digit mobile number'),
+        FormFieldModel(
+            key: 'complainant_email',
+            label: 'Email Address',
+            type: FormFieldType.email,
+            hint: 'your@email.com'),
+        FormFieldModel(
+            key: 'opposite_party_name',
+            label: 'Opposite Party (Company/Person)',
+            type: FormFieldType.text,
+            required: true,
+            hint: 'Full name of company or person'),
+        FormFieldModel(
+            key: 'opposite_party_address',
+            label: 'Opposite Party Address',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'Registered address of company',
+            maxLines: 3),
+        FormFieldModel(
+            key: 'complaint_category',
+            label: 'Nature of Complaint',
+            type: FormFieldType.dropdown,
+            required: true,
+            options: [
+              'Defective Goods',
+              'Deficient Services',
+              'Unfair Trade Practice',
+              'Overcharging',
+              'Misleading Advertisement',
+              'Other'
+            ]),
+        FormFieldModel(
+            key: 'purchase_date',
+            label: 'Date of Purchase / Service',
+            type: FormFieldType.date,
+            required: true,
+            hint: 'DD/MM/YYYY'),
+        FormFieldModel(
+            key: 'amount',
+            label: 'Amount Paid (Rs.)',
+            type: FormFieldType.number,
+            required: true,
+            hint: 'e.g. 5000',
+            prefix: 'Rs.'),
+        FormFieldModel(
+            key: 'complaint_details',
+            label: 'Details of Complaint',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'Describe the issue in detail - what happened, when, and how',
+            maxLines: 6),
+        FormFieldModel(
+            key: 'relief_sought',
+            label: 'Relief / Compensation Sought',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'What do you want - refund, replacement, compensation?',
+            maxLines: 3),
+        FormFieldModel(
+            key: 'previous_complaints',
+            label: 'Previous Complaints to Company',
+            type: FormFieldType.textarea,
+            hint: 'Mention any emails, calls, or complaints already made',
+            maxLines: 3),
       ],
     ),
 
-    // â”€â”€ 2. RTI Application â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- 2. RTI Application --------------------------------------------------
     FormTemplateModel(
       id: 'rti_application',
       title: 'RTI Application',
@@ -1309,28 +1363,85 @@ class FormTemplates {
       authority: 'Public Information Officer (PIO) of concerned department',
       actReference: 'Right to Information Act, 2005',
       instructions:
-          'Submit to the PIO of the concerned department with â‚¹10 application fee (IPO/DD/cash). BPL applicants are exempt from fee.',
+          'Submit to the PIO of the concerned department with Rs.10 application fee (IPO/DD/cash). BPL applicants are exempt from fee.',
       documents: [
-        'Application fee of â‚¹10 (IPO / Demand Draft / Court Fee Stamp)',
+        'Application fee of Rs.10 (IPO / Demand Draft / Court Fee Stamp)',
         'BPL certificate (if claiming fee exemption)',
         'Identity proof (optional but recommended)',
       ],
       fields: [
-        FormFieldModel(key: 'applicant_name', label: 'Applicant Full Name', type: FormFieldType.text, required: true, hint: 'Your full legal name'),
-        FormFieldModel(key: 'applicant_address', label: 'Applicant Address', type: FormFieldType.textarea, required: true, hint: 'Full postal address', maxLines: 3),
-        FormFieldModel(key: 'applicant_phone', label: 'Phone Number', type: FormFieldType.phone, hint: '10-digit mobile number'),
-        FormFieldModel(key: 'applicant_email', label: 'Email Address', type: FormFieldType.email, hint: 'your@email.com'),
-        FormFieldModel(key: 'department_name', label: 'Department / Ministry Name', type: FormFieldType.text, required: true, hint: 'e.g. Municipal Corporation, Income Tax Department'),
-        FormFieldModel(key: 'pio_address', label: 'PIO Office Address', type: FormFieldType.textarea, required: true, hint: 'Address of Public Information Officer', maxLines: 3),
-        FormFieldModel(key: 'information_sought', label: 'Information Sought', type: FormFieldType.textarea, required: true, hint: 'Clearly state what information you need. Be specific.', maxLines: 6),
-        FormFieldModel(key: 'time_period', label: 'Time Period of Information', type: FormFieldType.text, hint: 'e.g. From April 2022 to March 2023'),
-        FormFieldModel(key: 'format_required', label: 'Format Required', type: FormFieldType.dropdown, options: ['Certified Copies', 'Inspection of Records', 'Soft Copy / CD', 'Any Format']),
-        FormFieldModel(key: 'is_bpl', label: 'Are you BPL (Below Poverty Line)?', type: FormFieldType.dropdown, options: ['No', 'Yes']),
-        FormFieldModel(key: 'fee_details', label: 'Fee Payment Details', type: FormFieldType.text, hint: 'e.g. IPO No. 123456 / Cash â‚¹10'),
+        FormFieldModel(
+            key: 'applicant_name',
+            label: 'Applicant Full Name',
+            type: FormFieldType.text,
+            required: true,
+            hint: 'Your full legal name'),
+        FormFieldModel(
+            key: 'applicant_address',
+            label: 'Applicant Address',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'Full postal address',
+            maxLines: 3),
+        FormFieldModel(
+            key: 'applicant_phone',
+            label: 'Phone Number',
+            type: FormFieldType.phone,
+            hint: '10-digit mobile number'),
+        FormFieldModel(
+            key: 'applicant_email',
+            label: 'Email Address',
+            type: FormFieldType.email,
+            hint: 'your@email.com'),
+        FormFieldModel(
+            key: 'department_name',
+            label: 'Department / Ministry Name',
+            type: FormFieldType.text,
+            required: true,
+            hint: 'e.g. Municipal Corporation, Income Tax Department'),
+        FormFieldModel(
+            key: 'pio_address',
+            label: 'PIO Office Address',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'Address of Public Information Officer',
+            maxLines: 3),
+        FormFieldModel(
+            key: 'information_sought',
+            label: 'Information Sought',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'Clearly state what information you need. Be specific.',
+            maxLines: 6),
+        FormFieldModel(
+            key: 'time_period',
+            label: 'Time Period of Information',
+            type: FormFieldType.text,
+            hint: 'e.g. From April 2022 to March 2023'),
+        FormFieldModel(
+            key: 'format_required',
+            label: 'Format Required',
+            type: FormFieldType.dropdown,
+            options: [
+              'Certified Copies',
+              'Inspection of Records',
+              'Soft Copy / CD',
+              'Any Format'
+            ]),
+        FormFieldModel(
+            key: 'is_bpl',
+            label: 'Are you BPL (Below Poverty Line)?',
+            type: FormFieldType.dropdown,
+            options: ['No', 'Yes']),
+        FormFieldModel(
+            key: 'fee_details',
+            label: 'Fee Payment Details',
+            type: FormFieldType.text,
+            hint: 'e.g. IPO No. 123456 / Cash Rs.10'),
       ],
     ),
 
-    // â”€â”€ 3. Cyber Crime Complaint â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- 3. Cyber Crime Complaint --------------------------------------------
     FormTemplateModel(
       id: 'cyber_crime',
       title: 'Cyber Crime Complaint',
@@ -1348,22 +1459,95 @@ class FormTemplates {
         'Any communication with accused',
       ],
       fields: [
-        FormFieldModel(key: 'complainant_name', label: 'Complainant Full Name', type: FormFieldType.text, required: true, hint: 'Your full legal name'),
-        FormFieldModel(key: 'complainant_address', label: 'Address', type: FormFieldType.textarea, required: true, hint: 'Full address with pin code', maxLines: 3),
-        FormFieldModel(key: 'complainant_phone', label: 'Phone Number', type: FormFieldType.phone, required: true, hint: '10-digit mobile number'),
-        FormFieldModel(key: 'complainant_email', label: 'Email Address', type: FormFieldType.email, required: true, hint: 'your@email.com'),
-        FormFieldModel(key: 'crime_type', label: 'Type of Cyber Crime', type: FormFieldType.dropdown, required: true, options: ['Online Financial Fraud', 'Online Job Fraud', 'Social Media Fraud', 'Hacking / Unauthorized Access', 'Cyber Stalking / Harassment', 'Identity Theft', 'Phishing', 'Ransomware', 'Child Pornography', 'Other']),
-        FormFieldModel(key: 'incident_date', label: 'Date of Incident', type: FormFieldType.date, required: true, hint: 'DD/MM/YYYY'),
-        FormFieldModel(key: 'incident_description', label: 'Incident Description', type: FormFieldType.textarea, required: true, hint: 'Describe exactly what happened step by step', maxLines: 6),
-        FormFieldModel(key: 'accused_details', label: 'Accused / Suspect Details', type: FormFieldType.textarea, hint: 'Phone number, email, website, social media profile of accused', maxLines: 3),
-        FormFieldModel(key: 'amount_lost', label: 'Amount Lost (â‚¹)', type: FormFieldType.number, hint: 'If financial fraud, enter amount', prefix: 'â‚¹'),
-        FormFieldModel(key: 'transaction_id', label: 'Transaction ID / UTR', type: FormFieldType.text, hint: 'Bank transaction reference number'),
-        FormFieldModel(key: 'bank_details', label: 'Your Bank & Account Details', type: FormFieldType.textarea, hint: 'Bank name, account number (last 4 digits only)', maxLines: 2),
-        FormFieldModel(key: 'evidence_list', label: 'Evidence Available', type: FormFieldType.textarea, hint: 'List all evidence you have â€” screenshots, emails, etc.', maxLines: 3),
+        FormFieldModel(
+            key: 'complainant_name',
+            label: 'Complainant Full Name',
+            type: FormFieldType.text,
+            required: true,
+            hint: 'Your full legal name'),
+        FormFieldModel(
+            key: 'complainant_address',
+            label: 'Address',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'Full address with pin code',
+            maxLines: 3),
+        FormFieldModel(
+            key: 'complainant_phone',
+            label: 'Phone Number',
+            type: FormFieldType.phone,
+            required: true,
+            hint: '10-digit mobile number'),
+        FormFieldModel(
+            key: 'complainant_email',
+            label: 'Email Address',
+            type: FormFieldType.email,
+            required: true,
+            hint: 'your@email.com'),
+        FormFieldModel(
+            key: 'crime_type',
+            label: 'Type of Cyber Crime',
+            type: FormFieldType.dropdown,
+            required: true,
+            options: [
+              'Online Financial Fraud',
+              'Online Job Fraud',
+              'Social Media Fraud',
+              'Hacking / Unauthorized Access',
+              'Cyber Stalking / Harassment',
+              'Identity Theft',
+              'Phishing',
+              'Ransomware',
+              'Child Pornography',
+              'Other'
+            ]),
+        FormFieldModel(
+            key: 'incident_date',
+            label: 'Date of Incident',
+            type: FormFieldType.date,
+            required: true,
+            hint: 'DD/MM/YYYY'),
+        FormFieldModel(
+            key: 'incident_description',
+            label: 'Incident Description',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'Describe exactly what happened step by step',
+            maxLines: 6),
+        FormFieldModel(
+            key: 'accused_details',
+            label: 'Accused / Suspect Details',
+            type: FormFieldType.textarea,
+            hint:
+                'Phone number, email, website, social media profile of accused',
+            maxLines: 3),
+        FormFieldModel(
+            key: 'amount_lost',
+            label: 'Amount Lost (Rs.)',
+            type: FormFieldType.number,
+            hint: 'If financial fraud, enter amount',
+            prefix: 'Rs.'),
+        FormFieldModel(
+            key: 'transaction_id',
+            label: 'Transaction ID / UTR',
+            type: FormFieldType.text,
+            hint: 'Bank transaction reference number'),
+        FormFieldModel(
+            key: 'bank_details',
+            label: 'Your Bank & Account Details',
+            type: FormFieldType.textarea,
+            hint: 'Bank name, account number (last 4 digits only)',
+            maxLines: 2),
+        FormFieldModel(
+            key: 'evidence_list',
+            label: 'Evidence Available',
+            type: FormFieldType.textarea,
+            hint: 'List all evidence you have - screenshots, emails, etc.',
+            maxLines: 3),
       ],
     ),
 
-    // â”€â”€ 4. Banking Ombudsman â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- 4. Banking Ombudsman ------------------------------------------------
     FormTemplateModel(
       id: 'banking_ombudsman',
       title: 'Banking Ombudsman Complaint',
@@ -1380,28 +1564,102 @@ class FormTemplates {
         'Correspondence with bank',
       ],
       fields: [
-        FormFieldModel(key: 'complainant_name', label: 'Complainant Full Name', type: FormFieldType.text, required: true, hint: 'Account holder name'),
-        FormFieldModel(key: 'complainant_address', label: 'Address', type: FormFieldType.textarea, required: true, hint: 'Full address with pin code', maxLines: 3),
-        FormFieldModel(key: 'complainant_phone', label: 'Phone Number', type: FormFieldType.phone, required: true, hint: '10-digit mobile number'),
-        FormFieldModel(key: 'complainant_email', label: 'Email Address', type: FormFieldType.email, hint: 'your@email.com'),
-        FormFieldModel(key: 'bank_name', label: 'Bank Name', type: FormFieldType.text, required: true, hint: 'e.g. State Bank of India'),
-        FormFieldModel(key: 'branch_name', label: 'Branch Name & Address', type: FormFieldType.textarea, required: true, hint: 'Branch where account is held', maxLines: 2),
-        FormFieldModel(key: 'account_number', label: 'Account Number', type: FormFieldType.text, required: true, hint: 'Your bank account number'),
-        FormFieldModel(key: 'complaint_type', label: 'Nature of Complaint', type: FormFieldType.dropdown, required: true, options: ['Non-credit of amount', 'Unauthorized debit', 'ATM / Debit Card issue', 'Credit Card issue', 'Loan related', 'Internet Banking fraud', 'UPI / Mobile Banking', 'Cheque related', 'Account closure issue', 'Other']),
-        FormFieldModel(key: 'complaint_date_to_bank', label: 'Date of Complaint to Bank', type: FormFieldType.date, required: true, hint: 'When did you first complain to bank?'),
-        FormFieldModel(key: 'amount_involved', label: 'Amount Involved (â‚¹)', type: FormFieldType.number, hint: 'Amount in dispute', prefix: 'â‚¹'),
-        FormFieldModel(key: 'complaint_details', label: 'Complaint Details', type: FormFieldType.textarea, required: true, hint: 'Describe the issue and what the bank did or did not do', maxLines: 6),
-        FormFieldModel(key: 'relief_sought', label: 'Relief Sought', type: FormFieldType.textarea, required: true, hint: 'What resolution do you want from the bank?', maxLines: 3),
+        FormFieldModel(
+            key: 'complainant_name',
+            label: 'Complainant Full Name',
+            type: FormFieldType.text,
+            required: true,
+            hint: 'Account holder name'),
+        FormFieldModel(
+            key: 'complainant_address',
+            label: 'Address',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'Full address with pin code',
+            maxLines: 3),
+        FormFieldModel(
+            key: 'complainant_phone',
+            label: 'Phone Number',
+            type: FormFieldType.phone,
+            required: true,
+            hint: '10-digit mobile number'),
+        FormFieldModel(
+            key: 'complainant_email',
+            label: 'Email Address',
+            type: FormFieldType.email,
+            hint: 'your@email.com'),
+        FormFieldModel(
+            key: 'bank_name',
+            label: 'Bank Name',
+            type: FormFieldType.text,
+            required: true,
+            hint: 'e.g. State Bank of India'),
+        FormFieldModel(
+            key: 'branch_name',
+            label: 'Branch Name & Address',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'Branch where account is held',
+            maxLines: 2),
+        FormFieldModel(
+            key: 'account_number',
+            label: 'Account Number',
+            type: FormFieldType.text,
+            required: true,
+            hint: 'Your bank account number'),
+        FormFieldModel(
+            key: 'complaint_type',
+            label: 'Nature of Complaint',
+            type: FormFieldType.dropdown,
+            required: true,
+            options: [
+              'Non-credit of amount',
+              'Unauthorized debit',
+              'ATM / Debit Card issue',
+              'Credit Card issue',
+              'Loan related',
+              'Internet Banking fraud',
+              'UPI / Mobile Banking',
+              'Cheque related',
+              'Account closure issue',
+              'Other'
+            ]),
+        FormFieldModel(
+            key: 'complaint_date_to_bank',
+            label: 'Date of Complaint to Bank',
+            type: FormFieldType.date,
+            required: true,
+            hint: 'When did you first complain to bank?'),
+        FormFieldModel(
+            key: 'amount_involved',
+            label: 'Amount Involved (Rs.)',
+            type: FormFieldType.number,
+            hint: 'Amount in dispute',
+            prefix: 'Rs.'),
+        FormFieldModel(
+            key: 'complaint_details',
+            label: 'Complaint Details',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'Describe the issue and what the bank did or did not do',
+            maxLines: 6),
+        FormFieldModel(
+            key: 'relief_sought',
+            label: 'Relief Sought',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'What resolution do you want from the bank?',
+            maxLines: 3),
       ],
     ),
 
-    // â”€â”€ 5. Motor Accident Claim â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- 5. Motor Accident Claim ---------------------------------------------
     FormTemplateModel(
       id: 'motor_accident_claim',
       title: 'Motor Accident Claim (MACT)',
       subtitle: 'Claim compensation for motor accident injury or death',
       authority: 'Motor Accident Claims Tribunal (MACT)',
-      actReference: 'Motor Vehicles Act, 1988 â€” Section 166',
+      actReference: 'Motor Vehicles Act, 1988 - Section 166',
       instructions:
           'File at the Motor Accident Claims Tribunal in the district where accident occurred or where claimant resides. No court fee required.',
       documents: [
@@ -1416,30 +1674,110 @@ class FormTemplates {
         'Witness statements',
       ],
       fields: [
-        FormFieldModel(key: 'claimant_name', label: 'Claimant Full Name', type: FormFieldType.text, required: true, hint: 'Injured person or legal heir'),
-        FormFieldModel(key: 'claimant_address', label: 'Claimant Address', type: FormFieldType.textarea, required: true, hint: 'Full address with pin code', maxLines: 3),
-        FormFieldModel(key: 'claimant_phone', label: 'Phone Number', type: FormFieldType.phone, required: true, hint: '10-digit mobile number'),
-        FormFieldModel(key: 'claimant_relation', label: 'Relation to Victim', type: FormFieldType.dropdown, options: ['Self (Injured)', 'Spouse', 'Parent', 'Child', 'Legal Heir', 'Other']),
-        FormFieldModel(key: 'accident_date', label: 'Date of Accident', type: FormFieldType.date, required: true, hint: 'DD/MM/YYYY'),
-        FormFieldModel(key: 'accident_place', label: 'Place of Accident', type: FormFieldType.textarea, required: true, hint: 'Full location of accident', maxLines: 2),
-        FormFieldModel(key: 'accident_description', label: 'How Accident Occurred', type: FormFieldType.textarea, required: true, hint: 'Describe how the accident happened', maxLines: 5),
-        FormFieldModel(key: 'vehicle_number', label: 'Offending Vehicle Number', type: FormFieldType.text, required: true, hint: 'Registration number of vehicle at fault'),
-        FormFieldModel(key: 'driver_name', label: 'Driver / Accused Name', type: FormFieldType.text, hint: 'Name of driver at fault'),
-        FormFieldModel(key: 'insurance_company', label: 'Insurance Company of Vehicle', type: FormFieldType.text, hint: 'Insurance company name'),
-        FormFieldModel(key: 'fir_number', label: 'FIR Number', type: FormFieldType.text, hint: 'Police FIR number if registered'),
-        FormFieldModel(key: 'injuries', label: 'Nature of Injuries', type: FormFieldType.textarea, required: true, hint: 'Describe injuries sustained', maxLines: 3),
-        FormFieldModel(key: 'medical_expenses', label: 'Medical Expenses Incurred (â‚¹)', type: FormFieldType.number, hint: 'Total medical bills', prefix: 'â‚¹'),
-        FormFieldModel(key: 'compensation_sought', label: 'Total Compensation Sought (â‚¹)', type: FormFieldType.number, required: true, hint: 'Total amount claimed', prefix: 'â‚¹'),
+        FormFieldModel(
+            key: 'claimant_name',
+            label: 'Claimant Full Name',
+            type: FormFieldType.text,
+            required: true,
+            hint: 'Injured person or legal heir'),
+        FormFieldModel(
+            key: 'claimant_address',
+            label: 'Claimant Address',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'Full address with pin code',
+            maxLines: 3),
+        FormFieldModel(
+            key: 'claimant_phone',
+            label: 'Phone Number',
+            type: FormFieldType.phone,
+            required: true,
+            hint: '10-digit mobile number'),
+        FormFieldModel(
+            key: 'claimant_relation',
+            label: 'Relation to Victim',
+            type: FormFieldType.dropdown,
+            options: [
+              'Self (Injured)',
+              'Spouse',
+              'Parent',
+              'Child',
+              'Legal Heir',
+              'Other'
+            ]),
+        FormFieldModel(
+            key: 'accident_date',
+            label: 'Date of Accident',
+            type: FormFieldType.date,
+            required: true,
+            hint: 'DD/MM/YYYY'),
+        FormFieldModel(
+            key: 'accident_place',
+            label: 'Place of Accident',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'Full location of accident',
+            maxLines: 2),
+        FormFieldModel(
+            key: 'accident_description',
+            label: 'How Accident Occurred',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'Describe how the accident happened',
+            maxLines: 5),
+        FormFieldModel(
+            key: 'vehicle_number',
+            label: 'Offending Vehicle Number',
+            type: FormFieldType.text,
+            required: true,
+            hint: 'Registration number of vehicle at fault'),
+        FormFieldModel(
+            key: 'driver_name',
+            label: 'Driver / Accused Name',
+            type: FormFieldType.text,
+            hint: 'Name of driver at fault'),
+        FormFieldModel(
+            key: 'insurance_company',
+            label: 'Insurance Company of Vehicle',
+            type: FormFieldType.text,
+            hint: 'Insurance company name'),
+        FormFieldModel(
+            key: 'fir_number',
+            label: 'FIR Number',
+            type: FormFieldType.text,
+            hint: 'Police FIR number if registered'),
+        FormFieldModel(
+            key: 'injuries',
+            label: 'Nature of Injuries',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'Describe injuries sustained',
+            maxLines: 3),
+        FormFieldModel(
+            key: 'medical_expenses',
+            label: 'Medical Expenses Incurred (Rs.)',
+            type: FormFieldType.number,
+            hint: 'Total medical bills',
+            prefix: 'Rs.'),
+        FormFieldModel(
+            key: 'compensation_sought',
+            label: 'Total Compensation Sought (Rs.)',
+            type: FormFieldType.number,
+            required: true,
+            hint: 'Total amount claimed',
+            prefix: 'Rs.'),
       ],
     ),
 
-    // â”€â”€ 6. Labour Complaint â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- 6. Labour Complaint -------------------------------------------------
     FormTemplateModel(
       id: 'labour_complaint',
       title: 'Labour / Workmen Complaint',
-      subtitle: 'Complaint for unpaid wages, wrongful termination or labour rights',
+      subtitle:
+          'Complaint for unpaid wages, wrongful termination or labour rights',
       authority: 'Labour Commissioner Office',
-      actReference: 'Industrial Disputes Act, 1947 & Payment of Wages Act, 1936',
+      actReference:
+          'Industrial Disputes Act, 1947 & Payment of Wages Act, 1936',
       instructions:
           'Submit at the Labour Commissioner or Assistant Labour Commissioner office in your district. Bring original documents.',
       documents: [
@@ -1451,22 +1789,96 @@ class FormTemplates {
         'Any written communication with employer',
       ],
       fields: [
-        FormFieldModel(key: 'worker_name', label: 'Worker / Employee Full Name', type: FormFieldType.text, required: true, hint: 'Your full legal name'),
-        FormFieldModel(key: 'worker_address', label: 'Address', type: FormFieldType.textarea, required: true, hint: 'Full address with pin code', maxLines: 3),
-        FormFieldModel(key: 'worker_phone', label: 'Phone Number', type: FormFieldType.phone, required: true, hint: '10-digit mobile number'),
-        FormFieldModel(key: 'worker_designation', label: 'Designation / Role', type: FormFieldType.text, required: true, hint: 'Your job title'),
-        FormFieldModel(key: 'employer_name', label: 'Employer / Company Name', type: FormFieldType.text, required: true, hint: 'Full name of employer or company'),
-        FormFieldModel(key: 'employer_address', label: 'Employer Address', type: FormFieldType.textarea, required: true, hint: 'Company / factory address', maxLines: 3),
-        FormFieldModel(key: 'employment_period', label: 'Employment Period', type: FormFieldType.text, required: true, hint: 'e.g. From Jan 2022 to Dec 2023'),
-        FormFieldModel(key: 'monthly_wages', label: 'Monthly Wages (â‚¹)', type: FormFieldType.number, required: true, hint: 'Your monthly salary', prefix: 'â‚¹'),
-        FormFieldModel(key: 'complaint_type', label: 'Nature of Complaint', type: FormFieldType.dropdown, required: true, options: ['Unpaid Wages / Salary', 'Wrongful Termination', 'Illegal Deduction', 'Non-payment of Gratuity', 'Non-payment of PF/ESI', 'Forced Resignation', 'Sexual Harassment', 'Other']),
-        FormFieldModel(key: 'dues_amount', label: 'Amount of Dues (â‚¹)', type: FormFieldType.number, hint: 'Total unpaid amount', prefix: 'â‚¹'),
-        FormFieldModel(key: 'complaint_details', label: 'Complaint Details', type: FormFieldType.textarea, required: true, hint: 'Describe what happened in detail', maxLines: 6),
-        FormFieldModel(key: 'relief_sought', label: 'Relief Sought', type: FormFieldType.textarea, required: true, hint: 'What do you want â€” wages, reinstatement, compensation?', maxLines: 3),
+        FormFieldModel(
+            key: 'worker_name',
+            label: 'Worker / Employee Full Name',
+            type: FormFieldType.text,
+            required: true,
+            hint: 'Your full legal name'),
+        FormFieldModel(
+            key: 'worker_address',
+            label: 'Address',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'Full address with pin code',
+            maxLines: 3),
+        FormFieldModel(
+            key: 'worker_phone',
+            label: 'Phone Number',
+            type: FormFieldType.phone,
+            required: true,
+            hint: '10-digit mobile number'),
+        FormFieldModel(
+            key: 'worker_designation',
+            label: 'Designation / Role',
+            type: FormFieldType.text,
+            required: true,
+            hint: 'Your job title'),
+        FormFieldModel(
+            key: 'employer_name',
+            label: 'Employer / Company Name',
+            type: FormFieldType.text,
+            required: true,
+            hint: 'Full name of employer or company'),
+        FormFieldModel(
+            key: 'employer_address',
+            label: 'Employer Address',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'Company / factory address',
+            maxLines: 3),
+        FormFieldModel(
+            key: 'employment_period',
+            label: 'Employment Period',
+            type: FormFieldType.text,
+            required: true,
+            hint: 'e.g. From Jan 2022 to Dec 2023'),
+        FormFieldModel(
+            key: 'monthly_wages',
+            label: 'Monthly Wages (Rs.)',
+            type: FormFieldType.number,
+            required: true,
+            hint: 'Your monthly salary',
+            prefix: 'Rs.'),
+        FormFieldModel(
+            key: 'complaint_type',
+            label: 'Nature of Complaint',
+            type: FormFieldType.dropdown,
+            required: true,
+            options: [
+              'Unpaid Wages / Salary',
+              'Wrongful Termination',
+              'Illegal Deduction',
+              'Non-payment of Gratuity',
+              'Non-payment of PF/ESI',
+              'Forced Resignation',
+              'Sexual Harassment',
+              'Other'
+            ]),
+        FormFieldModel(
+            key: 'dues_amount',
+            label: 'Amount of Dues (Rs.)',
+            type: FormFieldType.number,
+            hint: 'Total unpaid amount',
+            prefix: 'Rs.'),
+        FormFieldModel(
+            key: 'complaint_details',
+            label: 'Complaint Details',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'Describe what happened in detail',
+            maxLines: 6),
+        FormFieldModel(
+            key: 'relief_sought',
+            label: 'Relief Sought',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'What do you want - wages, reinstatement, compensation?',
+            maxLines: 3),
       ],
     ),
 
-    // â”€â”€ 7. Lok Adalat Application â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- 7. Lok Adalat Application -------------------------------------------
     FormTemplateModel(
       id: 'lok_adalat',
       title: 'Lok Adalat Application',
@@ -1482,20 +1894,81 @@ class FormTemplates {
         'Any previous settlement attempts',
       ],
       fields: [
-        FormFieldModel(key: 'applicant_name', label: 'Applicant Full Name', type: FormFieldType.text, required: true, hint: 'Your full legal name'),
-        FormFieldModel(key: 'applicant_address', label: 'Address', type: FormFieldType.textarea, required: true, hint: 'Full address with pin code', maxLines: 3),
-        FormFieldModel(key: 'applicant_phone', label: 'Phone Number', type: FormFieldType.phone, required: true, hint: '10-digit mobile number'),
-        FormFieldModel(key: 'opposite_party', label: 'Opposite Party Name', type: FormFieldType.text, required: true, hint: 'Name of other party in dispute'),
-        FormFieldModel(key: 'opposite_party_address', label: 'Opposite Party Address', type: FormFieldType.textarea, hint: 'Address of opposite party', maxLines: 3),
-        FormFieldModel(key: 'dispute_type', label: 'Nature of Dispute', type: FormFieldType.dropdown, required: true, options: ['Motor Accident', 'Labour Dispute', 'Matrimonial (Non-divorce)', 'Land / Property', 'Cheque Bounce', 'Compoundable Criminal', 'Electricity Dispute', 'Consumer Dispute', 'Other']),
-        FormFieldModel(key: 'case_number', label: 'Case / Complaint Number (if pending)', type: FormFieldType.text, hint: 'Court case or complaint reference'),
-        FormFieldModel(key: 'court_name', label: 'Court / Forum Name', type: FormFieldType.text, hint: 'Where case is currently pending'),
-        FormFieldModel(key: 'dispute_details', label: 'Dispute Details', type: FormFieldType.textarea, required: true, hint: 'Briefly describe the dispute', maxLines: 5),
-        FormFieldModel(key: 'settlement_sought', label: 'Settlement Expected', type: FormFieldType.textarea, required: true, hint: 'What settlement are you looking for?', maxLines: 3),
+        FormFieldModel(
+            key: 'applicant_name',
+            label: 'Applicant Full Name',
+            type: FormFieldType.text,
+            required: true,
+            hint: 'Your full legal name'),
+        FormFieldModel(
+            key: 'applicant_address',
+            label: 'Address',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'Full address with pin code',
+            maxLines: 3),
+        FormFieldModel(
+            key: 'applicant_phone',
+            label: 'Phone Number',
+            type: FormFieldType.phone,
+            required: true,
+            hint: '10-digit mobile number'),
+        FormFieldModel(
+            key: 'opposite_party',
+            label: 'Opposite Party Name',
+            type: FormFieldType.text,
+            required: true,
+            hint: 'Name of other party in dispute'),
+        FormFieldModel(
+            key: 'opposite_party_address',
+            label: 'Opposite Party Address',
+            type: FormFieldType.textarea,
+            hint: 'Address of opposite party',
+            maxLines: 3),
+        FormFieldModel(
+            key: 'dispute_type',
+            label: 'Nature of Dispute',
+            type: FormFieldType.dropdown,
+            required: true,
+            options: [
+              'Motor Accident',
+              'Labour Dispute',
+              'Matrimonial (Non-divorce)',
+              'Land / Property',
+              'Cheque Bounce',
+              'Compoundable Criminal',
+              'Electricity Dispute',
+              'Consumer Dispute',
+              'Other'
+            ]),
+        FormFieldModel(
+            key: 'case_number',
+            label: 'Case / Complaint Number (if pending)',
+            type: FormFieldType.text,
+            hint: 'Court case or complaint reference'),
+        FormFieldModel(
+            key: 'court_name',
+            label: 'Court / Forum Name',
+            type: FormFieldType.text,
+            hint: 'Where case is currently pending'),
+        FormFieldModel(
+            key: 'dispute_details',
+            label: 'Dispute Details',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'Briefly describe the dispute',
+            maxLines: 5),
+        FormFieldModel(
+            key: 'settlement_sought',
+            label: 'Settlement Expected',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'What settlement are you looking for?',
+            maxLines: 3),
       ],
     ),
 
-    // â”€â”€ 8. Legal Aid Application â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- 8. Legal Aid Application --------------------------------------------
     FormTemplateModel(
       id: 'legal_aid',
       title: 'Legal Aid Application',
@@ -1505,28 +1978,101 @@ class FormTemplates {
       instructions:
           'Submit at your District Legal Services Authority (DLSA) office. Legal aid is free for eligible persons.',
       documents: [
-        'Income certificate (annual income below â‚¹1 lakh)',
+        'Income certificate (annual income below Rs.1 lakh)',
         'Identity proof (Aadhaar / Voter ID)',
         'Documents related to legal matter',
         'SC/ST/OBC certificate (if applicable)',
         'Disability certificate (if applicable)',
       ],
       fields: [
-        FormFieldModel(key: 'applicant_name', label: 'Applicant Full Name', type: FormFieldType.text, required: true, hint: 'Your full legal name'),
-        FormFieldModel(key: 'applicant_address', label: 'Address', type: FormFieldType.textarea, required: true, hint: 'Full address with pin code', maxLines: 3),
-        FormFieldModel(key: 'applicant_phone', label: 'Phone Number', type: FormFieldType.phone, required: true, hint: '10-digit mobile number'),
-        FormFieldModel(key: 'applicant_age', label: 'Age', type: FormFieldType.number, required: true, hint: 'Your age in years'),
-        FormFieldModel(key: 'applicant_gender', label: 'Gender', type: FormFieldType.dropdown, required: true, options: ['Male', 'Female', 'Transgender']),
-        FormFieldModel(key: 'category', label: 'Eligibility Category', type: FormFieldType.dropdown, required: true, options: ['SC / ST', 'Women / Child', 'Disabled Person', 'Industrial Workman', 'Victim of Disaster', 'Person in Custody', 'Annual Income below â‚¹1 Lakh', 'Other']),
-        FormFieldModel(key: 'annual_income', label: 'Annual Income (â‚¹)', type: FormFieldType.number, required: true, hint: 'Your total annual income', prefix: 'â‚¹'),
-        FormFieldModel(key: 'legal_matter_type', label: 'Type of Legal Matter', type: FormFieldType.dropdown, required: true, options: ['Criminal Case', 'Civil Case', 'Family Matter', 'Labour Dispute', 'Land / Property', 'Consumer Complaint', 'Other']),
-        FormFieldModel(key: 'legal_matter_details', label: 'Details of Legal Matter', type: FormFieldType.textarea, required: true, hint: 'Briefly describe your legal problem', maxLines: 5),
-        FormFieldModel(key: 'court_name', label: 'Court / Forum (if case filed)', type: FormFieldType.text, hint: 'Name of court if case already filed'),
-        FormFieldModel(key: 'case_number', label: 'Case Number (if any)', type: FormFieldType.text, hint: 'Leave blank if not yet filed'),
+        FormFieldModel(
+            key: 'applicant_name',
+            label: 'Applicant Full Name',
+            type: FormFieldType.text,
+            required: true,
+            hint: 'Your full legal name'),
+        FormFieldModel(
+            key: 'applicant_address',
+            label: 'Address',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'Full address with pin code',
+            maxLines: 3),
+        FormFieldModel(
+            key: 'applicant_phone',
+            label: 'Phone Number',
+            type: FormFieldType.phone,
+            required: true,
+            hint: '10-digit mobile number'),
+        FormFieldModel(
+            key: 'applicant_age',
+            label: 'Age',
+            type: FormFieldType.number,
+            required: true,
+            hint: 'Your age in years'),
+        FormFieldModel(
+            key: 'applicant_gender',
+            label: 'Gender',
+            type: FormFieldType.dropdown,
+            required: true,
+            options: ['Male', 'Female', 'Transgender']),
+        FormFieldModel(
+            key: 'category',
+            label: 'Eligibility Category',
+            type: FormFieldType.dropdown,
+            required: true,
+            options: [
+              'SC / ST',
+              'Women / Child',
+              'Disabled Person',
+              'Industrial Workman',
+              'Victim of Disaster',
+              'Person in Custody',
+              'Annual Income below Rs.1 Lakh',
+              'Other'
+            ]),
+        FormFieldModel(
+            key: 'annual_income',
+            label: 'Annual Income (Rs.)',
+            type: FormFieldType.number,
+            required: true,
+            hint: 'Your total annual income',
+            prefix: 'Rs.'),
+        FormFieldModel(
+            key: 'legal_matter_type',
+            label: 'Type of Legal Matter',
+            type: FormFieldType.dropdown,
+            required: true,
+            options: [
+              'Criminal Case',
+              'Civil Case',
+              'Family Matter',
+              'Labour Dispute',
+              'Land / Property',
+              'Consumer Complaint',
+              'Other'
+            ]),
+        FormFieldModel(
+            key: 'legal_matter_details',
+            label: 'Details of Legal Matter',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'Briefly describe your legal problem',
+            maxLines: 5),
+        FormFieldModel(
+            key: 'court_name',
+            label: 'Court / Forum (if case filed)',
+            type: FormFieldType.text,
+            hint: 'Name of court if case already filed'),
+        FormFieldModel(
+            key: 'case_number',
+            label: 'Case Number (if any)',
+            type: FormFieldType.text,
+            hint: 'Leave blank if not yet filed'),
       ],
     ),
 
-    // â”€â”€ 9. Rent Control Application â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- 9. Rent Control Application -----------------------------------------
     FormTemplateModel(
       id: 'rent_control',
       title: 'Rent Control Application',
@@ -1544,28 +2090,102 @@ class FormTemplates {
         'Bank statements showing rent payments',
       ],
       fields: [
-        FormFieldModel(key: 'applicant_name', label: 'Applicant Full Name', type: FormFieldType.text, required: true, hint: 'Landlord or tenant name'),
-        FormFieldModel(key: 'applicant_role', label: 'Applicant Is', type: FormFieldType.dropdown, required: true, options: ['Landlord', 'Tenant']),
-        FormFieldModel(key: 'applicant_address', label: 'Applicant Address', type: FormFieldType.textarea, required: true, hint: 'Full address', maxLines: 3),
-        FormFieldModel(key: 'applicant_phone', label: 'Phone Number', type: FormFieldType.phone, required: true, hint: '10-digit mobile number'),
-        FormFieldModel(key: 'opposite_party_name', label: 'Opposite Party Name', type: FormFieldType.text, required: true, hint: 'Tenant or landlord name'),
-        FormFieldModel(key: 'opposite_party_address', label: 'Opposite Party Address', type: FormFieldType.textarea, required: true, hint: 'Full address', maxLines: 3),
-        FormFieldModel(key: 'property_address', label: 'Rented Property Address', type: FormFieldType.textarea, required: true, hint: 'Full address of rented property', maxLines: 3),
-        FormFieldModel(key: 'monthly_rent', label: 'Monthly Rent (â‚¹)', type: FormFieldType.number, required: true, hint: 'Current monthly rent', prefix: 'â‚¹'),
-        FormFieldModel(key: 'tenancy_start', label: 'Tenancy Start Date', type: FormFieldType.date, required: true, hint: 'DD/MM/YYYY'),
-        FormFieldModel(key: 'application_type', label: 'Nature of Application', type: FormFieldType.dropdown, required: true, options: ['Eviction of Tenant', 'Fixation of Fair Rent', 'Recovery of Possession', 'Arrears of Rent', 'Deposit Refund', 'Illegal Enhancement of Rent', 'Other']),
-        FormFieldModel(key: 'dispute_details', label: 'Details of Dispute', type: FormFieldType.textarea, required: true, hint: 'Describe the tenancy dispute in detail', maxLines: 6),
-        FormFieldModel(key: 'relief_sought', label: 'Relief Sought', type: FormFieldType.textarea, required: true, hint: 'What order are you seeking from Rent Controller?', maxLines: 3),
+        FormFieldModel(
+            key: 'applicant_name',
+            label: 'Applicant Full Name',
+            type: FormFieldType.text,
+            required: true,
+            hint: 'Landlord or tenant name'),
+        FormFieldModel(
+            key: 'applicant_role',
+            label: 'Applicant Is',
+            type: FormFieldType.dropdown,
+            required: true,
+            options: ['Landlord', 'Tenant']),
+        FormFieldModel(
+            key: 'applicant_address',
+            label: 'Applicant Address',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'Full address',
+            maxLines: 3),
+        FormFieldModel(
+            key: 'applicant_phone',
+            label: 'Phone Number',
+            type: FormFieldType.phone,
+            required: true,
+            hint: '10-digit mobile number'),
+        FormFieldModel(
+            key: 'opposite_party_name',
+            label: 'Opposite Party Name',
+            type: FormFieldType.text,
+            required: true,
+            hint: 'Tenant or landlord name'),
+        FormFieldModel(
+            key: 'opposite_party_address',
+            label: 'Opposite Party Address',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'Full address',
+            maxLines: 3),
+        FormFieldModel(
+            key: 'property_address',
+            label: 'Rented Property Address',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'Full address of rented property',
+            maxLines: 3),
+        FormFieldModel(
+            key: 'monthly_rent',
+            label: 'Monthly Rent (Rs.)',
+            type: FormFieldType.number,
+            required: true,
+            hint: 'Current monthly rent',
+            prefix: 'Rs.'),
+        FormFieldModel(
+            key: 'tenancy_start',
+            label: 'Tenancy Start Date',
+            type: FormFieldType.date,
+            required: true,
+            hint: 'DD/MM/YYYY'),
+        FormFieldModel(
+            key: 'application_type',
+            label: 'Nature of Application',
+            type: FormFieldType.dropdown,
+            required: true,
+            options: [
+              'Eviction of Tenant',
+              'Fixation of Fair Rent',
+              'Recovery of Possession',
+              'Arrears of Rent',
+              'Deposit Refund',
+              'Illegal Enhancement of Rent',
+              'Other'
+            ]),
+        FormFieldModel(
+            key: 'dispute_details',
+            label: 'Details of Dispute',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'Describe the tenancy dispute in detail',
+            maxLines: 6),
+        FormFieldModel(
+            key: 'relief_sought',
+            label: 'Relief Sought',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'What order are you seeking from Rent Controller?',
+            maxLines: 3),
       ],
     ),
 
-    // â”€â”€ 10. Cheque Bounce Complaint â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- 10. Cheque Bounce Complaint -----------------------------------------
     FormTemplateModel(
       id: 'cheque_bounce',
       title: 'Cheque Bounce Complaint',
       subtitle: 'Complaint for dishonoured cheque under NI Act Section 138',
       authority: 'Judicial Magistrate Court (First Class)',
-      actReference: 'Negotiable Instruments Act, 1881 â€” Section 138',
+      actReference: 'Negotiable Instruments Act, 1881 - Section 138',
       instructions:
           'Send legal notice within 30 days of cheque bounce. If payment not made in 15 days, file complaint in Magistrate Court within 30 days.',
       documents: [
@@ -1577,19 +2197,94 @@ class FormTemplates {
         'Proof of legally enforceable debt',
       ],
       fields: [
-        FormFieldModel(key: 'complainant_name', label: 'Complainant Full Name', type: FormFieldType.text, required: true, hint: 'Person who received the cheque'),
-        FormFieldModel(key: 'complainant_address', label: 'Complainant Address', type: FormFieldType.textarea, required: true, hint: 'Full address with pin code', maxLines: 3),
-        FormFieldModel(key: 'complainant_phone', label: 'Phone Number', type: FormFieldType.phone, required: true, hint: '10-digit mobile number'),
-        FormFieldModel(key: 'accused_name', label: 'Accused Full Name', type: FormFieldType.text, required: true, hint: 'Person who issued the cheque'),
-        FormFieldModel(key: 'accused_address', label: 'Accused Address', type: FormFieldType.textarea, required: true, hint: 'Full address of accused', maxLines: 3),
-        FormFieldModel(key: 'cheque_number', label: 'Cheque Number', type: FormFieldType.text, required: true, hint: '6-digit cheque number'),
-        FormFieldModel(key: 'cheque_amount', label: 'Cheque Amount (â‚¹)', type: FormFieldType.number, required: true, hint: 'Amount on cheque', prefix: 'â‚¹'),
-        FormFieldModel(key: 'cheque_date', label: 'Cheque Date', type: FormFieldType.date, required: true, hint: 'Date written on cheque'),
-        FormFieldModel(key: 'bank_name', label: 'Drawee Bank Name & Branch', type: FormFieldType.text, required: true, hint: 'Bank and branch of accused'),
-        FormFieldModel(key: 'bounce_date', label: 'Date of Cheque Bounce', type: FormFieldType.date, required: true, hint: 'Date bank returned the cheque'),
-        FormFieldModel(key: 'bounce_reason', label: 'Reason for Bounce', type: FormFieldType.dropdown, required: true, options: ['Insufficient Funds', 'Account Closed', 'Signature Mismatch', 'Payment Stopped', 'Other']),
-        FormFieldModel(key: 'legal_notice_date', label: 'Date Legal Notice Sent', type: FormFieldType.date, required: true, hint: 'Date you sent notice to accused'),
-        FormFieldModel(key: 'debt_details', label: 'Nature of Debt / Transaction', type: FormFieldType.textarea, required: true, hint: 'Why was the cheque given â€” loan, goods, services?', maxLines: 4),
+        FormFieldModel(
+            key: 'complainant_name',
+            label: 'Complainant Full Name',
+            type: FormFieldType.text,
+            required: true,
+            hint: 'Person who received the cheque'),
+        FormFieldModel(
+            key: 'complainant_address',
+            label: 'Complainant Address',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'Full address with pin code',
+            maxLines: 3),
+        FormFieldModel(
+            key: 'complainant_phone',
+            label: 'Phone Number',
+            type: FormFieldType.phone,
+            required: true,
+            hint: '10-digit mobile number'),
+        FormFieldModel(
+            key: 'accused_name',
+            label: 'Accused Full Name',
+            type: FormFieldType.text,
+            required: true,
+            hint: 'Person who issued the cheque'),
+        FormFieldModel(
+            key: 'accused_address',
+            label: 'Accused Address',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'Full address of accused',
+            maxLines: 3),
+        FormFieldModel(
+            key: 'cheque_number',
+            label: 'Cheque Number',
+            type: FormFieldType.text,
+            required: true,
+            hint: '6-digit cheque number'),
+        FormFieldModel(
+            key: 'cheque_amount',
+            label: 'Cheque Amount (Rs.)',
+            type: FormFieldType.number,
+            required: true,
+            hint: 'Amount on cheque',
+            prefix: 'Rs.'),
+        FormFieldModel(
+            key: 'cheque_date',
+            label: 'Cheque Date',
+            type: FormFieldType.date,
+            required: true,
+            hint: 'Date written on cheque'),
+        FormFieldModel(
+            key: 'bank_name',
+            label: 'Drawee Bank Name & Branch',
+            type: FormFieldType.text,
+            required: true,
+            hint: 'Bank and branch of accused'),
+        FormFieldModel(
+            key: 'bounce_date',
+            label: 'Date of Cheque Bounce',
+            type: FormFieldType.date,
+            required: true,
+            hint: 'Date bank returned the cheque'),
+        FormFieldModel(
+            key: 'bounce_reason',
+            label: 'Reason for Bounce',
+            type: FormFieldType.dropdown,
+            required: true,
+            options: [
+              'Insufficient Funds',
+              'Account Closed',
+              'Signature Mismatch',
+              'Payment Stopped',
+              'Other'
+            ]),
+        FormFieldModel(
+            key: 'legal_notice_date',
+            label: 'Date Legal Notice Sent',
+            type: FormFieldType.date,
+            required: true,
+            hint: 'Date you sent notice to accused'),
+        FormFieldModel(
+            key: 'debt_details',
+            label: 'Nature of Debt / Transaction',
+            type: FormFieldType.textarea,
+            required: true,
+            hint: 'Why was the cheque given - loan, goods, services?',
+            maxLines: 4),
       ],
     ),
   ];
@@ -1613,7 +2308,12 @@ const List<DocumentCategory> documentCategories = [
         label: 'Legal Notice',
         description: 'Formal legal notice to opposite party before litigation',
         promptHint: 'Describe the dispute, amount involved, and relief sought',
-        requiredFields: ['Sender', 'Recipient', 'Dispute Details', 'Relief Sought'],
+        requiredFields: [
+          'Sender',
+          'Recipient',
+          'Dispute Details',
+          'Relief Sought'
+        ],
       ),
       DocumentType(
         id: 'consumer_complaint',
@@ -1626,8 +2326,14 @@ const List<DocumentCategory> documentCategories = [
         id: 'police_complaint',
         label: 'Police Complaint',
         description: 'FIR or complaint letter to police',
-        promptHint: 'Describe the incident with date, place, and persons involved',
-        requiredFields: ['Incident Date', 'Incident Place', 'Accused Details', 'Description'],
+        promptHint:
+            'Describe the incident with date, place, and persons involved',
+        requiredFields: [
+          'Incident Date',
+          'Incident Place',
+          'Accused Details',
+          'Description'
+        ],
       ),
       DocumentType(
         id: 'cease_desist',
@@ -1654,7 +2360,13 @@ const List<DocumentCategory> documentCategories = [
         label: 'Rent Agreement',
         description: 'Residential or commercial rental agreement',
         promptHint: 'Property details, rent amount, duration, terms',
-        requiredFields: ['Landlord', 'Tenant', 'Property Address', 'Rent', 'Duration'],
+        requiredFields: [
+          'Landlord',
+          'Tenant',
+          'Property Address',
+          'Rent',
+          'Duration'
+        ],
       ),
       DocumentType(
         id: 'service_agreement',
@@ -1668,14 +2380,25 @@ const List<DocumentCategory> documentCategories = [
         label: 'NDA / Confidentiality',
         description: 'Non-disclosure agreement between parties',
         promptHint: 'What information is confidential and duration of NDA',
-        requiredFields: ['Party 1', 'Party 2', 'Confidential Information', 'Duration'],
+        requiredFields: [
+          'Party 1',
+          'Party 2',
+          'Confidential Information',
+          'Duration'
+        ],
       ),
       DocumentType(
         id: 'employment_contract',
         label: 'Employment Contract',
         description: 'Agreement between employer and employee',
         promptHint: 'Role, salary, benefits, notice period, terms',
-        requiredFields: ['Employer', 'Employee', 'Role', 'Salary', 'Start Date'],
+        requiredFields: [
+          'Employer',
+          'Employee',
+          'Role',
+          'Salary',
+          'Start Date'
+        ],
       ),
       DocumentType(
         id: 'freelance_contract',
@@ -1757,7 +2480,12 @@ const List<DocumentCategory> documentCategories = [
         label: 'Vakalatnama',
         description: 'Authorization letter to appoint an advocate',
         promptHint: 'Case details and advocate information',
-        requiredFields: ['Client Name', 'Advocate Name', 'Court', 'Case Details'],
+        requiredFields: [
+          'Client Name',
+          'Advocate Name',
+          'Court',
+          'Case Details'
+        ],
       ),
       DocumentType(
         id: 'bail_application',
@@ -1771,7 +2499,12 @@ const List<DocumentCategory> documentCategories = [
         label: 'Appeal Letter',
         description: 'Appeal against a decision or order',
         promptHint: 'Original decision, grounds of appeal, relief sought',
-        requiredFields: ['Appellant', 'Against Whom', 'Original Decision', 'Grounds'],
+        requiredFields: [
+          'Appellant',
+          'Against Whom',
+          'Original Decision',
+          'Grounds'
+        ],
       ),
     ],
   ),
@@ -1818,7 +2551,12 @@ const List<DocumentCategory> documentCategories = [
         label: 'Resignation Letter',
         description: 'Formal resignation from employment',
         promptHint: 'Role, company, last working day, reason (optional)',
-        requiredFields: ['Employee Name', 'Role', 'Company', 'Last Working Day'],
+        requiredFields: [
+          'Employee Name',
+          'Role',
+          'Company',
+          'Last Working Day'
+        ],
       ),
       DocumentType(
         id: 'termination_letter',
@@ -1844,4 +2582,3 @@ const List<DocumentCategory> documentCategories = [
     ],
   ),
 ];
-

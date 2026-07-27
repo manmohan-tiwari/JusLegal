@@ -1,4 +1,4 @@
-﻿import 'dart:ui';
+import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -203,9 +203,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ---------------------------------------------
 // AI Feature Tool model
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ---------------------------------------------
 
 class _AiFeatureTool {
   final String title;
@@ -223,9 +223,9 @@ class _AiFeatureTool {
   });
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ---------------------------------------------
 // Full feature list
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ---------------------------------------------
 
 const List<_AiFeatureTool> _aiChatTools = [
   _AiFeatureTool(
@@ -275,7 +275,7 @@ const List<_AiFeatureTool> _documentTools = [
   ),
   _AiFeatureTool(
     title: 'Document Review',
-    description: 'Upload a doc â€” AI finds red flags & key clauses',
+    description: 'Upload a doc - AI finds red flags & key clauses',
     icon: Icons.fact_check_outlined,
     route: '/home/document-review',
     category: 'documents',
@@ -289,9 +289,9 @@ const List<_AiFeatureTool> _documentTools = [
   ),
 ];
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ---------------------------------------------
 // Home Content
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ---------------------------------------------
 
 class _HomeContent extends StatelessWidget {
   final List<LegalCategory> categories;
@@ -320,7 +320,7 @@ class _HomeContent extends StatelessWidget {
               : _categorySectionTopSpacingMobile,
         ),
 
-        // â”€â”€ Legal Categories â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- Legal Categories ------------------------------
         const _SectionLabel('EXPLORE LEGAL CATEGORIES'),
         const SizedBox(height: 16),
         if (categories.isEmpty)
@@ -373,7 +373,7 @@ class _HomeContent extends StatelessWidget {
           ),
         ),
 
-        // â”€â”€ AI Chat & Analysis Tools â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- AI Chat & Analysis Tools ----------------------
         SizedBox(height: isDesktop ? 32 : 28),
         const _SectionLabel('AI CHAT, LEGAL QUERIES AND ANALYSIS'),
         const SizedBox(height: 4),
@@ -396,7 +396,7 @@ class _HomeContent extends StatelessWidget {
           delay: const Duration(milliseconds: 120),
         ),
 
-        // â”€â”€ Documents & Contracts Tools â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- Documents & Contracts Tools -------------------
         SizedBox(height: isDesktop ? 32 : 28),
         const _SectionLabel('DOCUMENTS AND CONTRACTS'),
         const SizedBox(height: 4),
@@ -419,7 +419,7 @@ class _HomeContent extends StatelessWidget {
           delay: const Duration(milliseconds: 180),
         ),
 
-        // â”€â”€ Why Choose JusLegal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- Why Choose JusLegal ---------------------------
         SizedBox(height: isDesktop ? 28 : 24),
         const _SectionLabel('WHY CHOOSE JUSLEGAL'),
         const SizedBox(height: 16),
@@ -455,9 +455,9 @@ class _HomeContent extends StatelessWidget {
   }
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ---------------------------------------------
 // AI Tools Grid
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ---------------------------------------------
 
 class _AiToolsGrid extends StatelessWidget {
   final List<_AiFeatureTool> tools;
@@ -495,9 +495,9 @@ class _AiToolsGrid extends StatelessWidget {
   }
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ---------------------------------------------
 // AI Tool Card
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ---------------------------------------------
 
 class _AiToolCard extends StatelessWidget {
   final _AiFeatureTool tool;
@@ -617,9 +617,9 @@ class _AiToolCard extends StatelessWidget {
   }
 }
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// Existing widgets below â€” unchanged
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ---------------------------------------------
+// Existing widgets below - unchanged
+// ---------------------------------------------
 
 class _HeroSection extends StatelessWidget {
   final bool isDesktop;
@@ -1216,4 +1216,3 @@ class _BottomNavItem {
 
   const _BottomNavItem(this.label, this.icon, this.selectedIcon);
 }
-

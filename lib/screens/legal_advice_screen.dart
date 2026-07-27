@@ -1,14 +1,14 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/config/theme_config.dart';
 import '../services/ai_service.dart';
 
-// â”€â”€ Pre-built Q&A templates â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Pre-built Q&A templates ---------------------------------------------------
 
 class _QTemplate {
-  final String display;   // shown in list
-  final String prompt;    // sent to AI (placeholder replaced)
-  final String hint;      // TextField hint
+  final String display; // shown in list
+  final String prompt; // sent to AI (placeholder replaced)
+  final String hint; // TextField hint
   final IconData icon;
 
   const _QTemplate({
@@ -22,67 +22,80 @@ class _QTemplate {
 const List<_QTemplate> _templates = [
   _QTemplate(
     display: 'What legal steps should I take after an incident?',
-    prompt: 'What legal steps should I take after the following incident: {input}? Explain under Indian law.',
+    prompt:
+        'What legal steps should I take after the following incident: {input}? Explain under Indian law.',
     hint: 'Describe the incident (e.g. product damaged during delivery)',
     icon: Icons.directions_walk_outlined,
   ),
   _QTemplate(
     display: 'Should I file a lawsuit for this issue?',
-    prompt: 'Should I file a lawsuit for the following issue under Indian consumer law: {input}? Give pros, cons and recommendation.',
+    prompt:
+        'Should I file a lawsuit for the following issue under Indian consumer law: {input}? Give pros, cons and recommendation.',
     hint: 'Describe the issue (e.g. seller refused refund for defective item)',
     icon: Icons.gavel_outlined,
   ),
   _QTemplate(
     display: 'How can I protect myself legally in this scenario?',
-    prompt: 'How can I protect myself legally in the following scenario under Indian law: {input}?',
-    hint: 'Describe the scenario (e.g. landlord not returning security deposit)',
+    prompt:
+        'How can I protect myself legally in the following scenario under Indian law: {input}?',
+    hint:
+        'Describe the scenario (e.g. landlord not returning security deposit)',
     icon: Icons.shield_outlined,
   ),
   _QTemplate(
     display: 'Is it advisable to sign a contract with this clause?',
-    prompt: 'Is it advisable to sign a contract that includes the following clause under Indian contract law: {input}? Explain risks.',
+    prompt:
+        'Is it advisable to sign a contract that includes the following clause under Indian contract law: {input}? Explain risks.',
     hint: 'Paste or describe the clause',
     icon: Icons.edit_document,
   ),
   _QTemplate(
     display: 'What are my legal options if this situation occurs?',
-    prompt: 'What are my legal options if the following situation occurs under Indian law: {input}?',
+    prompt:
+        'What are my legal options if the following situation occurs under Indian law: {input}?',
     hint: 'Describe the situation (e.g. employer withheld salary)',
     icon: Icons.account_tree_outlined,
   ),
   _QTemplate(
     display: 'What legal risks are involved in this action?',
-    prompt: 'What legal risks are involved in the following action under Indian law: {input}?',
+    prompt:
+        'What legal risks are involved in the following action under Indian law: {input}?',
     hint: 'Describe the action (e.g. starting a food business from home)',
     icon: Icons.warning_amber_outlined,
   ),
   _QTemplate(
     display: 'Can I represent myself in this type of case?',
-    prompt: 'Can I represent myself in the following type of case in Indian courts: {input}? What are the practical implications?',
-    hint: 'Describe the case type (e.g. consumer court complaint under â‚¹20 lakh)',
+    prompt:
+        'Can I represent myself in the following type of case in Indian courts: {input}? What are the practical implications?',
+    hint:
+        'Describe the case type (e.g. consumer court complaint under Rs.20 lakh)',
     icon: Icons.person_outlined,
   ),
   _QTemplate(
     display: 'Should I settle or go to trial for this dispute?',
-    prompt: 'Should I settle or go to trial for the following dispute under Indian law: {input}? Give a balanced analysis.',
+    prompt:
+        'Should I settle or go to trial for the following dispute under Indian law: {input}? Give a balanced analysis.',
     hint: 'Describe the dispute (e.g. builder delayed possession by 2 years)',
     icon: Icons.balance_outlined,
   ),
   _QTemplate(
     display: 'What kind of lawyer should I hire for this case?',
-    prompt: 'What kind of lawyer should I hire for the following case in India: {input}? Describe the specialisation needed.',
+    prompt:
+        'What kind of lawyer should I hire for the following case in India: {input}? Describe the specialisation needed.',
     hint: 'Describe the case (e.g. cheque bounce / NI Act case)',
     icon: Icons.support_agent_outlined,
   ),
   _QTemplate(
     display: 'How can I appeal a decision related to this case?',
-    prompt: 'How can I appeal a decision related to the following case under Indian law: {input}? Explain the appeal process step by step.',
-    hint: 'Describe the case and decision (e.g. consumer forum ruled against me)',
+    prompt:
+        'How can I appeal a decision related to the following case under Indian law: {input}? Explain the appeal process step by step.',
+    hint:
+        'Describe the case and decision (e.g. consumer forum ruled against me)',
     icon: Icons.upload_outlined,
   ),
 ];
 
-// â”€â”€ Provider â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Provider ------------------------------------------------------------------
 
 final _aiServiceProvider = Provider<AIService>((ref) {
   final svc = AIService();
@@ -90,7 +103,7 @@ final _aiServiceProvider = Provider<AIService>((ref) {
   return svc;
 });
 
-// â”€â”€ Screen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Screen --------------------------------------------------------------------
 
 class LegalAdviceScreen extends ConsumerStatefulWidget {
   const LegalAdviceScreen({super.key});
@@ -185,35 +198,32 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // â”€â”€ Disclaimer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+              // -- Disclaimer -----------------------------
               _DisclaimerBanner(),
               const SizedBox(height: 20),
 
-              // â”€â”€ Section label â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+              // -- Section label ---------------------------
               _SectionLabel(
-                _selected == null
-                    ? 'SELECT A QUESTION'
-                    : 'SELECTED QUESTION',
+                _selected == null ? 'SELECT A QUESTION' : 'SELECTED QUESTION',
               ),
               const SizedBox(height: 12),
 
-              // â”€â”€ Question list OR selected chip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+              // -- Question list OR selected chip ----------
               if (_selected == null) ...[
                 ListView.separated(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: _templates.length,
                   separatorBuilder: (_, __) => const SizedBox(height: 10),
-                  itemBuilder: (context, i) =>
-                      _QuestionTile(
-                        template: _templates[i],
-                        onTap: () => setState(() {
-                          _selected = _templates[i];
-                          _result = null;
-                          _error = null;
-                          _controller.clear();
-                        }),
-                      ),
+                  itemBuilder: (context, i) => _QuestionTile(
+                    template: _templates[i],
+                    onTap: () => setState(() {
+                      _selected = _templates[i];
+                      _result = null;
+                      _error = null;
+                      _controller.clear();
+                    }),
+                  ),
                 ),
               ] else ...[
                 // Selected question chip with change button
@@ -227,8 +237,7 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
                   ),
                   child: Row(
                     children: [
-                      Icon(_selected!.icon,
-                          color: Color(0xFF0052CC), size: 22),
+                      Icon(_selected!.icon, color: Color(0xFF0052CC), size: 22),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
@@ -249,7 +258,7 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                // â”€â”€ Input field â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                // -- Input field ---------------------------
                 _SectionLabel('YOUR DETAILS'),
                 const SizedBox(height: 10),
                 TextField(
@@ -279,7 +288,7 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // â”€â”€ Submit button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+                // -- Submit button -------------------------
                 SizedBox(
                   width: double.infinity,
                   height: 50,
@@ -309,7 +318,7 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
                 ),
               ],
 
-              // â”€â”€ Error â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+              // -- Error -----------------------------------
               if (_error != null) ...[
                 const SizedBox(height: 20),
                 Container(
@@ -343,7 +352,7 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
                 ),
               ],
 
-              // â”€â”€ Result â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+              // -- Result ----------------------------------
               if (_result != null) ...[
                 const SizedBox(height: 24),
                 Text(
@@ -381,7 +390,7 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
   }
 }
 
-// â”€â”€ Question Tile â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Question Tile -------------------------------------------------------------
 
 class _QuestionTile extends StatelessWidget {
   final _QTemplate template;
@@ -412,8 +421,7 @@ class _QuestionTile extends StatelessWidget {
                   color: AppTheme.trustBlue.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(template.icon,
-                    color: AppTheme.trustBlue, size: 20),
+                child: Icon(template.icon, color: AppTheme.trustBlue, size: 20),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -435,7 +443,7 @@ class _QuestionTile extends StatelessWidget {
   }
 }
 
-// â”€â”€ Result Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Result Card ---------------------------------------------------------------
 
 class _ResultCard extends StatelessWidget {
   final Map<String, dynamic> result;
@@ -455,9 +463,8 @@ class _ResultCard extends StatelessWidget {
     final summary = _str('caseSummary');
     final analysis = _str('legalAnalysis');
     final rights = _list('rights');
-    final steps = _list('nextSteps').isNotEmpty
-        ? _list('nextSteps')
-        : _list('steps');
+    final steps =
+        _list('nextSteps').isNotEmpty ? _list('nextSteps') : _list('steps');
     final laws = result['relevantLaws'];
     final confidence = result['confidence'];
 
@@ -465,141 +472,151 @@ class _ResultCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Summary
-        if (summary.isNotEmpty) _InfoBlock(
-          icon: Icons.summarize_outlined,
-          title: 'Summary',
-          child: Text(summary,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppTheme.primaryNavy, height: 1.5)),
-        ),
+        if (summary.isNotEmpty)
+          _InfoBlock(
+            icon: Icons.summarize_outlined,
+            title: 'Summary',
+            child: Text(summary,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(color: AppTheme.primaryNavy, height: 1.5)),
+          ),
         if (summary.isNotEmpty) const SizedBox(height: 12),
 
         // Confidence
-        if (confidence != null) _InfoBlock(
-          icon: Icons.bar_chart_rounded,
-          title: 'Case Strength',
-          child: _ConfidenceBar(score: (confidence is num)
-              ? confidence.toInt()
-              : int.tryParse(confidence.toString()) ?? 0),
-        ),
+        if (confidence != null)
+          _InfoBlock(
+            icon: Icons.bar_chart_rounded,
+            title: 'Case Strength',
+            child: _ConfidenceBar(
+                score: (confidence is num)
+                    ? confidence.toInt()
+                    : int.tryParse(confidence.toString()) ?? 0),
+          ),
         if (confidence != null) const SizedBox(height: 12),
 
         // Legal Analysis
-        if (analysis.isNotEmpty) _InfoBlock(
-          icon: Icons.balance_outlined,
-          title: 'Legal Analysis',
-          child: Text(analysis,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppTheme.primaryNavy, height: 1.5)),
-        ),
+        if (analysis.isNotEmpty)
+          _InfoBlock(
+            icon: Icons.balance_outlined,
+            title: 'Legal Analysis',
+            child: Text(analysis,
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(color: AppTheme.primaryNavy, height: 1.5)),
+          ),
         if (analysis.isNotEmpty) const SizedBox(height: 12),
 
         // Rights
-        if (rights.isNotEmpty) _InfoBlock(
-          icon: Icons.verified_outlined,
-          title: 'Your Rights',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: rights
-                .map((r) => Padding(
-                      padding: const EdgeInsets.only(bottom: 6),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Icon(Icons.check_circle_outline,
-                              size: 16, color: Color(0xFF16A34A)),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(r,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall
-                                    ?.copyWith(
-                                        color: AppTheme.primaryNavy,
-                                        height: 1.4)),
-                          ),
-                        ],
-                      ),
-                    ))
-                .toList(),
+        if (rights.isNotEmpty)
+          _InfoBlock(
+            icon: Icons.verified_outlined,
+            title: 'Your Rights',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: rights
+                  .map((r) => Padding(
+                        padding: const EdgeInsets.only(bottom: 6),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Icon(Icons.check_circle_outline,
+                                size: 16, color: Color(0xFF16A34A)),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(r,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(
+                                          color: AppTheme.primaryNavy,
+                                          height: 1.4)),
+                            ),
+                          ],
+                        ),
+                      ))
+                  .toList(),
+            ),
           ),
-        ),
         if (rights.isNotEmpty) const SizedBox(height: 12),
 
         // Next Steps
-        if (steps.isNotEmpty) _InfoBlock(
-          icon: Icons.checklist_rounded,
-          title: 'Next Steps',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: steps.asMap().entries.map((e) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: 22,
-                      height: 22,
-                      decoration: BoxDecoration(
-                        color: AppTheme.trustBlue.withValues(alpha: 0.12),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: Text(
-                          '${e.key + 1}',
-                          style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                              color: AppTheme.trustBlue),
+        if (steps.isNotEmpty)
+          _InfoBlock(
+            icon: Icons.checklist_rounded,
+            title: 'Next Steps',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: steps.asMap().entries.map((e) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 22,
+                        height: 22,
+                        decoration: BoxDecoration(
+                          color: AppTheme.trustBlue.withValues(alpha: 0.12),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                          child: Text(
+                            '${e.key + 1}',
+                            style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                color: AppTheme.trustBlue),
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(e.value,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall
-                              ?.copyWith(
-                                  color: AppTheme.primaryNavy, height: 1.4)),
-                    ),
-                  ],
-                ),
-              );
-            }).toList(),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(e.value,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.copyWith(
+                                    color: AppTheme.primaryNavy, height: 1.4)),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
           ),
-        ),
         if (steps.isNotEmpty) const SizedBox(height: 12),
 
         // Relevant Laws chips
-        if (laws is List && laws.isNotEmpty) _InfoBlock(
-          icon: Icons.menu_book_outlined,
-          title: 'Relevant Laws',
-          child: Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: laws.map((l) {
-              final lawName = l is Map
-                  ? (l['law'] ?? '').toString()
-                  : l.toString();
-              return Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppTheme.legalGold.withValues(alpha: 0.10),
-                  border: Border.all(
-                      color: AppTheme.legalGold.withValues(alpha: 0.5)),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(lawName,
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: AppTheme.primaryNavy,
-                        fontWeight: FontWeight.w600)),
-              );
-            }).toList(),
+        if (laws is List && laws.isNotEmpty)
+          _InfoBlock(
+            icon: Icons.menu_book_outlined,
+            title: 'Relevant Laws',
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: laws.map((l) {
+                final lawName =
+                    l is Map ? (l['law'] ?? '').toString() : l.toString();
+                return Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppTheme.legalGold.withValues(alpha: 0.10),
+                    border: Border.all(
+                        color: AppTheme.legalGold.withValues(alpha: 0.5)),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(lawName,
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: AppTheme.primaryNavy,
+                          fontWeight: FontWeight.w600)),
+                );
+              }).toList(),
+            ),
           ),
-        ),
 
         // Disclaimer
         const SizedBox(height: 16),
@@ -618,8 +635,10 @@ class _ResultCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   'AI-generated guidance only. Not a substitute for professional legal advice.',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppTheme.primaryNavy, height: 1.4),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.copyWith(color: AppTheme.primaryNavy, height: 1.4),
                 ),
               ),
             ],
@@ -630,7 +649,7 @@ class _ResultCard extends StatelessWidget {
   }
 }
 
-// â”€â”€ Info Block â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Info Block ----------------------------------------------------------------
 
 class _InfoBlock extends StatelessWidget {
   final IconData icon;
@@ -675,10 +694,10 @@ class _InfoBlock extends StatelessWidget {
   }
 }
 
-// â”€â”€ Confidence Bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Confidence Bar ------------------------------------------------------------
 
 class _ConfidenceBar extends StatelessWidget {
-  final int score; // 0â€“100
+  final int score; // 0-100
 
   const _ConfidenceBar({required this.score});
 
@@ -706,8 +725,7 @@ class _ConfidenceBar extends StatelessWidget {
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: AppTheme.primaryNavy, fontWeight: FontWeight.w700)),
             Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
                 color: _color.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(20),
@@ -735,7 +753,7 @@ class _ConfidenceBar extends StatelessWidget {
   }
 }
 
-// â”€â”€ Section Label â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Section Label -------------------------------------------------------------
 
 class _SectionLabel extends StatelessWidget {
   final String title;
@@ -761,7 +779,7 @@ class _SectionLabel extends StatelessWidget {
   }
 }
 
-// â”€â”€ Disclaimer Banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Disclaimer Banner ---------------------------------------------------------
 
 class _DisclaimerBanner extends StatelessWidget {
   const _DisclaimerBanner();

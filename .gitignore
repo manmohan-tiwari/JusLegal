@@ -15,6 +15,12 @@ migrate_working_dir/
 .env.local
 .env.production
 .dev.vars
+.wrangler/
+firebase-debug.log
+analyze_output.txt
+full_structure.txt
+output.txt
+output_files.txt
 
 # IntelliJ related
 *.iml

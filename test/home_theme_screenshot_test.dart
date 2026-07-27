@@ -27,7 +27,9 @@ void main() {
         ),
       ),
     );
-    await tester.pumpAndSettle();
+    // HomeScreen includes repeating decorative animations that never settle.
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
 
     await expectLater(
       find.byType(HomeScreen),

@@ -1,35 +1,57 @@
-import {
-	env,
-	createExecutionContext,
-	waitOnExecutionContext,
-	SELF,
-} from "cloudflare:test";
-import { describe, it, expect } from "vitest";
-import worker from "../src/index";
+import { createExecutionContext, waitOnExecutionContext } from "cloudflare:test";
+import { describe, expect, it } from "vitest";
+import worker, { type Env } from "../src/index";
 
-// For now, you'll need to do something like this to get a correctly-typed
-// `Request` to pass to `worker.fetch()`.
-const IncomingRequest = Request<unknown, IncomingRequestCfProperties>;
+const testEnv: Env = {
+	ALLOWED_ORIGIN: "https://juslegal-2196.web.app",
+	GROQ_API_KEY: "groq-key",
+	OPENROUTER_API_KEY: "openrouter-key",
+	PROXY_AUTH_TOKEN: "test-client-token",
+};
+
+async function dispatch(path: string, init: RequestInit = {}) {
+	const request = new Request(`https://proxy.example${path}`, init);
+	const ctx = createExecutionContext();
+	const response = await worker.fetch(request, testEnv, ctx);
+	await waitOnExecutionContext(ctx);
+	return response;
+}
 
 describe("JusLegal AI proxy", () => {
-	it("returns 404 with CORS headers for an unknown route (unit style)", async () => {
-		const request = new IncomingRequest("http://example.com/unknown", {
+	it("allows the configured origin", async () => {
+		const response = await dispatch("/unknown", {
 			method: "POST",
+			headers: { Origin: testEnv.ALLOWED_ORIGIN, "Content-Type": "application/json" },
 		});
-		// Create an empty context to pass to `worker.fetch()`.
-		const ctx = createExecutionContext();
-		const response = await worker.fetch(request, env, ctx);
-		// Wait for all `Promise`s passed to `ctx.waitUntil()` to settle before running test assertions
-		await waitOnExecutionContext(ctx);
 		expect(response.status).toBe(404);
-		expect(response.headers.get("Access-Control-Allow-Origin")).toBe("*");
-		expect(await response.json()).toEqual({ error: "Not found" });
+		expect(response.headers.get("Access-Control-Allow-Origin")).toBe(testEnv.ALLOWED_ORIGIN);
 	});
 
-	it("returns 405 for unsupported methods (integration style)", async () => {
-		const response = await SELF.fetch("https://example.com/callOpenRouter");
-		expect(response.status).toBe(405);
-		expect(response.headers.get("Access-Control-Allow-Origin")).toBe("*");
-		expect(await response.json()).toEqual({ error: "Method not allowed" });
+	it("rejects an unconfigured origin", async () => {
+		const response = await dispatch("/callGroq", {
+			method: "POST",
+			headers: { Origin: "https://evil.example", "Content-Type": "application/json" },
+		});
+		expect(response.status).toBe(403);
+		expect(response.headers.get("Access-Control-Allow-Origin")).toBeNull();
+	});
+
+	it("answers an allowed CORS preflight", async () => {
+		const response = await dispatch("/callOpenRouter", {
+			method: "OPTIONS",
+			headers: { Origin: testEnv.ALLOWED_ORIGIN },
+		});
+		expect(response.status).toBe(204);
+		expect(response.headers.get("Access-Control-Allow-Headers")).toContain("Authorization");
+	});
+
+	it("rejects an unauthenticated provider request", async () => {
+		const response = await dispatch("/callOpenRouter", {
+			method: "POST",
+			headers: { Origin: testEnv.ALLOWED_ORIGIN, "Content-Type": "application/json" },
+			body: "{}",
+		});
+		expect(response.status).toBe(401);
+		expect(await response.json()).toEqual({ error: "Unauthorized" });
 	});
 });

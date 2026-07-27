@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -30,29 +30,33 @@ Future<void> main() async {
     firebaseInitialized = true;
     if (kDebugMode) {
       debugPrint('[Main] Firebase initialized successfully');
-      debugPrint('[Main] Firebase Apps: ${Firebase.apps.map((e) => e.name).toList()}');
+      debugPrint(
+          '[Main] Firebase Apps: ${Firebase.apps.map((e) => e.name).toList()}');
     }
-  } catch (e) {
+  } catch (_) {
     if (kDebugMode) {
-      debugPrint('[Main] Firebase initialization failed: $e');
-      debugPrint('[Main] Continuing without Firebase (app will work with limited functionality)');
+      debugPrint('[Main] Firebase initialization failed');
+      debugPrint(
+          '[Main] Continuing without Firebase (app will work with limited functionality)');
     }
     // For web, continue without Firebase if it fails
     // For mobile, log the error locally using debugPrint since Firebase isn't available yet
     if (!kIsWeb && firebaseInitialized) {
       // Only use Crashlytics if Firebase was successfully initialized
-      FirebaseCrashlytics.instance.recordError(e, StackTrace.current);
+      FirebaseCrashlytics.instance.recordError(
+        'Firebase initialization failed',
+        StackTrace.current,
+      );
     } else {
-      // Fallback: log error locally using debugPrint
-      debugPrint('[Main] Firebase initialization error: $e');
-      debugPrint('[Main] Stack trace: ${StackTrace.current}');
+      debugPrint('[Main] Firebase-dependent features are unavailable');
     }
   }
 
   // Initialize Firebase Crashlytics only if Firebase is available
   if (firebaseInitialized) {
     try {
-      FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+      FlutterError.onError =
+          FirebaseCrashlytics.instance.recordFlutterFatalError;
       PlatformDispatcher.instance.onError = (error, stack) {
         FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
         return true;
@@ -72,7 +76,8 @@ Future<void> main() async {
     try {
       await SafeAnalytics.initialize();
       if (kDebugMode) {
-        debugPrint('[Main] Analytics initialized: ${SafeAnalytics.isAvailable}');
+        debugPrint(
+            '[Main] Analytics initialized: ${SafeAnalytics.isAvailable}');
       }
     } catch (e) {
       if (kDebugMode) {
@@ -98,15 +103,18 @@ Future<void> main() async {
     },
   );
 
-runApp(const ProviderScope(child: JusLegalApp()));
+  runApp(ProviderScope(
+      child: JusLegalApp(firebaseAvailable: firebaseInitialized)));
 }
 
 class JusLegalApp extends StatelessWidget {
-  const JusLegalApp({super.key});
+  const JusLegalApp({super.key, required this.firebaseAvailable});
+
+  final bool firebaseAvailable;
 
   @override
   Widget build(BuildContext context) {
-    final router = buildRouter();
+    final router = buildRouter(firebaseAvailable: firebaseAvailable);
     return MaterialApp.router(
       title: 'JusLegal',
       theme: AppTheme.lightTheme,
@@ -117,4 +125,3 @@ class JusLegalApp extends StatelessWidget {
     );
   }
 }
-

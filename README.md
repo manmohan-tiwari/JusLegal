@@ -21,9 +21,9 @@ JusLegal is an AI-powered consumer legal assistant for Indian citizens, providin
 - **Cross-Platform** - Works on Android and Web
 - **Trust & Verification System** - Legal expert verification badges and transparent AI sourcing
 - **Real User Testimonials** - Social proof with actual case outcomes and success stories
-- **Streaming AI Responses** - Real-time analysis with better user experience
+- **AI Responses** - Provider responses are requested as complete JSON results
 - **Error Boundaries** - Graceful error handling with retry mechanisms
-- **Offline Knowledge Base** - Access legal information even without internet (Mobile only — not available on web)
+- **Bundled legal data** - `assets/legal_kb.json` is packaged with the app; AI analysis still requires network access
 
 ## Trust & Credibility Features
 
@@ -218,12 +218,26 @@ Before the first deploy, set the server-side secrets from a trusted terminal:
 cd juslegal-ai-proxy
 wrangler secret put OPENROUTER_API_KEY
 wrangler secret put GROQ_API_KEY
+wrangler secret put PROXY_AUTH_TOKEN
 wrangler deploy
 ```
+
+The current Worker protection uses a shared proxy token. Provide the matching
+value only through secure CI/build configuration, for example
+`--dart-define=PROXY_AUTH_TOKEN=...`; never commit it. Replace this temporary
+shared-token scheme with Firebase App Check or verified Firebase ID tokens for
+per-user production authentication.
 
 Any former client-side provider credentials should be revoked and replaced.
 Never add provider keys, `.env` files, or service account JSON files to this
 repository.
+
+The root `package.json` and `package-lock.json` are empty legacy placeholders;
+all Node dependencies and scripts live in `juslegal-ai-proxy/`.
+
+`flutter_markdown` is currently used by the chat UI. It is retained for
+compatibility; migration to a maintained Markdown renderer is a follow-up to
+avoid changing current rendering behavior.
 
 ## Contributing
 

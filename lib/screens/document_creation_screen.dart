@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/config/theme_config.dart';
 import '../core/config/templates.dart';
@@ -63,7 +63,7 @@ class _DocumentCreationScreenState
     );
   }
 
-  // â”€â”€ Step 0: Form Selection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // -- Step 0: Form Selection ----------------------------------------------
 
   Widget _buildFormSelection() {
     return Column(
@@ -92,9 +92,7 @@ class _DocumentCreationScreenState
             return FormPreviewCard(
               form: form,
               onTap: () {
-                ref
-                    .read(documentCreationProvider.notifier)
-                    .selectForm(form);
+                ref.read(documentCreationProvider.notifier).selectForm(form);
                 Future.delayed(const Duration(milliseconds: 300), () {
                   if (_scrollController.hasClients) {
                     _scrollController.animateTo(
@@ -112,7 +110,7 @@ class _DocumentCreationScreenState
     );
   }
 
-  // â”€â”€ Step 1: Form Filling â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // -- Step 1: Form Filling ------------------------------------------------
 
   Widget _buildFormFilling(
     DocumentCreationState state,
@@ -136,8 +134,7 @@ class _DocumentCreationScreenState
           ),
           child: Row(
             children: [
-              const Icon(Icons.edit_document,
-                  color: Colors.white, size: 24),
+              const Icon(Icons.edit_document, color: Colors.white, size: 24),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -170,8 +167,8 @@ class _DocumentCreationScreenState
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: AppColors.trustBlue.withValues(alpha: 0.06),
-            border: Border.all(
-                color: AppColors.trustBlue.withValues(alpha: 0.3)),
+            border:
+                Border.all(color: AppColors.trustBlue.withValues(alpha: 0.3)),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
@@ -185,10 +182,7 @@ class _DocumentCreationScreenState
                   children: [
                     Text(
                       'AI Enhancement',
-                      style: Theme.of(context)
-                          .textTheme
-                          .labelSmall
-                          ?.copyWith(
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
                             color: AppColors.primaryNavy,
                             fontWeight: FontWeight.w600,
                           ),
@@ -271,7 +265,7 @@ class _DocumentCreationScreenState
     );
   }
 
-  // â”€â”€ Step 2: Form Result â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // -- Step 2: Form Result -------------------------------------------------
 
   Widget _buildFormResult(
     DocumentCreationState state,
@@ -301,14 +295,13 @@ class _DocumentCreationScreenState
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline,
-                color: Colors.red, size: 48),
+            const Icon(Icons.error_outline, color: Colors.red, size: 48),
             const SizedBox(height: 16),
             Text(
               'Generation failed',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: AppColors.primaryNavy,
-              ),
+                  ),
             ),
             const SizedBox(height: 8),
             Text(
@@ -343,7 +336,7 @@ class _DocumentCreationScreenState
   }
 }
 
-// â”€â”€ Section Label â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// -- Section Label ---------------------------------------------------------
 
 class _SectionLabel extends StatelessWidget {
   final String title;
