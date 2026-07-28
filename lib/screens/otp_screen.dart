@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -211,7 +211,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                         fields.add(
                           Expanded(
                             child: SizedBox(
-                              height: 52,
+                              height: 56,
                               child: TextField(
                                 controller: _controllers[index],
                                 focusNode: _focusNodes[index],
@@ -368,4 +368,3 @@ class LoadingMessageWidget extends StatelessWidget {
     );
   }
 }
-

@@ -269,9 +269,11 @@ Summary: $summaryText
                 final crossAxisCount = constraints.maxWidth > 900
                     ? 4
                     : (constraints.maxWidth > 600 ? 3 : 2);
-                final childAspectRatio = constraints.maxWidth > 900
-                    ? 1.15
-                    : (constraints.maxWidth > 600 ? 0.95 : 0.85);
+                final textScale = MediaQuery.textScalerOf(context).scale(1);
+                final cardHeight = (constraints.maxWidth > 900
+                        ? 190.0
+                        : (constraints.maxWidth > 600 ? 204.0 : 212.0)) *
+                    textScale.clamp(1.0, 1.35);
 
                 return GridView.builder(
                   shrinkWrap: true,
@@ -281,7 +283,7 @@ Summary: $summaryText
                     crossAxisCount: crossAxisCount,
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
-                    childAspectRatio: childAspectRatio,
+                    mainAxisExtent: cardHeight,
                   ),
                   itemBuilder: (context, index) {
                     final category = _categories[index];
