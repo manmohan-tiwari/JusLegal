@@ -149,10 +149,11 @@ class _ProblemAnalyzerScreenState extends ConsumerState<ProblemAnalyzerScreen> {
       }
     }
 
-    if (targetNode != null && targetNode.context != null) {
+    final targetContext = targetNode?.context;
+    if (targetNode != null && targetContext != null) {
       targetNode.requestFocus();
       _scrollController.position.ensureVisible(
-        targetNode.context!.findRenderObject()!,
+        targetContext.findRenderObject()!,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
@@ -543,10 +544,10 @@ Summary: $summaryText
                           Text(
                             file.name,
                             style: const TextStyle(
-                              color: Color(0xFF6B7280),
+                              color: Color(0xFF1F2937),
                               fontSize: 12,
                               fontWeight: FontWeight.w400,
-                            ).copyWith(color: const Color(0xFF1F2937)),
+                            ),
                           ),
                           Text(
                             '${(file.size / 1024).toStringAsFixed(1)} KB',
@@ -554,7 +555,7 @@ Summary: $summaryText
                               color: Color(0xFF6B7280),
                               fontSize: 12,
                               fontWeight: FontWeight.w400,
-                            ).copyWith(color: const Color(0xFF6B7280)),
+                            ),
                           ),
                         ],
                       ),
@@ -612,8 +613,6 @@ Summary: $summaryText
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
     final bool isLastStep = _currentStep == 3;
-    const bool canContinue = true;
-
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
@@ -696,7 +695,7 @@ Summary: $summaryText
                   child: SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _isAnalyzing || !canContinue
+                      onPressed: _isAnalyzing
                           ? null
                           : () {
                               HapticFeedback.lightImpact();
