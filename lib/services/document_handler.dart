@@ -13,6 +13,9 @@ class DocumentCreationService {
 
   FormTemplateModel? getFormById(String id) => FormTemplates.getById(id);
 
+  String _value(Map<String, String> values, String key) =>
+      values[key]?.trim() ?? '';
+
   // Build filled form as plain text (for preview + copy)
   String buildFilledFormText({
     required FormTemplateModel template,
@@ -28,7 +31,7 @@ class DocumentCreationService {
     buffer.writeln();
 
     for (final field in template.fields) {
-      final value = values[field.key]?.trim() ?? '';
+      final value = _value(values, field.key);
       if (value.isEmpty && !field.required) continue;
 
       buffer.writeln(field.label.toUpperCase());
@@ -64,7 +67,7 @@ class DocumentCreationService {
     );
 
     final fieldsText = template.fields.map((f) {
-      final value = values[f.key]?.trim() ?? '';
+      final value = _value(values, f.key);
       return '${f.label}: ${value.isEmpty ? "Not provided" : value}';
     }).join('\n');
 
@@ -92,7 +95,7 @@ class DocumentCreationService {
 
     for (final field in template.fields) {
       if (!field.required) continue;
-      final value = values[field.key]?.trim() ?? '';
+      final value = _value(values, field.key);
       if (value.isEmpty) {
         errors[field.key] = '${field.label} is required';
         continue;
