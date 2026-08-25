@@ -3,15 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/config/theme_config.dart';
 import '../services/ai_service.dart';
 
-// -- Provider ------------------------------------------------------------------
-
 final _aiServiceProvider = Provider<AIService>((ref) {
   final svc = AIService();
   svc.initialize();
   return svc;
 });
-
-// -- Case type suggestions -----------------------------------------------------
 
 const List<String> _caseTypeSuggestions = [
   'Consumer dispute',
@@ -25,8 +21,6 @@ const List<String> _caseTypeSuggestions = [
   'Medical negligence',
   'Cyber fraud',
 ];
-
-// -- Screen --------------------------------------------------------------------
 
 class CaseAnalysisScreen extends ConsumerStatefulWidget {
   const CaseAnalysisScreen({super.key});
@@ -76,7 +70,6 @@ class _CaseAnalysisScreenState extends ConsumerState<CaseAnalysisScreen> {
       _result = null;
     });
 
-    // Scroll to bottom to show loader
     await Future.delayed(const Duration(milliseconds: 100));
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
@@ -113,7 +106,6 @@ Provide a thorough legal analysis covering all the above points.
       });
     }
 
-    // Scroll to result
     await Future.delayed(const Duration(milliseconds: 150));
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
@@ -148,16 +140,11 @@ Provide a thorough legal analysis covering all the above points.
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // -- Disclaimer ------------------------------
               _DisclaimerBanner(),
               const SizedBox(height: 20),
-
-              // -- Input section ---------------------------
               if (_result == null) ...[
                 _SectionLabel('DESCRIBE YOUR CASE'),
                 const SizedBox(height: 12),
-
-                // Case type chips
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
@@ -182,8 +169,6 @@ Provide a thorough legal analysis covering all the above points.
                       .toList(),
                 ),
                 const SizedBox(height: 14),
-
-                // Text input
                 TextField(
                   controller: _caseController,
                   focusNode: _focusNode,
@@ -214,7 +199,6 @@ Provide a thorough legal analysis covering all the above points.
                   ),
                 ),
                 const SizedBox(height: 16),
-
                 SizedBox(
                   width: double.infinity,
                   height: 50,
@@ -242,16 +226,11 @@ Provide a thorough legal analysis covering all the above points.
                   ),
                 ),
               ],
-
-              // -- Error -----------------------------------
               if (_error != null) ...[
                 const SizedBox(height: 20),
                 _ErrorCard(onRetry: _analyze),
               ],
-
-              // -- Result ----------------------------------
               if (_result != null) ...[
-                // Show original case description collapsed
                 _OriginalCaseCard(text: _caseController.text.trim()),
                 const SizedBox(height: 20),
                 _SectionLabel('CASE ANALYSIS REPORT'),
@@ -284,8 +263,6 @@ Provide a thorough legal analysis covering all the above points.
     );
   }
 }
-
-// -- Original Case Card --------------------------------------------------------
 
 class _OriginalCaseCard extends StatefulWidget {
   final String text;
@@ -352,8 +329,6 @@ class _OriginalCaseCardState extends State<_OriginalCaseCard> {
   }
 }
 
-// -- Case Analysis Result ------------------------------------------------------
-
 class _CaseAnalysisResult extends StatelessWidget {
   final Map<String, dynamic> result;
 
@@ -386,7 +361,6 @@ class _CaseAnalysisResult extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // -- Confidence + Strength -------------------------
         if (confidence != null || strength.isNotEmpty)
           _InfoBlock(
             icon: Icons.bar_chart_rounded,
@@ -410,8 +384,6 @@ class _CaseAnalysisResult extends StatelessWidget {
           ),
         if (confidence != null || strength.isNotEmpty)
           const SizedBox(height: 12),
-
-        // -- Summary ---------------------------------------
         if (summary.isNotEmpty) ...[
           _InfoBlock(
             icon: Icons.summarize_outlined,
@@ -424,8 +396,6 @@ class _CaseAnalysisResult extends StatelessWidget {
           ),
           const SizedBox(height: 12),
         ],
-
-        // -- Strengths (Rights) ----------------------------
         if (rights.isNotEmpty) ...[
           _InfoBlock(
             icon: Icons.thumb_up_outlined,
@@ -444,8 +414,6 @@ class _CaseAnalysisResult extends StatelessWidget {
           ),
           const SizedBox(height: 12),
         ],
-
-        // -- Risk Factors (Weaknesses) ---------------------
         if (riskFactors.isNotEmpty) ...[
           _InfoBlock(
             icon: Icons.warning_amber_outlined,
@@ -464,8 +432,6 @@ class _CaseAnalysisResult extends StatelessWidget {
           ),
           const SizedBox(height: 12),
         ],
-
-        // -- Legal Analysis --------------------------------
         if (analysis.isNotEmpty) ...[
           _InfoBlock(
             icon: Icons.balance_outlined,
@@ -478,8 +444,6 @@ class _CaseAnalysisResult extends StatelessWidget {
           ),
           const SizedBox(height: 12),
         ],
-
-        // -- Next Steps ------------------------------------
         if (steps.isNotEmpty) ...[
           _InfoBlock(
             icon: Icons.checklist_rounded,
@@ -526,8 +490,6 @@ class _CaseAnalysisResult extends StatelessWidget {
           ),
           const SizedBox(height: 12),
         ],
-
-        // -- Estimated Outcome -----------------------------
         if (estimatedOutcome.isNotEmpty) ...[
           _InfoBlock(
             icon: Icons.flag_outlined,
@@ -540,8 +502,6 @@ class _CaseAnalysisResult extends StatelessWidget {
           ),
           const SizedBox(height: 12),
         ],
-
-        // -- Relevant Laws ---------------------------------
         if (laws is List && laws.isNotEmpty) ...[
           _InfoBlock(
             icon: Icons.menu_book_outlined,
@@ -571,8 +531,6 @@ class _CaseAnalysisResult extends StatelessWidget {
           ),
           const SizedBox(height: 12),
         ],
-
-        // -- Documents Required ----------------------------
         if (docsRequired.isNotEmpty) ...[
           _InfoBlock(
             icon: Icons.folder_outlined,
@@ -590,8 +548,6 @@ class _CaseAnalysisResult extends StatelessWidget {
           ),
           const SizedBox(height: 12),
         ],
-
-        // -- Disclaimer ------------------------------------
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
@@ -620,8 +576,6 @@ class _CaseAnalysisResult extends StatelessWidget {
     );
   }
 }
-
-// -- Strength Badge ------------------------------------------------------------
 
 class _StrengthBadge extends StatelessWidget {
   final String strength;
@@ -663,8 +617,6 @@ class _StrengthBadge extends StatelessWidget {
   }
 }
 
-// -- Bullet Row ----------------------------------------------------------------
-
 class _BulletRow extends StatelessWidget {
   final String text;
   final Color color;
@@ -694,8 +646,6 @@ class _BulletRow extends StatelessWidget {
     );
   }
 }
-
-// -- Confidence Bar ------------------------------------------------------------
 
 class _ConfidenceBar extends StatelessWidget {
   final int score;
@@ -753,8 +703,6 @@ class _ConfidenceBar extends StatelessWidget {
   }
 }
 
-// -- Info Block ----------------------------------------------------------------
-
 class _InfoBlock extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -804,8 +752,6 @@ class _InfoBlock extends StatelessWidget {
   }
 }
 
-// -- Error Card ----------------------------------------------------------------
-
 class _ErrorCard extends StatelessWidget {
   final VoidCallback onRetry;
   const _ErrorCard({required this.onRetry});
@@ -839,8 +785,6 @@ class _ErrorCard extends StatelessWidget {
   }
 }
 
-// -- Suggestion Chip -----------------------------------------------------------
-
 class _SuggestionChip extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
@@ -871,8 +815,6 @@ class _SuggestionChip extends StatelessWidget {
   }
 }
 
-// -- Section Label -------------------------------------------------------------
-
 class _SectionLabel extends StatelessWidget {
   final String title;
   const _SectionLabel(this.title);
@@ -895,8 +837,6 @@ class _SectionLabel extends StatelessWidget {
     );
   }
 }
-
-// -- Disclaimer Banner ---------------------------------------------------------
 
 class _DisclaimerBanner extends StatelessWidget {
   const _DisclaimerBanner();
