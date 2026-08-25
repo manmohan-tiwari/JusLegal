@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' show kDebugMode, defaultTargetPlatform;
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:juslegal/l10n/gen/app_localizations.dart';
@@ -42,45 +41,20 @@ Future<void> main() async {
       debugPrint(
           '[Main] Continuing without Firebase (app will work with limited functionality)');
     }
-    // For web, continue without Firebase if it fails
-    // For mobile, log the error locally using debugPrint since Firebase isn't available yet
-    if (!kIsWeb && firebaseInitialized) {
-      // Only use Crashlytics if Firebase was successfully initialized
-      FirebaseCrashlytics.instance.recordError(
-        'Firebase initialization failed',
-        StackTrace.current,
-      );
-    } else {
+    if (kDebugMode) {
       debugPrint('[Main] Firebase-dependent features are unavailable');
     }
   }
 
-  // Initialize Firebase Crashlytics only if Firebase is available
-  if (firebaseInitialized) {
-    try {
-      FlutterError.onError =
-          FirebaseCrashlytics.instance.recordFlutterFatalError;
-      PlatformDispatcher.instance.onError = (error, stack) {
-        FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-        return true;
-      };
-      if (kDebugMode) {
-        debugPrint('[Main] Crashlytics initialized');
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('[Main] Crashlytics initialization failed: $e');
-      }
-    }
-  }
-
-  // Initialize SafeAnalytics
+  // Initialize SafeAnalytics (disabled by default, requires user consent)
   if (firebaseInitialized) {
     try {
       await SafeAnalytics.initialize();
       if (kDebugMode) {
         debugPrint(
             '[Main] Analytics initialized: ${SafeAnalytics.isAvailable}');
+        debugPrint('[Main] Analytics consent: ${SafeAnalytics.analyticsEnabled}');
+        debugPrint('[Main] Crashlytics consent: ${SafeAnalytics.crashlyticsEnabled}');
       }
     } catch (e) {
       if (kDebugMode) {
@@ -97,15 +71,17 @@ Future<void> main() async {
   // Initialize configuration
   await AppConfig.initialize();
 
-  // Log app start
-  await SafeAnalytics.logEvent(
-    name: 'app_started',
-    parameters: {
-      'firebase_initialized': firebaseInitialized,
-      'platform': defaultTargetPlatform.name,
-      'is_debug': kDebugMode,
-    },
-  );
+  // Log app start (only if analytics is enabled)
+  if (SafeAnalytics.analyticsEnabled) {
+    await SafeAnalytics.logEvent(
+      name: 'app_started',
+      parameters: {
+        'firebase_initialized': firebaseInitialized,
+        'platform': defaultTargetPlatform.name,
+        'is_debug': kDebugMode,
+      },
+    );
+  }
 
   runApp(ProviderScope(
       child: JusLegalApp(firebaseAvailable: firebaseInitialized)));

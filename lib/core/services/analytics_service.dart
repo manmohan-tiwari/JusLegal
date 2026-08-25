@@ -1,6 +1,9 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' show kDebugMode, debugPrint, PlatformDispatcher;
+import 'package:flutter/material.dart' show FlutterError;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// A safe wrapper around Firebase Analytics that handles initialization
 /// failures gracefully and provides fallback behavior.
@@ -11,8 +14,13 @@ class SafeAnalytics {
   SafeAnalytics._();
 
   static FirebaseAnalytics? _analytics;
+  static FirebaseCrashlytics? _crashlytics;
   static bool _isInitialized = false;
   static bool _isAvailable = false;
+  static bool _analyticsEnabled = false;
+  static bool _crashlyticsEnabled = false;
+  static const String _analyticsConsentKey = 'analytics_consent';
+  static const String _crashlyticsConsentKey = 'crashlytics_consent';
 
   /// Initialize the analytics service.
   /// Should be called after Firebase initialization.
@@ -32,10 +40,21 @@ class SafeAnalytics {
       }
 
       _analytics = FirebaseAnalytics.instance;
+      _crashlytics = FirebaseCrashlytics.instance;
       _isAvailable = true;
+      
+      // Load user consent preferences
+      final prefs = await SharedPreferences.getInstance();
+      _analyticsEnabled = prefs.getBool(_analyticsConsentKey) ?? false;
+      _crashlyticsEnabled = prefs.getBool(_crashlyticsConsentKey) ?? false;
+      
+      // Apply consent settings
+      await _applyConsentSettings();
       
       if (kDebugMode) {
         debugPrint('[SafeAnalytics] Analytics initialized successfully');
+        debugPrint('[SafeAnalytics] Analytics enabled: $_analyticsEnabled');
+        debugPrint('[SafeAnalytics] Crashlytics enabled: $_crashlyticsEnabled');
       }
     } catch (e) {
       if (kDebugMode) {
@@ -46,6 +65,89 @@ class SafeAnalytics {
       _isInitialized = true;
     }
   }
+
+  /// Apply consent settings to Firebase services
+  static Future<void> _applyConsentSettings() async {
+    if (_analytics != null) {
+      await _analytics!.setAnalyticsCollectionEnabled(_analyticsEnabled);
+    }
+    if (_crashlytics != null) {
+      await _crashlytics!.setCrashlyticsCollectionEnabled(_crashlyticsEnabled);
+      
+      // Set up error handlers only if crashlytics is enabled
+      if (_crashlyticsEnabled) {
+        if (_crashlytics != null) {
+          FlutterError.onError = _crashlytics!.recordFlutterFatalError;
+          PlatformDispatcher.instance.onError = (error, stack) {
+            _crashlytics!.recordError(error, stack, fatal: true);
+            return true;
+          };
+        }
+      }
+    }
+  }
+
+  /// Enable analytics collection
+  static Future<void> enableAnalytics() async {
+    _analyticsEnabled = true;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_analyticsConsentKey, true);
+    await _applyConsentSettings();
+    if (kDebugMode) {
+      debugPrint('[SafeAnalytics] Analytics enabled by user');
+    }
+  }
+
+  /// Disable analytics collection
+  static Future<void> disableAnalytics() async {
+    _analyticsEnabled = false;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_analyticsConsentKey, false);
+    await _applyConsentSettings();
+    if (kDebugMode) {
+      debugPrint('[SafeAnalytics] Analytics disabled by user');
+    }
+  }
+
+  /// Enable crashlytics collection
+  static Future<void> enableCrashlytics() async {
+    _crashlyticsEnabled = true;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_crashlyticsConsentKey, true);
+    await _applyConsentSettings();
+    if (kDebugMode) {
+      debugPrint('[SafeAnalytics] Crashlytics enabled by user');
+    }
+  }
+
+  /// Disable crashlytics collection
+  static Future<void> disableCrashlytics() async {
+    _crashlyticsEnabled = false;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_crashlyticsConsentKey, false);
+    await _applyConsentSettings();
+    if (kDebugMode) {
+      debugPrint('[SafeAnalytics] Crashlytics disabled by user');
+    }
+  }
+
+  /// Enable both analytics and crashlytics
+  static Future<void> enableAll() async {
+    await enableAnalytics();
+    await enableCrashlytics();
+  }
+
+  /// Disable both analytics and crashlytics
+  static Future<void> disableAll() async {
+    await disableAnalytics();
+    await disableCrashlytics();
+  }
+
+  /// Check if analytics is enabled
+  static bool get analyticsEnabled => _analyticsEnabled;
+
+  /// Check if crashlytics is enabled
+  static bool get crashlyticsEnabled => _crashlyticsEnabled;
 
   /// Check if analytics is available.
   static bool get isAvailable => _isAvailable;

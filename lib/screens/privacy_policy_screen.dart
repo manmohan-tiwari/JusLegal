@@ -1,10 +1,18 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/constants/app_config.dart';
 import '../core/config/theme_config.dart';
+import '../core/services/analytics_service.dart';
 
-class PrivacyPolicyScreen extends StatelessWidget {
+class PrivacyPolicyScreen extends ConsumerStatefulWidget {
   const PrivacyPolicyScreen({super.key});
+
+  @override
+  ConsumerState<PrivacyPolicyScreen> createState() => _PrivacyPolicyScreenState();
+}
+
+class _PrivacyPolicyScreenState extends ConsumerState<PrivacyPolicyScreen> {
 
   Widget _section(
     BuildContext context, {
@@ -180,6 +188,55 @@ class PrivacyPolicyScreen extends StatelessWidget {
                   AppConfig.supportEmail,
                 ],
               ),
+              Container(
+                width: double.infinity,
+                margin: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFFFFF),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusM),
+                  border: Border.all(color: const Color(0xFFE5E7EB)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Privacy Controls', style: textTheme.titleMedium),
+                    const SizedBox(height: 12),
+                    Text(
+                      'You can control whether JusLegal collects analytics and crash reporting data.',
+                      style: textTheme.bodyMedium?.copyWith(color: AppTheme.textSecondary),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildConsentToggle(
+                      'Analytics',
+                      'Help us improve the app by collecting anonymous usage data',
+                      SafeAnalytics.analyticsEnabled,
+                      (value) async {
+                        if (value) {
+                          await SafeAnalytics.enableAnalytics();
+                        } else {
+                          await SafeAnalytics.disableAnalytics();
+                        }
+                        setState(() {});
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    _buildConsentToggle(
+                      'Crash Reporting',
+                      'Help us fix bugs by collecting crash reports',
+                      SafeAnalytics.crashlyticsEnabled,
+                      (value) async {
+                        if (value) {
+                          await SafeAnalytics.enableCrashlytics();
+                        } else {
+                          await SafeAnalytics.disableCrashlytics();
+                        }
+                        setState(() {});
+                      },
+                    ),
+                  ],
+                ),
+              ),
               Text(
                 'Last updated: 2 June 2026',
                 style: textTheme.bodySmall?.copyWith(color: AppTheme.textSecondary),
@@ -188,6 +245,43 @@ class PrivacyPolicyScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildConsentToggle(
+    String title,
+    String description,
+    bool value,
+    Function(bool) onChanged,
+  ) {
+    final textTheme = Theme.of(context).textTheme;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                description,
+                style: textTheme.bodySmall?.copyWith(color: AppTheme.textSecondary),
+              ),
+            ],
+          ),
+        ),
+        Switch(
+          value: value,
+          onChanged: onChanged,
+          activeTrackColor: AppTheme.trustBlue,
+        ),
+      ],
     );
   }
 }
