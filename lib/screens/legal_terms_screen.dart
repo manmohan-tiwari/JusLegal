@@ -4,15 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/config/theme_config.dart';
 import '../services/ai_service.dart';
 
-// -- AIService provider --------------------------------------------------------
-
 final _aiServiceProvider = Provider<AIService>((ref) {
   final svc = AIService();
   svc.initialize();
   return svc;
 });
-
-// -- Popular terms shown on load -----------------------------------------------
 
 const List<String> _popularTerms = [
   'Affidavit',
@@ -37,8 +33,6 @@ const List<String> _popularTerms = [
   'Consumer Forum',
 ];
 
-// -- Result model --------------------------------------------------------------
-
 class _TermResult {
   final String term;
   final String definition;
@@ -52,8 +46,6 @@ class _TermResult {
     required this.indianContext,
   });
 }
-
-// -- Screen --------------------------------------------------------------------
 
 class LegalTermsScreen extends ConsumerStatefulWidget {
   const LegalTermsScreen({super.key});
@@ -112,14 +104,10 @@ If the term is not a legal term, return:
       final raw =
           await ref.read(_aiServiceProvider).analyzeProblemFromText(prompt);
 
-      // Try to extract structured fields from the raw AI response map
-      // analyzeProblemFromText returns the full analysis JSON
-      // We'll use caseSummary as definition fallback, legalAnalysis as context
       final caseSummary = (raw['caseSummary'] ?? '').toString();
       final legalAnalysis = (raw['legalAnalysis'] ?? '').toString();
       final steps = raw['nextSteps'] is List ? raw['nextSteps'] as List : [];
 
-      // Build a clean result from whatever AI returned
       setState(() {
         _result = _TermResult(
           term: trimmed,
@@ -151,6 +139,9 @@ If the term is not a legal term, return:
 
   @override
   Widget build(BuildContext context) {
+    final result = _result;
+    final showPopularTerms = result == null && !_loading && _error == null;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -163,7 +154,6 @@ If the term is not a legal term, return:
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // -- Search bar ------------------------------
               Container(
                 decoration: BoxDecoration(
                   color: AppColors.surface,
@@ -226,11 +216,8 @@ If the term is not a legal term, return:
                   ],
                 ),
               ),
-
               const SizedBox(height: 20),
-
-              // -- Popular terms ---------------------------
-              if (_result == null && !_loading && _error == null) ...[
+              if (showPopularTerms) ...[
                 _SectionLabel('POPULAR TERMS'),
                 const SizedBox(height: 12),
                 Wrap(
@@ -249,8 +236,6 @@ If the term is not a legal term, return:
                 const SizedBox(height: 24),
                 _DisclaimerBanner(),
               ],
-
-              // -- Loading ---------------------------------
               if (_loading) ...[
                 const SizedBox(height: 32),
                 Center(
@@ -269,8 +254,6 @@ If the term is not a legal term, return:
                   ),
                 ),
               ],
-
-              // -- Error -----------------------------------
               if (_error != null) ...[
                 const SizedBox(height: 20),
                 Container(
@@ -302,11 +285,9 @@ If the term is not a legal term, return:
                   ),
                 ),
               ],
-
-              // -- Result ----------------------------------
-              if (_result != null) ...[
+              if (result != null) ...[
                 _TermResultCard(
-                  result: _result!,
+                  result: result,
                   onSearchRelated: (term) {
                     _searchController.text = term;
                     _search(term);
@@ -320,7 +301,7 @@ If the term is not a legal term, return:
                     label: const Text('Search Another Term'),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.primaryNavy,
-                      side: BorderSide(color: AppColors.border),
+                      side: const BorderSide(color: AppColors.border),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -336,8 +317,6 @@ If the term is not a legal term, return:
   }
 }
 
-// -- Term Result Card ----------------------------------------------------------
-
 class _TermResultCard extends StatelessWidget {
   final _TermResult result;
   final ValueChanged<String> onSearchRelated;
@@ -349,7 +328,6 @@ class _TermResultCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Term header
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(16),
@@ -383,7 +361,6 @@ class _TermResultCard extends StatelessWidget {
                   ],
                 ),
               ),
-              // Copy button
               IconButton(
                 icon: const Icon(Icons.copy_outlined,
                     color: Colors.white, size: 20),
@@ -402,10 +379,7 @@ class _TermResultCard extends StatelessWidget {
             ],
           ),
         ),
-
         const SizedBox(height: 12),
-
-        // Definition
         _InfoBlock(
           icon: Icons.info_outline_rounded,
           title: 'Definition',
@@ -417,7 +391,6 @@ class _TermResultCard extends StatelessWidget {
                 ?.copyWith(color: AppColors.primaryNavy, height: 1.6),
           ),
         ),
-
         if (result.indianContext.isNotEmpty) ...[
           const SizedBox(height: 12),
           _InfoBlock(
@@ -432,7 +405,6 @@ class _TermResultCard extends StatelessWidget {
             ),
           ),
         ],
-
         if (result.example.isNotEmpty) ...[
           const SizedBox(height: 12),
           _InfoBlock(
@@ -456,15 +428,12 @@ class _TermResultCard extends StatelessWidget {
             ),
           ),
         ],
-
         const SizedBox(height: 12),
         _DisclaimerBanner(),
       ],
     );
   }
 }
-
-// -- Term Chip -----------------------------------------------------------------
 
 class _TermChip extends StatelessWidget {
   final String label;
@@ -503,8 +472,6 @@ class _TermChip extends StatelessWidget {
     );
   }
 }
-
-// -- Info Block ----------------------------------------------------------------
 
 class _InfoBlock extends StatelessWidget {
   final IconData icon;
@@ -549,8 +516,6 @@ class _InfoBlock extends StatelessWidget {
   }
 }
 
-// -- Section Label -------------------------------------------------------------
-
 class _SectionLabel extends StatelessWidget {
   final String title;
 
@@ -574,8 +539,6 @@ class _SectionLabel extends StatelessWidget {
     );
   }
 }
-
-// -- Disclaimer Banner ---------------------------------------------------------
 
 class _DisclaimerBanner extends StatelessWidget {
   const _DisclaimerBanner();
