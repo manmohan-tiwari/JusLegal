@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -248,61 +248,14 @@ class _AuthoritiesScreenState extends State<AuthoritiesScreen> {
                     ),
                   ],
                   const SizedBox(height: 16),
-                  Wrap(
-                    spacing: 10,
-                    runSpacing: 10,
-                    children: [
-                      if (isPhone || action == 'Call Now')
-                        _ContactActionIcon(
-                          icon: Icons.call,
-                          label: 'Phone',
-                          color: AppColors.textSecondary,
-                          onPressed: () async {
-                            Navigator.of(ctx).pop();
-                            await _launchCall(contact);
-                          },
-                        ),
-                      if (isEmail)
-                        _ContactActionIcon(
-                          icon: Icons.email,
-                          label: 'Email',
-                          color: AppColors.textSecondary,
-                          onPressed: () async {
-                            Navigator.of(ctx).pop();
-                            await _launchEmail(contact);
-                          },
-                        ),
-                      if (isWebsite)
-                        _ContactActionIcon(
-                          icon: Icons.open_in_browser,
-                          label: 'Website',
-                          color: AppColors.textSecondary,
-                          onPressed: () async {
-                            Navigator.of(ctx).pop();
-                            await _launchUrl(contact);
-                          },
-                        ),
-                      if (action == 'Find Nearest')
-                        _ContactActionIcon(
-                          icon: Icons.location_on,
-                          label: 'Find Nearest',
-                          color: AppColors.textSecondary,
-                          onPressed: () async {
-                            Navigator.of(ctx).pop();
-                            await _openNearest(name);
-                          },
-                        ),
-                      if (contact.isNotEmpty)
-                        _ContactActionIcon(
-                          icon: Icons.copy,
-                          label: 'Copy',
-                          color: AppColors.textSecondary,
-                          onPressed: () async {
-                            Navigator.of(ctx).pop();
-                            await _copyText(contact);
-                          },
-                        ),
-                    ],
+                  _buildContactActions(
+                    context: ctx,
+                    name: name,
+                    contact: contact,
+                    action: action,
+                    isPhone: isPhone,
+                    isEmail: isEmail,
+                    isWebsite: isWebsite,
                   ),
                   const SizedBox(height: 12),
                   if (isWebsite)
@@ -335,6 +288,70 @@ class _AuthoritiesScreenState extends State<AuthoritiesScreen> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildContactActions({
+    required BuildContext context,
+    required String name,
+    required String contact,
+    required String action,
+    required bool isPhone,
+    required bool isEmail,
+    required bool isWebsite,
+  }) {
+    void closeSheet() => Navigator.of(context).pop();
+
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: [
+        if (isPhone || action == 'Call Now')
+          _ContactActionIcon(
+            icon: Icons.call,
+            label: 'Phone',
+            onPressed: () async {
+              closeSheet();
+              await _launchCall(contact);
+            },
+          ),
+        if (isEmail)
+          _ContactActionIcon(
+            icon: Icons.email,
+            label: 'Email',
+            onPressed: () async {
+              closeSheet();
+              await _launchEmail(contact);
+            },
+          ),
+        if (isWebsite)
+          _ContactActionIcon(
+            icon: Icons.open_in_browser,
+            label: 'Website',
+            onPressed: () async {
+              closeSheet();
+              await _launchUrl(contact);
+            },
+          ),
+        if (action == 'Find Nearest')
+          _ContactActionIcon(
+            icon: Icons.location_on,
+            label: 'Find Nearest',
+            onPressed: () async {
+              closeSheet();
+              await _openNearest(name);
+            },
+          ),
+        if (contact.isNotEmpty)
+          _ContactActionIcon(
+            icon: Icons.copy,
+            label: 'Copy',
+            onPressed: () async {
+              closeSheet();
+              await _copyText(contact);
+            },
+          ),
+      ],
     );
   }
 
@@ -463,13 +480,11 @@ class _AuthoritiesScreenState extends State<AuthoritiesScreen> {
 class _ContactActionIcon extends StatelessWidget {
   final IconData icon;
   final String label;
-  final Color color;
   final VoidCallback onPressed;
 
   const _ContactActionIcon({
     required this.icon,
     required this.label,
-    required this.color,
     required this.onPressed,
   });
 
@@ -492,11 +507,11 @@ class _ContactActionIcon extends StatelessWidget {
             const SizedBox(width: 6),
             Text(
               label,
-              style: TextStyle(
-                color: color,
-                fontWeight: FontWeight.w600,
-                fontSize: 13,
-              ),
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: AppColors.textSecondary,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                  ),
             ),
           ],
         ),
@@ -504,4 +519,3 @@ class _ContactActionIcon extends StatelessWidget {
     );
   }
 }
-
