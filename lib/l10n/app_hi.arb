@@ -1,0 +1,239 @@
+{
+  "@@locale": "hi",
+  "appName": "जसलीगल",
+  "home": "होम",
+  "myCases": "मेरे मामले",
+  "authorities": "अधिकारी",
+  "settings": "सेटिंग्स",
+  "language": "भाषा",
+  "selectLanguage": "भाषा चुनें",
+  "english": "अंग्रेज़ी",
+  "hindi": "हिंदी",
+  "preferences": "वरीयताएँ",
+  "appInfo": "ऐप जानकारी",
+  "appNameLabel": "ऐप नाम",
+  "appVersion": "ऐप संस्करण",
+  "legal": "कानूनी",
+  "privacyPolicy": "गोपनीयता नीति",
+  "terms": "नियम",
+  "website": "वेबसाइट",
+  "disclaimer": "अस्वीकरण",
+  "account": "खाता",
+  "deleteAccount": "खाता हटाएँ",
+  "deleteAccountTitle": "खाता हटाएँ?",
+  "deleteAccountMessage": "यह आपका Firebase खाता स्थायी रूप से हटा देगा। इस कार्रवाई को वापस नहीं किया जा सकता।",
+  "delete": "हटाएँ",
+  "cancel": "रद्द करें",
+  "ok": "ठीक है",
+  "unableToDeleteAccount": "खाता हटाया नहीं जा सका। कृपया फिर से प्रयास करें।",
+  "reauthenticationFailed": "पुनः प्रमाणीकरण विफल रहा। कृपया फिर से प्रयास करें।",
+  "legalDisclaimer": "कानूनी अस्वीकरण",
+  "settingsTooltip": "सेटिंग्स",
+  "languageSubtitleEnglish": "अंग्रेज़ी",
+  "languageSubtitleHindi": "हिंदी",
+  "languageTileSubtitle": "अंग्रेज़ी और हिंदी के बीच स्विच करें",
+
+  "homeHeroHeadline1": "अपने अधिकार जानें।",
+  "homeHeroHeadline2": "कार्रवाई करें।",
+  "homeHeroBody": "अपने उपभोक्ता मुद्दों के लिए तुरंत AI-संचालित कानूनी मार्गदर्शन पाएँ।",
+  "getStarted": "शुरू करें",
+  "exploreLegalCategories": "कानूनी श्रेणियाँ देखें",
+  "noCategoriesAvailable": "कोई श्रेणी उपलब्ध नहीं है",
+  "pleaseCheckBackLaterForLegalTopics": "कृपया कानूनी विषयों के लिए बाद में जाँचें।",
+  "showAllCategories": "सभी श्रेणियाँ दिखाएँ",
+  "aiChatLegalQueriesAndAnalysis": "AI चैट, कानूनी प्रश्न और विश्लेषण",
+  "instantAIPoweredLegalGuidanceAtYourFingertips": "तुरंत AI-संचालित कानूनी मार्गदर्शन आपकी उंगलियों पर",
+  "documentsAndContracts": "दस्तावेज़ और अनुबंध",
+  "generateReviewAndNegotiateLegalDocumentsWithAI": "AI के साथ कानूनी दस्तावेज़ बनाएँ, जाँचें और बातचीत करें",
+  "whyChooseJuslegal": "JusLegal क्यों चुनें",
+  "aiPoweredAnalysis": "AI-संचालित विश्लेषण",
+  "aiPoweredAnalysisDesc": "अपनी स्थिति के आधार पर तुरंत कानूनी विश्लेषण पाएँ",
+  "legalCategoriesCount": "10+ कानूनी श्रेणियाँ",
+  "legalCategoriesCountDesc": "सभी प्रमुख उपभोक्ता समस्याएँ कवर करता है",
+  "expertAuthorities": "विशेषज्ञ अधिकारी",
+  "expertAuthoritiesDesc": "आधिकारिक नियामक निकायों तक सीधी पहुँच",
+  "documentGeneration": "दस्तावेज़ निर्माण",
+  "documentGenerationDesc": "पेशेवर शिकायत पत्र और नोटिस",
+  "aiGuidanceOnlyNotLegalAdvice": "केवल AI-जनित मार्गदर्शन। यह कानूनी सलाह नहीं है। ",
+  "learnMore": "और जानें",
+  "open": "खोलें",
+  "there": "वहाँ",
+  "toolAiLawyerChatTitle": "AI कानूनी चैट",
+  "toolAiLawyerChatDesc": "प्राकृतिक बातचीत में कानूनी प्रश्न पूछें",
+  "toolLegalAdviceTitle": "कानूनी सलाह Q&A",
+  "toolLegalAdviceDesc": "AI-जनित उत्तरों के साथ तैयार प्रश्न",
+  "toolCaseAnalysisTitle": "मामला विश्लेषण",
+  "toolCaseAnalysisDesc": "आपके मामले की ताकत, कमज़ोरियाँ और अगले कदम",
+  "toolLegalTermsTitle": "कानूनी शब्द",
+  "toolLegalTermsDesc": "कानूनी शब्दों की सरल भाषा में शब्दावली",
+  "toolLegalWritingTitle": "कानूनी लेखन",
+  "toolLegalWritingDesc": "शिकायत पत्र, नोटिस और समझौते बनाएँ",
+  "toolDocumentCreationTitle": "दस्तावेज़ निर्माण",
+  "toolDocumentCreationDesc": "AI-सहायता प्राप्त टेम्पलेट PDF या टेक्स्ट में भरें",
+  "toolDocumentReviewTitle": "दस्तावेज़ समीक्षा",
+  "toolDocumentReviewDesc": "दस्तावेज़ अपलोड करें - AI लाल झंडे और महत्वपूर्ण क्लॉज़ खोजता है",
+  "toolContractNegotiationTitle": "अनुबंध वार्ता",
+  "toolContractNegotiationDesc": "AI अनुचित शर्तों को चिन्हित करता है और संशोधन सुझाता है",
+
+  "login": "लॉगिन",
+  "register": "रजिस्टर",
+  "yourLegalRightsProtected": "आपके कानूनी अधिकार सुरक्षित हैं",
+  "secureAccessPortal": "सुरक्षित एक्सेस पोर्टल",
+  "continueWith": "जारी रखें",
+  "continueWithGoogle": "Google से जारी रखें",
+  "continueWithApple": "Apple से जारी रखें",
+  "signInInstantlyWithPhoneOtp": "फोन (OTP) से तुरंत साइन इन करें",
+  "enterYourPhoneNumber": "अपना फोन नंबर दर्ज करें",
+  "sendOtp": "OTP भेजें",
+  "continueWithEmail": "ईमेल से जारी रखें",
+  "needHelp": "मदद चाहिए?",
+  "byContinuingYouAgreeToOur": "जारी रखने पर आप हमारे ",
+  "termsAndPrivacy": "नियम और गोपनीयता नीति",
+  "authenticating": "प्रमाणित किया जा रहा है...",
+  "validPhoneNumberError": "कृपया एक वैध 10-अंकीय फोन नंबर दर्ज करें",
+  "otpSentSuccessfully": "OTP सफलतापूर्वक भेजा गया",
+  "phoneNumberVerifiedSuccessfully": "फोन नंबर सफलतापूर्वक सत्यापित हुआ",
+  "appleSignInSoon": "Apple साइन-इन जल्द उपलब्ध होगा।",
+  "reachUsAt": "हमसे संपर्क करें: {email}",
+  "@reachUsAt": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+
+  "verifyYourNumber": "अपना नंबर सत्यापित करें",
+  "otpSentTo": "OTP +91 {phoneNumber} पर भेजा गया",
+  "@otpSentTo": {
+    "placeholders": {
+      "phoneNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "verifyOtp": "OTP सत्यापित करें",
+  "didntReceiveOtp": "OTP नहीं मिला? ",
+  "resendIn": "दोबारा भेजें {time} में",
+  "@resendIn": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "resend": "दोबारा भेजें",
+  "verifyingOtp": "OTP सत्यापित किया जा रहा है...",
+  "enterOtpDigits": "कृपया OTP के सभी 6 अंक दर्ज करें",
+  "otpResentSuccessfully": "OTP फिर से सफलतापूर्वक भेजा गया",
+  "verifyYourNumberSubtitle": "अपने फोन पर भेजा गया 6-अंकीय कोड दर्ज करें।",
+
+  "email": "ईमेल",
+  "password": "पासवर्ड",
+  "confirmPassword": "पासवर्ड की पुष्टि करें",
+  "enterYourEmail": "अपना ईमेल दर्ज करें",
+  "enterYourPassword": "अपना पासवर्ड दर्ज करें",
+  "confirmYourPassword": "अपना पासवर्ड फिर से दर्ज करें",
+  "forgotPassword": "पासवर्ड भूल गए?",
+  "backToLoginOptions": "लॉगिन विकल्पों पर वापस जाएँ",
+  "pleaseEnterYourEmail": "कृपया अपना ईमेल दर्ज करें",
+  "pleaseEnterValidEmail": "कृपया एक वैध ईमेल पता दर्ज करें",
+  "pleaseEnterYourPassword": "कृपया अपना पासवर्ड दर्ज करें",
+  "passwordMustBeAtLeast6Characters": "पासवर्ड कम से कम 6 वर्णों का होना चाहिए",
+  "pleaseConfirmYourPassword": "कृपया अपने पासवर्ड की पुष्टि करें",
+  "passwordsDoNotMatch": "पासवर्ड मेल नहीं खाते",
+  "loginSuccessful": "लॉगिन सफल!",
+  "accountCreatedSuccessfully": "खाता सफलतापूर्वक बनाया गया!",
+  "passwordResetEmailSent": "पासवर्ड रीसेट ईमेल {email} पर भेजा गया",
+  "@passwordResetEmailSent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+
+  "yourLegalAnalysis": "आपका कानूनी विश्लेषण",
+  "noAnalysisAvailable": "कोई विश्लेषण उपलब्ध नहीं है",
+  "somethingWentWrong": "कुछ गलत हो गया",
+  "retry": "दोबारा प्रयास करें",
+  "analysisIncomplete": "विश्लेषण अधूरा है",
+  "updatingAnalysis": "विश्लेषण अपडेट हो रहा है...",
+  "confidenceScore": "विश्वास स्कोर",
+  "strongCase": "मजबूत मामला",
+  "moderateCase": "मध्यम",
+  "weakCase": "कमज़ोर",
+  "yourRights": "आपके अधिकार",
+  "recommendedSteps": "अनुशंसित कदम",
+  "relevantLaws": "प्रासंगिक कानून",
+  "authoritiesToContact": "संपर्क करने योग्य अधिकारी",
+  "generateComplaint": "शिकायत बनाएँ",
+  "saveCase": "मामला सहेजें",
+  "caseSavedToMyCases": "मामला मेरे मामलों में सहेजा गया",
+  "unableToSaveCase": "मामला सहेजा नहीं जा सका। कृपया फिर से प्रयास करें।",
+  "noAuthoritiesListedForThisCase": "इस मामले के लिए कोई अधिकारी सूचीबद्ध नहीं है।",
+  "unknown": "अज्ञात",
+  "visitWebsite": "वेबसाइट देखें",
+  "learnMoreAction": "और जानें",
+  "updatingAnalysisStatus": "विश्लेषण अपडेट हो रहा है...",
+
+  "complaintLetter": "शिकायत पत्र",
+  "recipient": "प्रापक",
+  "selectTone": "स्वर चुनें",
+  "letterPreview": "पत्र पूर्वावलोकन",
+  "lockLetter": "पत्र लॉक करें",
+  "editLetter": "पत्र संपादित करें",
+  "notSatisfied": "संतुष्ट नहीं हैं?",
+  "copyText": "टेक्स्ट कॉपी करें",
+  "downloadPrintPdf": "PDF डाउनलोड / प्रिंट करें",
+  "regenerate": "फिर से बनाएँ",
+  "copiedToClipboard": "क्लिपबोर्ड में कॉपी किया गया",
+  "pdfDownloadedSuccessfully": "PDF सफलतापूर्वक डाउनलोड हुई",
+  "failedToDownloadPdf": "PDF डाउनलोड विफल: {error}",
+  "@failedToDownloadPdf": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "pleaseAnalyzeYourProblemFirst": "कृपया पहले अपनी समस्या का विश्लेषण करें।",
+  "concernedAuthority": "संबंधित प्राधिकारी",
+  "formal": "औपचारिक",
+  "assertive": "दृढ़",
+  "concise": "संक्षिप्त",
+
+  "documentCreation": "दस्तावेज़ निर्माण",
+  "availableForms": "उपलब्ध फॉर्म",
+  "browseAndSelectFrom10OfficialIndianLegalForms": "10 आधिकारिक भारतीय कानूनी फॉर्म में से चुनें",
+  "aiEnhancement": "AI संवर्द्धन",
+  "letAiImproveLanguageAndFormatting": "AI को भाषा और स्वरूपण सुधारने दें",
+  "fillDetails": "विवरण भरें",
+  "generating": "बनाया जा रहा है...",
+  "generateForm": "फॉर्म बनाएँ",
+  "generationFailed": "निर्माण विफल",
+  "pleaseTryAgain": "कृपया फिर से प्रयास करें",
+  "tryAgain": "फिर से प्रयास करें",
+  "generatingYourForm": "आपका {formTitle} बनाया जा रहा है...",
+  "@generatingYourForm": {
+    "placeholders": {
+      "formTitle": {
+        "type": "String"
+      }
+    }
+  },
+
+  "legalNotice": "कानूनी नोटिस",
+  "privacyPolicyTitle": "गोपनीयता नीति",
+  "informationWeCollect": "हम कौन-सी जानकारी एकत्र करते हैं",
+  "howWeUseData": "हम डेटा का उपयोग कैसे करते हैं",
+  "thirdPartyServices": "तृतीय-पक्ष सेवाएँ",
+  "aiProcessingNotice": "AI प्रसंस्करण सूचना",
+  "userRightsPolicy": "उपयोगकर्ता अधिकार",
+  "contactInformation": "संपर्क जानकारी",
+  "lastUpdated": "अंतिम अद्यतन: 2 जून 2026",
+
+  "serviceUnavailable": "सेवा उपलब्ध नहीं है",
+  "signInFeaturesTemporarilyUnavailable": "साइन-इन सुविधाएँ अस्थायी रूप से उपलब्ध नहीं हैं। कृपया बाद में फिर से प्रयास करें।",
+  "privacyPolicyBody": "यह पृष्ठ बताता है कि JusLegal ऐप का उपयोग करते समय आपकी जानकारी को कैसे संभालता है।"
+}

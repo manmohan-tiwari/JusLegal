@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:juslegal/l10n/gen/app_localizations.dart';
 
 import '../services/auth_handler.dart';
 import '../widgets/loading_widget.dart';
@@ -80,11 +81,12 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   }
 
   Future<void> _verifyOtp() async {
+    final l10n = AppLocalizations.of(context);
     final otpText = _otp;
     if (otpText.length != 6) {
       _isAutoSubmitted = false;
       setState(() {
-        _localError = "Please enter all 6 digits of the OTP";
+        _localError = l10n.enterOtpDigits;
       });
       return;
     }
@@ -100,7 +102,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
           );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Phone number verified successfully')),
+        SnackBar(content: Text(l10n.phoneNumberVerifiedSuccessfully)),
       );
       goRouter.go('/home');
     } catch (error) {
@@ -134,7 +136,9 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
         // Verification ID refreshed
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("OTP resent successfully")),
+            SnackBar(
+                content:
+                    Text(AppLocalizations.of(context).otpResentSuccessfully)),
           );
           _startTimer();
         }
@@ -162,6 +166,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final authState = ref.watch(authProvider);
     final isLoading = authState.isLoading;
     final displayError = authState.error ?? _localError;
@@ -185,7 +190,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Verify your number",
+                    l10n.verifyYourNumber,
                     style: GoogleFonts.merriweather(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -194,7 +199,8 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    "OTP sent to +91 ${widget.phoneNumber.replaceFirst('+91', '').trim()}",
+                    l10n.otpSentTo(
+                        widget.phoneNumber.replaceFirst('+91', '').trim()),
                     style: const TextStyle(
                       color: Color(0xFF6B7280),
                       fontSize: 14,
@@ -266,7 +272,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: const Text("Verify OTP"),
+                    child: Text(l10n.verifyOtp),
                   ),
                   const SizedBox(height: 16),
 
@@ -275,7 +281,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "Didn't receive OTP? ",
+                        l10n.didntReceiveOtp,
                         style: const TextStyle(
                           color: Color(0xFF6B7280),
                           fontSize: 12,
@@ -284,7 +290,9 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                       ),
                       _secondsRemaining > 0
                           ? Text(
-                              "Resend in 0:${_secondsRemaining.toString().padLeft(2, '0')}",
+                              l10n.resendIn(
+                                '0:${_secondsRemaining.toString().padLeft(2, '0')}',
+                              ),
                               style: const TextStyle(
                                 color: Color(0xFF6B7280),
                                 fontSize: 12,
@@ -301,7 +309,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                                 ),
                                 minimumSize: const Size(64, 48),
                               ),
-                              child: const Text("Resend"),
+                              child: Text(l10n.resend),
                             ),
                     ],
                   ),
@@ -328,7 +336,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                 child: Container(
                   color: Colors.white70,
                   child: const LoadingMessageWidget(
-                    message: "Verifying OTP...",
+                    message: 'Verifying OTP...',
                   ),
                 ),
               ),

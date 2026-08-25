@@ -7,6 +7,7 @@ import '../core/exceptions/ai_exceptions.dart';
 import '../core/services/analytics_service.dart';
 import '../core/constants/app_strings.dart';
 import '../models/chat_message_model.dart';
+import 'locale_provider.dart';
 
 // Provider for AIService instance
 final aiServiceProvider = Provider<AIService>((ref) => AIService());
@@ -71,7 +72,11 @@ class ChatNotifier extends Notifier<ChatState> {
     try {
       final response = await ref
           .read(aiServiceProvider)
-          .sendMessage(trimmedMessage, messagesForApi);
+          .sendMessage(
+            trimmedMessage,
+            messagesForApi,
+            languageCode: ref.read(localeProvider).languageCode,
+          );
       addMessage('assistant', response);
       state = state.copyWith(isSending: false, clearError: true);
     } catch (error) {
@@ -161,6 +166,7 @@ class AnalysisNotifier extends AsyncNotifier<AnalysisState> {
         summary: problem.summary,
         attachedFiles: problem.attachedFiles,
         dynamicFieldValues: problem.dynamicFieldValues,
+        languageCode: ref.read(localeProvider).languageCode,
       );
 
       if (kDebugMode) {

@@ -1,4 +1,4 @@
-﻿import 'dart:math' as math;
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -89,6 +89,7 @@ class _AILegalChatScreenState extends ConsumerState<AILegalChatScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         foregroundColor: AppColors.white,
+        iconTheme: const IconThemeData(color: Colors.white),
         surfaceTintColor: Colors.transparent,
         elevation: 8,
         shadowColor: AppColors.shadowStrong,
@@ -104,9 +105,13 @@ class _AILegalChatScreenState extends ConsumerState<AILegalChatScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('JusLegal AI',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                )),
             Text('Legal guidance, not legal advice',
-                style: TextStyle(fontSize: 12, color: Color(0xFFEAF4FF))),
+                style: TextStyle(fontSize: 12, color: Colors.white70)),
           ],
         ),
         actions: [
@@ -513,4 +518,3 @@ class _SuggestionChip extends StatelessWidget {
         ),
       );
 }
-

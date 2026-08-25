@@ -1,26 +1,26 @@
-﻿import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:juslegal/l10n/gen/app_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:package_info_plus/package_info_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
-
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-import '../core/constants/app_config.dart';
-import '../core/constants/app_strings.dart';
 import '../core/config/theme_config.dart';
+import '../core/constants/app_config.dart';
+import '../providers/locale_provider.dart';
 
-
-class SettingsScreen extends StatefulWidget {
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   String _appVersion = AppConfig.appVersion;
   String _buildNumber = AppConfig.appBuildNumber;
 
@@ -46,30 +46,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  Future<void> _showAccountDeletionDialog() async {
+  Future<void> _showAccountDeletionDialog(AppLocalizations l10n) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
           backgroundColor: AppColors.background,
-          title: const Text('Delete account?'),
-          content: const Text(
-            'This will permanently delete your Firebase account. This action cannot be undone.',
-          ),
+          title: Text(l10n.deleteAccountTitle),
+          content: Text(l10n.deleteAccountMessage),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
               style: TextButton.styleFrom(
                 foregroundColor: AppColors.primaryNavy,
               ),
-              child: const Text('Cancel'),
+              child: Text(l10n.cancel),
             ),
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
               style: TextButton.styleFrom(
                 foregroundColor: Colors.red,
               ),
-              child: const Text('Delete'),
+              child: Text(l10n.delete),
             ),
           ],
         );
@@ -82,7 +80,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (user == null) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Unable to delete account. Please log in again.')),
+        SnackBar(content: Text(l10n.unableToDeleteAccount)),
       );
       return;
     }
@@ -113,7 +111,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           if (accessToken == null || idToken == null) {
             if (!mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Re-authentication failed. Please try again.')),
+              SnackBar(content: Text(l10n.reauthenticationFailed)),
             );
             return;
           }
@@ -129,37 +127,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
         } on FirebaseAuthException catch (e2) {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e2.message ?? 'Unable to delete account. Please try again.')),
+            SnackBar(content: Text(e2.message ?? l10n.unableToDeleteAccount)),
           );
         } catch (_) {
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Unable to delete account. Please try again.')),
+            SnackBar(content: Text(l10n.unableToDeleteAccount)),
           );
         }
       } else {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message ?? 'Unable to delete account.')),
+          SnackBar(content: Text(e.message ?? l10n.unableToDeleteAccount)),
         );
       }
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Unable to delete account. Please try again.')),
+        SnackBar(content: Text(l10n.unableToDeleteAccount)),
       );
     }
   }
 
-  void _showDisclaimerDialog() {
-
+  void _showDisclaimerDialog(AppLocalizations l10n) {
     showDialog<void>(
       context: context,
       builder: (context) {
         return AlertDialog(
           backgroundColor: AppColors.background,
           title: Text(
-            'Legal Disclaimer',
+            l10n.legalDisclaimer,
             style: const TextStyle(
               color: Color(0xFF1F2937),
               fontSize: 16,
@@ -167,7 +164,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           content: Text(
-            AppStrings.onboardingDisclaimer,
+            AppConfig.onboardingDisclaimer,
             style: const TextStyle(
               color: Color(0xFF6B7280),
               fontSize: 12,
@@ -180,7 +177,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               style: TextButton.styleFrom(
                 foregroundColor: AppColors.primaryNavy,
               ),
-              child: const Text('OK'),
+              child: Text(l10n.ok),
             ),
           ],
         );
@@ -188,13 +185,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final locale = ref.watch(localeProvider);
+    final isHindi = locale.languageCode == 'hi';
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: Text(l10n.settings),
         backgroundColor: AppColors.background,
         elevation: 0,
         foregroundColor: AppColors.primaryNavy,
@@ -206,7 +206,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Padding(
                 padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
                 child: Text(
-                  'PREFERENCES',
+                  l10n.preferences.toUpperCase(),
                   style: const TextStyle(
                     letterSpacing: 1.0,
                     color: Color(0xFF6B7280),
@@ -215,13 +215,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
               ),
-
               const Divider(indent: 16, endIndent: 16),
-
+              ListTile(
+                leading: const Icon(Icons.language),
+                title: Text(l10n.language),
+                subtitle: Text(
+                  isHindi ? l10n.languageSubtitleHindi : l10n.languageSubtitleEnglish,
+                ),
+                trailing: Switch(
+                  value: isHindi,
+                  onChanged: (_) => ref.read(localeProvider.notifier).toggle(),
+                ),
+              ),
+              const Divider(indent: 16, endIndent: 16),
               Padding(
                 padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
                 child: Text(
-                  'APP INFO',
+                  l10n.appInfo.toUpperCase(),
                   style: const TextStyle(
                     letterSpacing: 1.0,
                     color: Color(0xFF6B7280),
@@ -231,12 +241,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               ListTile(
-                title: const Text('App Name'),
+                title: Text(l10n.appNameLabel),
                 subtitle: Text(AppConfig.appName),
               ),
               const Divider(indent: 16, endIndent: 16),
               ListTile(
-                title: const Text('App Version'),
+                title: Text(l10n.appVersion),
                 trailing: Text(
                   'v$_appVersion+$_buildNumber',
                   style: const TextStyle(
@@ -247,11 +257,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               const Divider(indent: 16, endIndent: 16),
-
               Padding(
                 padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
                 child: Text(
-                  'LEGAL',
+                  l10n.legal.toUpperCase(),
                   style: const TextStyle(
                     letterSpacing: 1.0,
                     color: Color(0xFF6B7280),
@@ -261,10 +270,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               ListTile(
-                title: const Text('Privacy Policy'),
-                onTap: () {
-                  context.go('/privacy-policy');
-                },
+                title: Text(l10n.privacyPolicy),
+                onTap: () => context.go('/privacy-policy'),
                 trailing: Icon(
                   Icons.chevron_right,
                   size: 20,
@@ -272,9 +279,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               const Divider(indent: 16, endIndent: 16),
-
               ListTile(
-                title: const Text('Terms'),
+                title: Text(l10n.terms),
                 onTap: () => _launchURL(AppConfig.termsOfServiceUrl),
                 trailing: Icon(
                   Icons.chevron_right,
@@ -283,9 +289,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               const Divider(indent: 16, endIndent: 16),
-
               ListTile(
-                title: const Text('Website'),
+                title: Text(l10n.website),
                 onTap: () => _launchURL(AppConfig.websiteUrl),
                 trailing: Icon(
                   Icons.chevron_right,
@@ -294,10 +299,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               const Divider(indent: 16, endIndent: 16),
-
               ListTile(
-                title: const Text('Disclaimer'),
-                onTap: _showDisclaimerDialog,
+                title: Text(l10n.disclaimer),
+                onTap: () => _showDisclaimerDialog(l10n),
                 trailing: Icon(
                   Icons.chevron_right,
                   size: 20,
@@ -305,11 +309,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               const Divider(indent: 16, endIndent: 16),
-
               Padding(
                 padding: const EdgeInsets.only(left: 16, top: 8, bottom: 8),
                 child: Text(
-                  'ACCOUNT',
+                  l10n.account.toUpperCase(),
                   style: const TextStyle(
                     letterSpacing: 1.0,
                     color: Color(0xFF6B7280),
@@ -318,17 +321,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
               ),
-
               ListTile(
-                title: const Text('Delete account'),
-                onTap: _showAccountDeletionDialog,
+                title: Text(l10n.deleteAccount),
+                onTap: () => _showAccountDeletionDialog(l10n),
                 trailing: Icon(
                   Icons.chevron_right,
                   size: 20,
                   color: AppColors.textSecondary.withValues(alpha: 0.6),
                 ),
               ),
-
               const SizedBox(height: 24),
             ],
           ),
@@ -337,4 +338,3 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 }
-

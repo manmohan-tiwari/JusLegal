@@ -1,0 +1,239 @@
+{
+  "@@locale": "en",
+  "appName": "JusLegal",
+  "home": "Home",
+  "myCases": "My Cases",
+  "authorities": "Authorities",
+  "settings": "Settings",
+  "language": "Language",
+  "selectLanguage": "Select Language",
+  "english": "English",
+  "hindi": "Hindi",
+  "preferences": "Preferences",
+  "appInfo": "App Info",
+  "appNameLabel": "App Name",
+  "appVersion": "App Version",
+  "legal": "Legal",
+  "privacyPolicy": "Privacy Policy",
+  "terms": "Terms",
+  "website": "Website",
+  "disclaimer": "Disclaimer",
+  "account": "Account",
+  "deleteAccount": "Delete account",
+  "deleteAccountTitle": "Delete account?",
+  "deleteAccountMessage": "This will permanently delete your Firebase account. This action cannot be undone.",
+  "delete": "Delete",
+  "cancel": "Cancel",
+  "ok": "OK",
+  "unableToDeleteAccount": "Unable to delete account. Please try again.",
+  "reauthenticationFailed": "Re-authentication failed. Please try again.",
+  "legalDisclaimer": "Legal Disclaimer",
+  "settingsTooltip": "Settings",
+  "languageSubtitleEnglish": "English",
+  "languageSubtitleHindi": "Hindi",
+  "languageTileSubtitle": "Switch between English and Hindi",
+
+  "homeHeroHeadline1": "Know Your Rights.",
+  "homeHeroHeadline2": "Take Action.",
+  "homeHeroBody": "Get instant AI-powered legal guidance for your consumer issues.",
+  "getStarted": "Get Started",
+  "exploreLegalCategories": "EXPLORE LEGAL CATEGORIES",
+  "noCategoriesAvailable": "No categories available",
+  "pleaseCheckBackLaterForLegalTopics": "Please check back later for legal topics.",
+  "showAllCategories": "Show All Categories",
+  "aiChatLegalQueriesAndAnalysis": "AI CHAT, LEGAL QUERIES AND ANALYSIS",
+  "instantAIPoweredLegalGuidanceAtYourFingertips": "Instant AI-powered legal guidance at your fingertips",
+  "documentsAndContracts": "DOCUMENTS AND CONTRACTS",
+  "generateReviewAndNegotiateLegalDocumentsWithAI": "Generate, review and negotiate legal documents with AI",
+  "whyChooseJuslegal": "WHY CHOOSE JUSLEGAL",
+  "aiPoweredAnalysis": "AI-Powered Analysis",
+  "aiPoweredAnalysisDesc": "Get instant legal analysis based on your situation",
+  "legalCategoriesCount": "10+ Legal Categories",
+  "legalCategoriesCountDesc": "Covers all major consumer issues",
+  "expertAuthorities": "Expert Authorities",
+  "expertAuthoritiesDesc": "Direct access to official regulatory bodies",
+  "documentGeneration": "Document Generation",
+  "documentGenerationDesc": "Professional complaint letters and notices",
+  "aiGuidanceOnlyNotLegalAdvice": "AI-generated guidance only. Not legal advice. ",
+  "learnMore": "Learn More",
+  "open": "Open",
+  "there": "there",
+  "toolAiLawyerChatTitle": "AI Lawyer Chat",
+  "toolAiLawyerChatDesc": "Ask legal questions in natural conversation",
+  "toolLegalAdviceTitle": "Legal Advice Q&A",
+  "toolLegalAdviceDesc": "Pre-built questions with AI-generated answers",
+  "toolCaseAnalysisTitle": "Case Analysis",
+  "toolCaseAnalysisDesc": "Strengths, weaknesses & next steps for your case",
+  "toolLegalTermsTitle": "Legal Terms",
+  "toolLegalTermsDesc": "Plain-language dictionary of legal terminology",
+  "toolLegalWritingTitle": "Legal Writing",
+  "toolLegalWritingDesc": "Generate complaint letters, notices & agreements",
+  "toolDocumentCreationTitle": "Document Creation",
+  "toolDocumentCreationDesc": "Fill AI-assisted templates as PDF or text",
+  "toolDocumentReviewTitle": "Document Review",
+  "toolDocumentReviewDesc": "Upload a doc - AI finds red flags & key clauses",
+  "toolContractNegotiationTitle": "Contract Negotiation",
+  "toolContractNegotiationDesc": "AI flags unfair clauses & suggests amendments",
+
+  "login": "Login",
+  "register": "Register",
+  "yourLegalRightsProtected": "Your legal rights, protected",
+  "secureAccessPortal": "Secure Access Portal",
+  "continueWith": "Continue with",
+  "continueWithGoogle": "Continue with Google",
+  "continueWithApple": "Continue with Apple",
+  "signInInstantlyWithPhoneOtp": "Sign in instantly with Phone (OTP)",
+  "enterYourPhoneNumber": "Enter your phone number",
+  "sendOtp": "Send OTP",
+  "continueWithEmail": "Continue with Email",
+  "needHelp": "Need help?",
+  "byContinuingYouAgreeToOur": "By continuing you agree to our ",
+  "termsAndPrivacy": "Terms & Privacy Policy",
+  "authenticating": "Authenticating...",
+  "validPhoneNumberError": "Please enter a valid 10-digit phone number",
+  "otpSentSuccessfully": "OTP sent successfully",
+  "phoneNumberVerifiedSuccessfully": "Phone number verified successfully",
+  "appleSignInSoon": "Apple sign-in will be available soon.",
+  "reachUsAt": "Reach us at {email}",
+  "@reachUsAt": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+
+  "verifyYourNumber": "Verify your number",
+  "otpSentTo": "OTP sent to +91 {phoneNumber}",
+  "@otpSentTo": {
+    "placeholders": {
+      "phoneNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "verifyOtp": "Verify OTP",
+  "didntReceiveOtp": "Didn't receive OTP? ",
+  "resendIn": "Resend in {time}",
+  "@resendIn": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "resend": "Resend",
+  "verifyingOtp": "Verifying OTP...",
+  "enterOtpDigits": "Please enter all 6 digits of the OTP",
+  "otpResentSuccessfully": "OTP resent successfully",
+  "verifyYourNumberSubtitle": "Enter the 6-digit code sent to your phone.",
+
+  "email": "Email",
+  "password": "Password",
+  "confirmPassword": "Confirm Password",
+  "enterYourEmail": "Enter your email",
+  "enterYourPassword": "Enter your password",
+  "confirmYourPassword": "Confirm your password",
+  "forgotPassword": "Forgot Password?",
+  "backToLoginOptions": "Back to Login Options",
+  "pleaseEnterYourEmail": "Please enter your email",
+  "pleaseEnterValidEmail": "Please enter a valid email address",
+  "pleaseEnterYourPassword": "Please enter your password",
+  "passwordMustBeAtLeast6Characters": "Password must be at least 6 characters",
+  "pleaseConfirmYourPassword": "Please confirm your password",
+  "passwordsDoNotMatch": "Passwords do not match",
+  "loginSuccessful": "Login successful!",
+  "accountCreatedSuccessfully": "Account created successfully!",
+  "passwordResetEmailSent": "Password reset email sent to {email}",
+  "@passwordResetEmailSent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+
+  "yourLegalAnalysis": "Your Legal Analysis",
+  "noAnalysisAvailable": "No analysis available",
+  "somethingWentWrong": "Something went wrong",
+  "retry": "Retry",
+  "analysisIncomplete": "Analysis incomplete",
+  "updatingAnalysis": "Updating analysis...",
+  "confidenceScore": "Confidence Score",
+  "strongCase": "Strong case",
+  "moderateCase": "Moderate",
+  "weakCase": "Weak",
+  "yourRights": "Your Rights",
+  "recommendedSteps": "Recommended Steps",
+  "relevantLaws": "Relevant Laws",
+  "authoritiesToContact": "Authorities to Contact",
+  "generateComplaint": "Generate Complaint",
+  "saveCase": "Save Case",
+  "caseSavedToMyCases": "Case saved to My Cases",
+  "unableToSaveCase": "Unable to save case. Please try again.",
+  "noAuthoritiesListedForThisCase": "No authorities listed for this case.",
+  "unknown": "Unknown",
+  "visitWebsite": "Visit Website",
+  "learnMoreAction": "Learn More",
+  "updatingAnalysisStatus": "Updating analysis...",
+
+  "complaintLetter": "Complaint Letter",
+  "recipient": "Recipient",
+  "selectTone": "Select Tone",
+  "letterPreview": "Letter Preview",
+  "lockLetter": "Lock Letter",
+  "editLetter": "Edit Letter",
+  "notSatisfied": "Not satisfied?",
+  "copyText": "Copy Text",
+  "downloadPrintPdf": "Download / Print PDF",
+  "regenerate": "Regenerate",
+  "copiedToClipboard": "Copied to clipboard",
+  "pdfDownloadedSuccessfully": "PDF Downloaded successfully",
+  "failedToDownloadPdf": "Failed to download PDF: {error}",
+  "@failedToDownloadPdf": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "pleaseAnalyzeYourProblemFirst": "Please analyze your problem first.",
+  "concernedAuthority": "Concerned Authority",
+  "formal": "Formal",
+  "assertive": "Assertive",
+  "concise": "Concise",
+
+  "documentCreation": "Document Creation",
+  "availableForms": "AVAILABLE FORMS",
+  "browseAndSelectFrom10OfficialIndianLegalForms": "Browse and select from 10 official Indian legal forms",
+  "aiEnhancement": "AI Enhancement",
+  "letAiImproveLanguageAndFormatting": "Let AI improve language and formatting",
+  "fillDetails": "FILL DETAILS",
+  "generating": "Generating...",
+  "generateForm": "Generate Form",
+  "generationFailed": "Generation failed",
+  "pleaseTryAgain": "Please try again",
+  "tryAgain": "Try Again",
+  "generatingYourForm": "Generating your {formTitle}...",
+  "@generatingYourForm": {
+    "placeholders": {
+      "formTitle": {
+        "type": "String"
+      }
+    }
+  },
+
+  "legalNotice": "Legal Notice",
+  "privacyPolicyTitle": "Privacy Policy",
+  "informationWeCollect": "Information We Collect",
+  "howWeUseData": "How We Use Data",
+  "thirdPartyServices": "Third Party Services",
+  "aiProcessingNotice": "AI Processing Notice",
+  "userRightsPolicy": "User Rights",
+  "contactInformation": "Contact Information",
+  "lastUpdated": "Last updated: 2 June 2026",
+
+  "serviceUnavailable": "Service unavailable",
+  "signInFeaturesTemporarilyUnavailable": "Sign-in features are temporarily unavailable. Please try again later.",
+  "privacyPolicyBody": "This page explains how JusLegal handles your information when you use the app for legal guidance."
+}

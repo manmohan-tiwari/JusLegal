@@ -7,12 +7,15 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:device_preview/device_preview.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:juslegal/l10n/gen/app_localizations.dart';
 import 'core/constants/app_config.dart';
 import 'core/constants/firebase_options.dart';
 import 'core/config/env_config.dart';
 import 'core/router/app_router.dart';
 import 'core/services/analytics_service.dart';
 import 'core/config/theme_config.dart';
+import 'providers/locale_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -89,6 +92,7 @@ Future<void> main() async {
   // Initialize local storage
   await Hive.initFlutter();
   await Hive.openBox('cases');
+  await Hive.openBox('settings');
 
   // Initialize configuration
   await AppConfig.initialize();
@@ -107,20 +111,28 @@ Future<void> main() async {
       child: JusLegalApp(firebaseAvailable: firebaseInitialized)));
 }
 
-class JusLegalApp extends StatelessWidget {
+class JusLegalApp extends ConsumerWidget {
   const JusLegalApp({super.key, required this.firebaseAvailable});
 
   final bool firebaseAvailable;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final router = buildRouter(firebaseAvailable: firebaseAvailable);
+    final locale = ref.watch(localeProvider);
     return MaterialApp.router(
       title: 'JusLegal',
       theme: AppTheme.lightTheme,
       routerConfig: router,
       debugShowCheckedModeBanner: false,
-      locale: kDebugMode ? DevicePreview.locale(context) : null,
+      locale: kDebugMode ? DevicePreview.locale(context) ?? locale : locale,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
       builder: kDebugMode ? DevicePreview.appBuilder : null,
     );
   }

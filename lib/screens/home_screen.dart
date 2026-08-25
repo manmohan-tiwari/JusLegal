@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:juslegal/l10n/gen/app_localizations.dart';
 
 import '../core/constants/app_animations.dart';
 import '../core/constants/categories.dart';
@@ -70,14 +71,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.dispose();
   }
 
-  static const List<_BottomNavItem> _navItems = [
-    _BottomNavItem('Home', Icons.home_outlined, Icons.home_rounded),
-    _BottomNavItem(
-        'My Cases', Icons.folder_open_outlined, Icons.folder_rounded),
-    _BottomNavItem('Authorities', Icons.gavel_outlined, Icons.gavel_rounded),
-    _BottomNavItem('Settings', Icons.settings_outlined, Icons.settings_rounded),
-  ];
-
   void _onTab(int index) {
     if (index == _tabIndex) {
       _scrollController.animateTo(
@@ -102,6 +95,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return LayoutBuilder(
       builder: (context, constraints) {
         final isDesktop = constraints.maxWidth > 600;
@@ -112,13 +106,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 : const ClampingScrollPhysics();
         final homeCategories =
             AppCategories.categories.take(4).toList(growable: false);
+        final navItems = [
+          _BottomNavItem(l10n.home, Icons.home_outlined, Icons.home_rounded),
+          _BottomNavItem(
+              l10n.myCases, Icons.folder_open_outlined, Icons.folder_rounded),
+          _BottomNavItem(
+              l10n.authorities, Icons.gavel_outlined, Icons.gavel_rounded),
+          _BottomNavItem(
+              l10n.settings, Icons.settings_outlined, Icons.settings_rounded),
+        ];
 
         return Scaffold(
           backgroundColor: AppColors.background,
           appBar: isDesktop
               ? _DesktopHeader(
                   selectedIndex: _tabIndex,
-                  items: _navItems,
+                  items: navItems,
                   onSelected: _onTab,
                 )
               : AppBar(
@@ -143,7 +146,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     IconButton(
                       icon: const Icon(Icons.settings_outlined),
                       onPressed: () => context.go('/home/settings'),
-                      tooltip: 'Settings',
+                      tooltip: l10n.settings,
                       constraints:
                           const BoxConstraints(minWidth: 48, minHeight: 48),
                     ),
@@ -179,7 +182,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ? null
               : _FloatingBottomNav(
                   selectedIndex: _tabIndex,
-                  items: _navItems,
+                  items: navItems,
                   onSelected: _onTab,
                 ),
           floatingActionButton: Padding(
@@ -198,7 +201,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildFloatingAIButton() {
     final authState = ref.watch(authProvider);
     final user = authState.user;
-    final name = user?.displayName?.split(' ').first ?? 'there';
+    final l10n = AppLocalizations.of(context);
+    final name = user?.displayName?.split(' ').first ?? l10n.there;
     return FloatingAIButton(userName: name);
   }
 }
@@ -227,68 +231,6 @@ class _AiFeatureTool {
 // Full feature list
 // ---------------------------------------------
 
-const List<_AiFeatureTool> _aiChatTools = [
-  _AiFeatureTool(
-    title: 'AI Lawyer Chat',
-    description: 'Ask legal questions in natural conversation',
-    icon: Icons.chat_bubble_outline_rounded,
-    route: '/home/ai-lawyer-chat',
-    category: 'chat',
-  ),
-  _AiFeatureTool(
-    title: 'Legal Advice Q&A',
-    description: 'Pre-built questions with AI-generated answers',
-    icon: Icons.balance_outlined,
-    route: '/home/legal-advice',
-    category: 'chat',
-  ),
-  _AiFeatureTool(
-    title: 'Case Analysis',
-    description: 'Strengths, weaknesses & next steps for your case',
-    icon: Icons.track_changes_rounded,
-    route: '/home/case-analysis',
-    category: 'chat',
-  ),
-  _AiFeatureTool(
-    title: 'Legal Terms',
-    description: 'Plain-language dictionary of legal terminology',
-    icon: Icons.menu_book_outlined,
-    route: '/home/legal-terms',
-    category: 'chat',
-  ),
-];
-
-const List<_AiFeatureTool> _documentTools = [
-  _AiFeatureTool(
-    title: 'Legal Writing',
-    description: 'Generate complaint letters, notices & agreements',
-    icon: Icons.edit_note_rounded,
-    route: '/home/legal-writing',
-    category: 'documents',
-  ),
-  _AiFeatureTool(
-    title: 'Document Creation',
-    description: 'Fill AI-assisted templates as PDF or text',
-    icon: Icons.note_add_outlined,
-    route: '/home/document-creation',
-    category: 'documents',
-  ),
-  _AiFeatureTool(
-    title: 'Document Review',
-    description: 'Upload a doc - AI finds red flags & key clauses',
-    icon: Icons.fact_check_outlined,
-    route: '/home/document-review',
-    category: 'documents',
-  ),
-  _AiFeatureTool(
-    title: 'Contract Negotiation',
-    description: 'AI flags unfair clauses & suggests amendments',
-    icon: Icons.handshake_outlined,
-    route: '/home/contract-negotiation',
-    category: 'documents',
-  ),
-];
-
 // ---------------------------------------------
 // Home Content
 // ---------------------------------------------
@@ -307,6 +249,67 @@ class _HomeContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final aiChatTools = [
+      _AiFeatureTool(
+        title: l10n.toolAiLawyerChatTitle,
+        description: l10n.toolAiLawyerChatDesc,
+        icon: Icons.chat_bubble_outline_rounded,
+        route: '/home/ai-lawyer-chat',
+        category: 'chat',
+      ),
+      _AiFeatureTool(
+        title: l10n.toolLegalAdviceTitle,
+        description: l10n.toolLegalAdviceDesc,
+        icon: Icons.balance_outlined,
+        route: '/home/legal-advice',
+        category: 'chat',
+      ),
+      _AiFeatureTool(
+        title: l10n.toolCaseAnalysisTitle,
+        description: l10n.toolCaseAnalysisDesc,
+        icon: Icons.track_changes_rounded,
+        route: '/home/case-analysis',
+        category: 'chat',
+      ),
+      _AiFeatureTool(
+        title: l10n.toolLegalTermsTitle,
+        description: l10n.toolLegalTermsDesc,
+        icon: Icons.menu_book_outlined,
+        route: '/home/legal-terms',
+        category: 'chat',
+      ),
+    ];
+    final documentTools = [
+      _AiFeatureTool(
+        title: l10n.toolLegalWritingTitle,
+        description: l10n.toolLegalWritingDesc,
+        icon: Icons.edit_note_rounded,
+        route: '/home/legal-writing',
+        category: 'documents',
+      ),
+      _AiFeatureTool(
+        title: l10n.toolDocumentCreationTitle,
+        description: l10n.toolDocumentCreationDesc,
+        icon: Icons.note_add_outlined,
+        route: '/home/document-creation',
+        category: 'documents',
+      ),
+      _AiFeatureTool(
+        title: l10n.toolDocumentReviewTitle,
+        description: l10n.toolDocumentReviewDesc,
+        icon: Icons.fact_check_outlined,
+        route: '/home/document-review',
+        category: 'documents',
+      ),
+      _AiFeatureTool(
+        title: l10n.toolContractNegotiationTitle,
+        description: l10n.toolContractNegotiationDesc,
+        icon: Icons.handshake_outlined,
+        route: '/home/contract-negotiation',
+        category: 'documents',
+      ),
+    ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -321,7 +324,7 @@ class _HomeContent extends StatelessWidget {
         ),
 
         // -- Legal Categories ------------------------------
-        const _SectionLabel('EXPLORE LEGAL CATEGORIES'),
+        _SectionLabel(l10n.exploreLegalCategories),
         const SizedBox(height: 16),
         if (categories.isEmpty)
           const EmptyStateWidget(
@@ -362,12 +365,12 @@ class _HomeContent extends StatelessWidget {
         Center(
           child: TextButton(
             onPressed: () => context.go('/home/analyzer'),
-            child: const Row(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Show All Categories'),
-                SizedBox(width: 4),
-                Icon(Icons.arrow_forward_rounded, size: 18),
+                Text(l10n.showAllCategories),
+                const SizedBox(width: 4),
+                const Icon(Icons.arrow_forward_rounded, size: 18),
               ],
             ),
           ),
@@ -375,12 +378,12 @@ class _HomeContent extends StatelessWidget {
 
         // -- AI Chat & Analysis Tools ----------------------
         SizedBox(height: isDesktop ? 32 : 28),
-        const _SectionLabel('AI CHAT, LEGAL QUERIES AND ANALYSIS'),
+        _SectionLabel(l10n.aiChatLegalQueriesAndAnalysis),
         const SizedBox(height: 4),
         Padding(
           padding: const EdgeInsets.only(left: 11),
           child: Text(
-            'Instant AI-powered legal guidance at your fingertips',
+            l10n.instantAIPoweredLegalGuidanceAtYourFingertips,
             style: const TextStyle(
               color: Color(0xFF6B7280),
               fontSize: 12,
@@ -392,18 +395,18 @@ class _HomeContent extends StatelessWidget {
         ),
         const SizedBox(height: 14),
         AppAnimations.fadeSlideIn(
-          _AiToolsGrid(tools: _aiChatTools, isDesktop: isDesktop),
+          _AiToolsGrid(tools: aiChatTools, isDesktop: isDesktop),
           delay: const Duration(milliseconds: 120),
         ),
 
         // -- Documents & Contracts Tools -------------------
         SizedBox(height: isDesktop ? 32 : 28),
-        const _SectionLabel('DOCUMENTS AND CONTRACTS'),
+        _SectionLabel(l10n.documentsAndContracts),
         const SizedBox(height: 4),
         Padding(
           padding: const EdgeInsets.only(left: 11),
           child: Text(
-            'Generate, review and negotiate legal documents with AI',
+            l10n.generateReviewAndNegotiateLegalDocumentsWithAI,
             style: const TextStyle(
               color: Color(0xFF6B7280),
               fontSize: 12,
@@ -415,13 +418,13 @@ class _HomeContent extends StatelessWidget {
         ),
         const SizedBox(height: 14),
         AppAnimations.fadeSlideIn(
-          _AiToolsGrid(tools: _documentTools, isDesktop: isDesktop),
+          _AiToolsGrid(tools: documentTools, isDesktop: isDesktop),
           delay: const Duration(milliseconds: 180),
         ),
 
         // -- Why Choose JusLegal ---------------------------
         SizedBox(height: isDesktop ? 28 : 24),
-        const _SectionLabel('WHY CHOOSE JUSLEGAL'),
+        _SectionLabel(l10n.whyChooseJuslegal),
         const SizedBox(height: 16),
         const _BenefitItem(
           icon: Icons.verified_outlined,
@@ -449,7 +452,11 @@ class _HomeContent extends StatelessWidget {
           isGold: true,
         ),
         const SizedBox(height: 24),
-        _DisclaimerBanner(onTap: () => context.push('/privacy-policy')),
+        _DisclaimerBanner(
+          onTap: () => context.push('/privacy-policy'),
+          text: l10n.aiGuidanceOnlyNotLegalAdvice,
+          moreText: l10n.learnMore,
+        ),
       ],
     );
   }
@@ -897,8 +904,14 @@ class _BenefitItem extends StatelessWidget {
 
 class _DisclaimerBanner extends StatelessWidget {
   final VoidCallback onTap;
+  final String text;
+  final String moreText;
 
-  const _DisclaimerBanner({required this.onTap});
+  const _DisclaimerBanner({
+    required this.onTap,
+    required this.text,
+    required this.moreText,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -940,12 +953,11 @@ class _DisclaimerBanner extends StatelessWidget {
                     color: AppColors.primaryNavy,
                     height: 1.4,
                   ),
-                  children: const [
+                  children: [
+                    TextSpan(text: text),
                     TextSpan(
-                        text: 'AI-generated guidance only. Not legal advice. '),
-                    TextSpan(
-                      text: 'Learn More ->',
-                      style: TextStyle(
+                      text: moreText,
+                      style: const TextStyle(
                         fontWeight: FontWeight.w700,
                         color: AppColors.trustBlue,
                       ),
@@ -1023,7 +1035,7 @@ class _DesktopHeader extends StatelessWidget implements PreferredSizeWidget {
       scrolledUnderElevation: 0,
       title: const Align(
         alignment: Alignment.centerLeft,
-        child: _HeaderLogo(iconHeight: 42),
+        child: _HeaderLogo(iconHeight: 82),
       ),
       actions: [
         ...List.generate(items.length, (index) {
@@ -1052,7 +1064,7 @@ class _DesktopHeader extends StatelessWidget implements PreferredSizeWidget {
             ),
           );
         }),
-        const SizedBox(width: 20),
+        const SizedBox(width: 21),
       ],
     );
   }
@@ -1065,33 +1077,11 @@ class _HeaderLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FittedBox(
-      fit: BoxFit.scaleDown,
-      alignment: Alignment.centerLeft,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SizedBox.square(
-            dimension: iconHeight,
-            child: Icon(
-              Icons.balance_rounded,
-              size: iconHeight,
-              color: AppColors.primaryNavy,
-            ),
-          ),
-          const SizedBox(width: 10),
-          Text(
-            'JusLegal',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: AppColors.legalGold,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.2,
-                ),
-          ),
-        ],
+    return SizedBox.square(
+      dimension: iconHeight,
+      child: Image.asset(
+        'assets/images/juslegal_logo.png',
+        fit: BoxFit.contain,
       ),
     );
   }

@@ -11,6 +11,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   speech_to_text: ^7.0.0
   flutter_riverpod: ^3.3.1
   go_router: ^17.2.3
@@ -28,6 +30,8 @@ dependencies:
   connectivity_plus: ^4.0.0
   device_preview: ^1.2.0
   flutter_markdown: ^0.7.7+1
+  pdf: ^3.11.0
+  printing: ^5.13.0
 
   firebase_core: ^4.9.0
   firebase_analytics: ^12.4.1
@@ -45,6 +49,15 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  generate: true
 
   assets:
     - assets/legal_kb.json
+    - assets/images/juslegal_logo.png
+
+  fonts:
+    - family: NotoSansDevanagari
+      fonts:
+        - asset: assets/Fonts/NotoSansDevanagari-Regular.ttf
+        - asset: assets/Fonts/NotoSansDevanagari-Bold.ttf
+          weight: 700

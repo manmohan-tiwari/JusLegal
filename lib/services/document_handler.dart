@@ -54,7 +54,7 @@ class DocumentCreationService {
   }
 
   // AI-enhanced version - fills gaps, improves language
-  Future<String> buildAIEnhancedForm({
+  Future<GeneratedFormContent> buildAIEnhancedForm({
     required FormTemplateModel template,
     required Map<String, String> values,
   }) async {
@@ -68,43 +68,18 @@ class DocumentCreationService {
       return '${f.label}: ${value.isEmpty ? "Not provided" : value}';
     }).join('\n');
 
-    final prompt = '''
-You are an expert Indian legal document drafter.
-
-The user is filling a "${template.title}" form under ${template.actReference}.
-This form will be submitted to: ${template.authority}
-
-USER PROVIDED DETAILS:
-$fieldsText
-
-TASK:
-Draft a complete, formal, ready-to-print "${template.title}" using the details above.
-
-FORMAT RULES:
-- Use proper legal document formatting
-- Include all standard sections for this type of form
-- Use formal legal language
-- For missing required details use [bracketed placeholders]
-- Include proper declaration, date and signature block at the end
-- Make it look like an official filled form
-- Cite the relevant act/section where appropriate
-
-Write ONLY the complete filled form document. No explanations.
-''';
-
     try {
-      final result = await _aiService.analyzeProblemFromText(prompt);
-      // Extract best text from result
-      final summary = (result['caseSummary'] ?? '').toString();
-      final analysis = (result['legalAnalysis'] ?? '').toString();
-
-      // If AI returned meaningful content use it, else fallback to plain text
-      if (summary.length > 100) {
-        return '$summary\n\n$analysis';
-      }
-      return filledText;
+      final result = await _aiService.generateDocumentFields(
+        documentType: template.id,
+        fieldsText: fieldsText,
+      );
+      final text = result['document_text']?.toString().trim();
+      return GeneratedFormContent(
+        text: text == null || text.isEmpty ? filledText : text,
+        fields: result,
+      );
     } catch (_) {
-      return filledText;
+      return GeneratedFormContent(text: filledText);
     }
   }
 
@@ -173,6 +148,7 @@ class DocumentCreationState {
   final Map<String, String> fieldErrors;
   final DocumentCreationStatus status;
   final String? generatedText;
+  final Map<String, dynamic> generatedFields;
   final String? errorMessage;
   final bool useAI; // AI-enhanced vs plain filled form
 
@@ -182,6 +158,7 @@ class DocumentCreationState {
     this.fieldErrors = const {},
     this.status = DocumentCreationStatus.idle,
     this.generatedText,
+    this.generatedFields = const {},
     this.errorMessage,
     this.useAI = true,
   });
@@ -192,6 +169,7 @@ class DocumentCreationState {
     Map<String, String>? fieldErrors,
     DocumentCreationStatus? status,
     String? generatedText,
+    Map<String, dynamic>? generatedFields,
     String? errorMessage,
     bool? useAI,
     bool clearSelected = false,
@@ -205,6 +183,8 @@ class DocumentCreationState {
       status: status ?? this.status,
       generatedText:
           clearGenerated ? null : (generatedText ?? this.generatedText),
+      generatedFields:
+          clearGenerated ? const {} : (generatedFields ?? this.generatedFields),
       errorMessage: errorMessage ?? this.errorMessage,
       useAI: useAI ?? this.useAI,
     );
@@ -285,7 +265,7 @@ class DocumentCreationNotifier extends Notifier<DocumentCreationState> {
     );
 
     try {
-      String result;
+      GeneratedFormContent result;
 
       if (state.useAI) {
         result = await _service.buildAIEnhancedForm(
@@ -293,15 +273,18 @@ class DocumentCreationNotifier extends Notifier<DocumentCreationState> {
           values: state.fieldValues,
         );
       } else {
-        result = _service.buildFilledFormText(
-          template: state.selectedForm!,
-          values: state.fieldValues,
+        result = GeneratedFormContent(
+          text: _service.buildFilledFormText(
+            template: state.selectedForm!,
+            values: state.fieldValues,
+          ),
         );
       }
 
       state = state.copyWith(
         status: DocumentCreationStatus.success,
-        generatedText: result,
+        generatedText: result.text,
+        generatedFields: result.fields,
       );
     } catch (e) {
       state = state.copyWith(
@@ -331,3 +314,10 @@ class DocumentCreationNotifier extends Notifier<DocumentCreationState> {
 final documentCreationProvider =
     NotifierProvider<DocumentCreationNotifier, DocumentCreationState>(
         DocumentCreationNotifier.new);
+
+class GeneratedFormContent {
+  const GeneratedFormContent({required this.text, this.fields = const {}});
+
+  final String text;
+  final Map<String, dynamic> fields;
+}

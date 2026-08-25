@@ -53,12 +53,14 @@ class GroqService {
   Future<String> sendMessage(
     String userMessage,
     List<Map<String, String>> conversationHistory,
+    {String languageCode = 'en'}
   ) =>
-      _sendChatRequest(userMessage, conversationHistory);
+      _sendChatRequest(userMessage, conversationHistory, languageCode);
 
   Future<String> _sendChatRequest(
     String userMessage,
     List<Map<String, String>> conversationHistory,
+    String languageCode,
   ) async {
     try {
       if (kDebugMode) {
@@ -71,7 +73,10 @@ class GroqService {
         data: {
           'model': GROQ_MODEL,
           'messages': [
-            {'role': 'system', 'content': jusLegalChatSystemPrompt},
+            {
+              'role': 'system',
+              'content': chatSystemPromptForLanguage(languageCode),
+            },
             ...history,
           ],
           'temperature': ApiConstants.temperature,

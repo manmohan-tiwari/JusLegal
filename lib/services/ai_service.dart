@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:file_picker/file_picker.dart';
 import '../core/constants/api_constants.dart';
@@ -27,14 +28,17 @@ class AIService {
   Future<String> sendMessage(
     String userMessage,
     List<Map<String, String>> conversationHistory,
-  ) async {
+    {String languageCode = 'en'}) async {
     String openRouterError = 'Unknown error';
     try {
       if (kDebugMode) {
         debugPrint('[AIService] Sending chat message to OpenRouter');
       }
       return await _openRouterService.sendMessage(
-          userMessage, conversationHistory);
+        userMessage,
+        conversationHistory,
+        languageCode: languageCode,
+      );
     } catch (error) {
       openRouterError = error.toString();
       if (kDebugMode) {
@@ -47,7 +51,11 @@ class AIService {
       if (kDebugMode) {
         debugPrint('[AIService] Sending chat message to Groq');
       }
-      return await _groqService.sendMessage(userMessage, conversationHistory);
+      return await _groqService.sendMessage(
+        userMessage,
+        conversationHistory,
+        languageCode: languageCode,
+      );
     } catch (error) {
       groqError = error.toString();
       if (kDebugMode) {
@@ -80,6 +88,7 @@ class AIService {
     required String summary,
     required List<PlatformFile> attachedFiles,
     Map<String, String> dynamicFieldValues = const {},
+    String languageCode = 'en',
   }) async {
     // Empty submissions cannot be analyzed remotely.
     if (summary.trim().isEmpty) {
@@ -121,6 +130,8 @@ Attached evidence count: ${attachedFiles.length} file(s)
 
 Provide: 1) Legal rights under Indian consumer law, 2) Step-by-step action plan, 3) Relevant laws/sections, 4) Authorities to contact, 5) Realistic outcome confidence score (0-100).
 """;
+    final localizedPrompt =
+        '$fullPrompt\n${_languageInstruction(languageCode)}';
 
     String openRouterError = 'Unknown error';
 
@@ -130,8 +141,9 @@ Provide: 1) Legal rights under Indian consumer law, 2) Step-by-step action plan,
       final result = await _tryWithRetry(
         () => _openRouterService.analyze(
           _buildStrictSystemPrompt(
-              'Consumer protection laws and regulations applicable to the case.'),
-          fullPrompt,
+              'Consumer protection laws and regulations applicable to the case.',
+              languageCode),
+          localizedPrompt,
           category: category,
         ),
         'OpenRouter',
@@ -146,7 +158,8 @@ Provide: 1) Legal rights under Indian consumer law, 2) Step-by-step action plan,
     const legalContext =
         'Consumer protection laws and regulations applicable to the case.';
 
-    final String systemPrompt = _buildStrictSystemPrompt(legalContext);
+    final String systemPrompt =
+        _buildStrictSystemPrompt(legalContext, languageCode);
     String groqError = 'Unknown error';
 
     // 2. Fall back to Groq.
@@ -154,7 +167,7 @@ Provide: 1) Legal rights under Indian consumer law, 2) Step-by-step action plan,
       if (kDebugMode) debugPrint('[AIService] Attempting Groq...');
       final result = await _tryWithRetry(
         () =>
-            _groqService.analyze(systemPrompt, fullPrompt, category: category),
+            _groqService.analyze(systemPrompt, localizedPrompt, category: category),
         'Groq',
       );
       if (kDebugMode) debugPrint('[AIService] ✅ Groq success');
@@ -177,6 +190,7 @@ Provide: 1) Legal rights under Indian consumer law, 2) Step-by-step action plan,
     required String summary,
     required List<PlatformFile> attachedFiles,
     Map<String, String> dynamicFieldValues = const {},
+    String languageCode = 'en',
   }) async {
     return await analyzeProblem(
       category: category,
@@ -187,6 +201,7 @@ Provide: 1) Legal rights under Indian consumer law, 2) Step-by-step action plan,
       summary: summary,
       attachedFiles: attachedFiles,
       dynamicFieldValues: dynamicFieldValues,
+      languageCode: languageCode,
     );
   }
 
@@ -201,6 +216,7 @@ Provide: 1) Legal rights under Indian consumer law, 2) Step-by-step action plan,
     required String senderAddress,
     required String opponentName,
     required String incidentDate,
+    String languageCode = 'en',
   }) async {
     final prompt = _buildLetterPrompt(
       letterType: letterType,
@@ -213,7 +229,9 @@ Provide: 1) Legal rights under Indian consumer law, 2) Step-by-step action plan,
       senderAddress: senderAddress,
       opponentName: opponentName,
       incidentDate: incidentDate,
+      languageCode: languageCode,
     );
+    final localizedPrompt = '$prompt\n${_languageInstruction(languageCode)}';
 
     String openRouterError = 'Unknown error';
     String groqError = 'Unknown error';
@@ -223,9 +241,9 @@ Provide: 1) Legal rights under Indian consumer law, 2) Step-by-step action plan,
       if (kDebugMode) {
         debugPrint('[AIService] Generating letter with OpenRouter...');
       }
-      final result = await _openRouterService.generateRaw('', prompt);
+      final result = await _openRouterService.generateRaw('', localizedPrompt);
       if (kDebugMode) debugPrint('[AIService] OpenRouter letter success');
-      return result;
+      return _documentTextFromJson(result);
     } catch (e) {
       openRouterError = e.toString();
       if (kDebugMode) debugPrint('[AIService] OpenRouter letter failed: $e');
@@ -234,9 +252,9 @@ Provide: 1) Legal rights under Indian consumer law, 2) Step-by-step action plan,
     // 2. Try Groq
     try {
       if (kDebugMode) debugPrint('[AIService] Generating letter with Groq...');
-      final result = await _groqService.generateRaw('', prompt);
+      final result = await _groqService.generateRaw('', localizedPrompt);
       if (kDebugMode) debugPrint('[AIService] ✅ Groq letter success');
-      return result;
+      return _documentTextFromJson(result);
     } catch (e) {
       groqError = e.toString();
       if (kDebugMode) debugPrint('[AIService] Groq letter failed: $e');
@@ -251,6 +269,113 @@ Provide: 1) Legal rights under Indian consumer law, 2) Step-by-step action plan,
     throw AllProvidersFailedException(openRouterError, groqError);
   }
 
+  /// Generates structured fields for a printable legal document.  Providers
+  /// occasionally wrap JSON in a Markdown fence, so normalize that response
+  /// before decoding it at the service boundary.
+  Future<Map<String, dynamic>> generateDocumentFields({
+    required String documentType,
+    required String fieldsText,
+    String languageCode = 'en',
+  }) async {
+    final type = documentType.toLowerCase();
+    final schema = type.contains('consumer') || type.contains('complaint')
+        ? '''{
+  "consumer_status_reason": "...",
+  "jurisdiction_territorial": "...",
+  "jurisdiction_pecuniary_amount": "50000",
+  "facts": ["That on [date], the complainant..."],
+  "cause_of_action_date": "DD/MM/YYYY",
+  "cause_of_action_reason": "...",
+  "relief": ["Direct the OP to refund ₹X", "Award compensation of ₹Y for mental harassment", "Award cost of litigation"]
+}'''
+        : type.contains('rti')
+            ? '''{
+  "pio_department": "...",
+  "pio_address": "...",
+  "information_sought": ["item1", "item2"],
+  "period": "...",
+  "preferred_format": "...",
+  "fee_method": "..."
+}'''
+            : type.contains('notice')
+                ? '''{
+  "background_facts": ["fact1", "fact2", "fact3"],
+  "legal_violation": "...",
+  "demands": ["demand1", "demand2"],
+  "deadline_days": 30
+}'''
+                : type.contains('affidavit')
+                    ? '''{
+  "purpose": "...",
+  "statements": ["stmt1", "stmt2", "stmt3"]
+}'''
+                    : '''{
+  "document_text": "complete ready-to-print legal document",
+  "structured_fields": { "field_key": "normalized value" }
+}''';
+    final prompt = '''You are an expert Indian legal document drafter.
+Create structured data for a $documentType using the user details below.
+
+USER PROVIDED DETAILS:
+$fieldsText
+
+You must respond with ONLY a valid JSON object.
+No explanation, no markdown, no ```json fences.
+Start your response with { and end with }.
+Return JSON matching this schema exactly, with no keys outside the schema:
+$schema''';
+    final localizedPrompt = '$prompt\n${_languageInstruction(languageCode)}';
+
+    String rawResponse;
+    try {
+      rawResponse = await _openRouterService.generateRaw('', localizedPrompt);
+    } catch (_) {
+      rawResponse = await _groqService.generateRaw('', localizedPrompt);
+    }
+    debugPrint('RAW AI RESPONSE: $rawResponse');
+    final decoded = jsonDecode(_extractJsonObject(rawResponse));
+    if (decoded is! Map) {
+      throw const FormatException('AI response must be a JSON object.');
+    }
+    final parsedJson = Map<String, dynamic>.from(decoded);
+    debugPrint('PARSED JSON: $parsedJson');
+    return parsedJson;
+  }
+
+  static String _stripJsonFences(String value) {
+    final trimmed = value.trim();
+    if (!trimmed.startsWith('```')) return trimmed;
+    final lines = trimmed.split(RegExp(r'\r?\n'));
+    if (lines.length >= 2 && lines.last.trim() == '```') {
+      return lines.sublist(1, lines.length - 1).join('\n').trim();
+    }
+    return trimmed.replaceFirst(RegExp(r'^```(?:json)?\s*'), '').trim();
+  }
+
+  static String _extractJsonObject(String value) {
+    var clean = value.trim();
+    if (clean.startsWith('```')) {
+      clean = clean
+          .replaceAll(RegExp(r'```json|```', caseSensitive: false), '')
+          .trim();
+    }
+    final start = clean.indexOf('{');
+    final end = clean.lastIndexOf('}');
+    if (start != -1 && end != -1 && end >= start) {
+      clean = clean.substring(start, end + 1);
+    }
+    return clean;
+  }
+
+  static String _documentTextFromJson(String value) {
+    final decoded = jsonDecode(_stripJsonFences(value));
+    if (decoded is! Map || decoded['document_text'] is! String) {
+      throw const FormatException(
+          'AI response must contain a document_text JSON field.');
+    }
+    return (decoded['document_text'] as String).trim();
+  }
+
   String _buildLetterPrompt({
     required String letterType,
     required String category,
@@ -262,6 +387,7 @@ Provide: 1) Legal rights under Indian consumer law, 2) Step-by-step action plan,
     required String senderAddress,
     required String opponentName,
     required String incidentDate,
+    String languageCode = 'en',
   }) {
     final typeLabel = {
           'email': 'a formal consumer complaint email',
@@ -289,6 +415,9 @@ Provide: 1) Legal rights under Indian consumer law, 2) Step-by-step action plan,
     return '''You are a professional Indian legal writer. Write $typeLabel based on the details below.
 
 IMPORTANT RULES:
+- Return ONLY valid JSON. Do not include Markdown, code fences, a preamble, or text outside JSON.
+- Use this exact response schema: {"document_text":"complete letter/document", "structured_fields":{"sender_name":"...", "sender_address":"...", "recipient_name":"...", "subject":"..."}}
+- Put the complete letter/document only in document_text.
 - Write ONLY the letter/document itself — no explanations, no preamble, no notes after the letter
 - Use formal, professional legal language appropriate for India
 - Fill in ALL details using the information provided below
@@ -349,7 +478,7 @@ Now write the complete $typeLabel:''';
         'All retries failed for $providerName. Last error: $lastError');
   }
 
-  String _buildStrictSystemPrompt(String legalContext) {
+  String _buildStrictSystemPrompt(String legalContext, String languageCode) {
     return '''You are JusLegal, an AI-powered legal assistant specializing in Indian consumer protection laws.
 Return valid JSON only. Do not include markdown, code fences, bullets, headings, prose outside JSON, or numbered prefixes inside array values.
 
@@ -396,6 +525,16 @@ The strength field must be a 1-10 score: 1-3 Weak, 4-6 Moderate, 7-10 Strong.
 legalAnalysis must explicitly cover why the law applies, consumer rights involved, and possible remedies.
 nextSteps/steps must be clean ordered actions as array values, without "1.", "1.1", bullets, or markdown.
 Do not invent law sections; only include sections you are reasonably confident apply.
-''';
+
+${_languageInstruction(languageCode)}''';
+  }
+
+  String _languageInstruction(String languageCode) {
+    if (languageCode.toLowerCase() == 'hi') {
+      return '''Respond in Hindi (Devanagari script).
+Generate the document content in Hindi.
+Keep legal terms like RTI, PIL, FIR, IPC, CPC, CrPC, and act names in English where appropriate, but all other content must be in Hindi.''';
+    }
+    return 'Respond in English.';
   }
 }

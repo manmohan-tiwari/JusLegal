@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:juslegal/l10n/gen/app_localizations.dart';
 
 import '../../models/legal_result_model.dart';
 import '../../screens/authorities_screen.dart';
@@ -209,16 +210,19 @@ class _FirebaseUnavailableScreen extends StatelessWidget {
   const _FirebaseUnavailableScreen();
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('Service unavailable')),
-        body: const Center(
-          child: Padding(
-            padding: EdgeInsets.all(24),
-            child: Text(
-              'Sign-in features are temporarily unavailable. Please try again later.',
-              textAlign: TextAlign.center,
-            ),
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Scaffold(
+      appBar: AppBar(title: Text(l10n.serviceUnavailable)),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text(
+            l10n.signInFeaturesTemporarilyUnavailable,
+            textAlign: TextAlign.center,
           ),
         ),
-      );
+      ),
+    );
+  }
 }

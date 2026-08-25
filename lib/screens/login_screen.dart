@@ -1,4 +1,4 @@
-﻿import 'dart:ui';
+import 'dart:ui';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:juslegal/l10n/gen/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../core/config/theme_config.dart';
@@ -106,11 +107,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   }
 
   Future<void> _handleOtpFlow() async {
+    final l10n = AppLocalizations.of(context);
     final phoneText =
         _phoneController.text.replaceAll(RegExp(r'\s+'), '').trim();
     if (phoneText.length != 10 || !RegExp(r'^\d{10}$').hasMatch(phoneText)) {
       setState(() {
-        _localError = 'Please enter a valid 10-digit phone number';
+        _localError = l10n.validPhoneNumberError;
       });
       return;
     }
@@ -123,7 +125,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       '+91$phoneText',
       (verificationId) {
         if (context.mounted) {
-          _showMessage('OTP sent successfully');
+          _showMessage(l10n.otpSentSuccessfully);
           context.push('/otp', extra: {
             'verificationId': verificationId,
             'phoneNumber': phoneText,
@@ -139,7 +141,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       },
       (_) {
         if (context.mounted) {
-          _showMessage('Phone number verified successfully');
+          _showMessage(l10n.phoneNumberVerifiedSuccessfully);
           context.go('/home');
         }
       },
@@ -148,6 +150,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final authState = ref.watch(authProvider);
     final isLoading = authState.isLoading;
     final displayError = authState.error ?? _localError;
@@ -192,12 +195,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                 phoneController: _phoneController,
                                 errorText: displayError,
                                 onGoogleTap: _handleGoogleSignIn,
-                                onAppleTap: () => _showMessage(
-                                  'Apple sign-in will be available soon.',
-                                ),
+                                onAppleTap: () =>
+                                    _showMessage(l10n.appleSignInSoon),
                                 onEmailTap: () => context.push('/email-auth'),
                                 onHelpTap: () => _showMessage(
-                                  'Reach us at ${AppConfig.supportEmail}',
+                                  l10n.reachUsAt(AppConfig.supportEmail),
                                 ),
                                 onOtpTap: _handleOtpFlow,
                               ),
@@ -215,11 +217,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                       fontWeight: FontWeight.w500,
                                     ),
                                     children: [
-                                      const TextSpan(
-                                        text: 'By continuing you agree to our ',
+                                      TextSpan(
+                                        text: l10n.byContinuingYouAgreeToOur,
                                       ),
                                       TextSpan(
-                                        text: 'Terms',
+                                        text: l10n.terms,
                                         recognizer: _termsRecognizer,
                                         style: GoogleFonts.inter(
                                           color: AppColors.primary,
@@ -229,7 +231,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                       ),
                                       const TextSpan(text: ' & '),
                                       TextSpan(
-                                        text: 'Privacy Policy',
+                                        text: l10n.privacyPolicy,
                                         recognizer: _privacyRecognizer,
                                         style: GoogleFonts.inter(
                                           color: AppColors.primary,
@@ -256,7 +258,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
             Positioned.fill(
               child: ColoredBox(
                 color: Colors.white.withValues(alpha: 0.72),
-                child: const _LoadingMessage(message: 'Authenticating...'),
+                child: _LoadingMessage(message: l10n.authenticating),
               ),
             ),
         ],
@@ -318,7 +320,7 @@ class _TopBrandLockup extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          'Secure Access Portal',
+          AppLocalizations.of(context).secureAccessPortal,
           textAlign: TextAlign.center,
           style: GoogleFonts.inter(
             color: AppColors.grey700,
@@ -356,6 +358,7 @@ class _AuthCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return ClipRRect(
       borderRadius: BorderRadius.circular(32),
       child: BackdropFilter(
@@ -394,17 +397,17 @@ class _AuthCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _SectionLabel(text: 'Continue with'),
+                    _SectionLabel(text: l10n.continueWith),
                     const SizedBox(height: 14),
                     _ProviderButton(
-                      label: 'Continue with Google',
+                      label: l10n.continueWithGoogle,
                       borderColor: const Color(0xFFBED7FF),
                       icon: const _GoogleMark(),
                       onTap: isLoading ? null : onGoogleTap,
                     ),
                     const SizedBox(height: 12),
                     _ProviderButton(
-                      label: 'Continue with Apple',
+                      label: l10n.continueWithApple,
                       borderColor: const Color(0xFFD9DEE7),
                       icon: const Icon(
                         Icons.apple,
@@ -417,7 +420,7 @@ class _AuthCard extends StatelessWidget {
                     const _Separator(),
                     const SizedBox(height: 22),
                     Text(
-                      'Sign in instantly with Phone (OTP)',
+                      l10n.signInInstantlyWithPhoneOtp,
                       style: GoogleFonts.inter(
                         color: const Color(0xFF102A56),
                         fontSize: compact ? 16 : 17,
@@ -441,7 +444,7 @@ class _AuthCard extends StatelessWidget {
                       ),
                       decoration: InputDecoration(
                         counterText: '',
-                        hintText: 'Enter your phone number',
+                        hintText: l10n.enterYourPhoneNumber,
                         hintStyle: GoogleFonts.inter(
                           color: AppColors.grey500,
                           fontSize: 14,
@@ -502,7 +505,7 @@ class _AuthCard extends StatelessWidget {
                           ),
                         ),
                         child: Text(
-                          'Send OTP',
+                          l10n.sendOtp,
                           style: GoogleFonts.inter(
                             fontSize: 16,
                             fontWeight: FontWeight.w800,
@@ -538,7 +541,7 @@ class _AuthCard extends StatelessWidget {
                               ),
                             ),
                             child: Text(
-                              'Continue with Email',
+                              l10n.continueWithEmail,
                               textAlign: TextAlign.center,
                               style: GoogleFonts.inter(
                                 color: AppColors.grey700,
@@ -559,7 +562,7 @@ class _AuthCard extends StatelessWidget {
                             ),
                           ),
                           child: Text(
-                            'Need help?',
+                            l10n.needHelp,
                             style: GoogleFonts.inter(
                               fontSize: compact ? 12 : 13,
                               fontWeight: FontWeight.w800,
@@ -958,4 +961,3 @@ class _LoadingMessage extends StatelessWidget {
     );
   }
 }
-
