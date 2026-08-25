@@ -332,13 +332,17 @@ $schema''';
     } catch (_) {
       rawResponse = await _groqService.generateRaw('', localizedPrompt);
     }
-    debugPrint('RAW AI RESPONSE: $rawResponse');
+    if (kDebugMode) {
+      debugPrint('RAW AI RESPONSE: $rawResponse');
+    }
     final decoded = jsonDecode(_extractJsonObject(rawResponse));
     if (decoded is! Map) {
       throw const FormatException('AI response must be a JSON object.');
     }
     final parsedJson = Map<String, dynamic>.from(decoded);
-    debugPrint('PARSED JSON: $parsedJson');
+    if (kDebugMode) {
+      debugPrint('PARSED JSON: $parsedJson');
+    }
     return parsedJson;
   }
 

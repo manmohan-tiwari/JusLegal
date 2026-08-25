@@ -16,36 +16,50 @@ class AuthService {
 
   Future<UserCredential> signInWithGoogle() async {
     try {
-      debugPrint('Google Sign-In: opening account picker');
+      if (kDebugMode) {
+        debugPrint('Google Sign-In: opening account picker');
+      }
       final googleUser = await _googleSignIn.signIn();
       if (googleUser == null) {
-        debugPrint('Google Sign-In cancelled by user');
+        if (kDebugMode) {
+          debugPrint('Google Sign-In cancelled by user');
+        }
         throw AuthCancelledException('Google sign-in was cancelled');
       }
 
-      debugPrint('Google Sign-In: fetching Google auth tokens');
+      if (kDebugMode) {
+        debugPrint('Google Sign-In: fetching Google auth tokens');
+      }
       final googleAuth = await googleUser.authentication;
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      debugPrint('Google Sign-In: signing in with Firebase credential');
+      if (kDebugMode) {
+        debugPrint('Google Sign-In: signing in with Firebase credential');
+      }
       final userCredential =
           await _firebaseAuth.signInWithCredential(credential);
-      debugPrint(
-        'Google Sign-In: success for uid ${userCredential.user?.uid ?? 'unknown'}',
-      );
+      if (kDebugMode) {
+        debugPrint(
+          'Google Sign-In: success for uid ${userCredential.user?.uid ?? 'unknown'}',
+        );
+      }
       return userCredential;
     } on FirebaseAuthException catch (e, stackTrace) {
-      debugPrint('Google Sign-In Firebase Error [${e.code}]: ${e.message}');
-      debugPrintStack(stackTrace: stackTrace);
+      if (kDebugMode) {
+        debugPrint('Google Sign-In Firebase Error [${e.code}]: ${e.message}');
+        debugPrintStack(stackTrace: stackTrace);
+      }
       throw AuthFailureException(_firebaseMessage(e));
     } on AuthCancelledException {
       rethrow;
     } catch (e, stackTrace) {
-      debugPrint('Google Sign-In Error: $e');
-      debugPrintStack(stackTrace: stackTrace);
+      if (kDebugMode) {
+        debugPrint('Google Sign-In Error: $e');
+        debugPrintStack(stackTrace: stackTrace);
+      }
       throw AuthFailureException(
         'Google sign-in failed. Check Play Services and Firebase SHA-1 setup.',
       );
@@ -59,64 +73,88 @@ class AuthService {
     Function(UserCredential)? onAutoVerified,
   ) async {
     final normalizedPhoneNumber = _normalizeIndianPhoneNumber(phoneNumber);
-    debugPrint('OTP: starting verification for $normalizedPhoneNumber');
+    if (kDebugMode) {
+      debugPrint('OTP: starting verification for $normalizedPhoneNumber');
+    }
 
     await _firebaseAuth.verifyPhoneNumber(
       phoneNumber: normalizedPhoneNumber,
       timeout: const Duration(seconds: 60),
       verificationCompleted: (credential) async {
         try {
-          debugPrint('OTP: automatic verification completed');
+          if (kDebugMode) {
+            debugPrint('OTP: automatic verification completed');
+          }
           final userCredential =
               await _firebaseAuth.signInWithCredential(credential);
-          debugPrint(
-            'OTP: automatic sign-in success for uid ${userCredential.user?.uid ?? 'unknown'}',
-          );
+          if (kDebugMode) {
+            debugPrint(
+              'OTP: automatic sign-in success for uid ${userCredential.user?.uid ?? 'unknown'}',
+            );
+          }
           onAutoVerified?.call(userCredential);
         } on FirebaseAuthException catch (e, stackTrace) {
-          debugPrint('OTP Auto Sign-In Error [${e.code}]: ${e.message}');
-          debugPrintStack(stackTrace: stackTrace);
+          if (kDebugMode) {
+            debugPrint('OTP Auto Sign-In Error [${e.code}]: ${e.message}');
+            debugPrintStack(stackTrace: stackTrace);
+          }
           onError(_firebaseMessage(e));
         } catch (e, stackTrace) {
-          debugPrint('OTP Auto Sign-In Error: $e');
-          debugPrintStack(stackTrace: stackTrace);
+          if (kDebugMode) {
+            debugPrint('OTP Auto Sign-In Error: $e');
+            debugPrintStack(stackTrace: stackTrace);
+          }
           onError('Automatic OTP verification failed. Please enter the OTP.');
         }
       },
       verificationFailed: (e) {
-        debugPrint('OTP Error [${e.code}]: ${e.message}');
+        if (kDebugMode) {
+          debugPrint('OTP Error [${e.code}]: ${e.message}');
+        }
         onError(_firebaseMessage(e));
       },
       codeSent: (verificationId, resendToken) {
-        debugPrint('OTP: code sent. resendToken=$resendToken');
+        if (kDebugMode) {
+          debugPrint('OTP: code sent. resendToken=$resendToken');
+        }
         onCodeSent(verificationId);
       },
       codeAutoRetrievalTimeout: (verificationId) {
-        debugPrint('OTP: auto retrieval timed out for verificationId');
+        if (kDebugMode) {
+          debugPrint('OTP: auto retrieval timed out for verificationId');
+        }
       },
     );
   }
 
   Future<UserCredential> verifyOTP(String verificationId, String otp) async {
     try {
-      debugPrint('OTP: verifying manual SMS code');
+      if (kDebugMode) {
+        debugPrint('OTP: verifying manual SMS code');
+      }
       final credential = PhoneAuthProvider.credential(
         verificationId: verificationId,
         smsCode: otp,
       );
       final userCredential =
           await _firebaseAuth.signInWithCredential(credential);
-      debugPrint(
-        'OTP: manual sign-in success for uid ${userCredential.user?.uid ?? 'unknown'}',
-      );
+      if (kDebugMode) {
+        debugPrint(
+          'OTP: manual sign-in success for uid ${userCredential.user?.uid ?? 'unknown'}',
+        );
+      }
       return userCredential;
     } on FirebaseAuthException catch (e, stackTrace) {
-      debugPrint('OTP Verify Error [${e.code}]: ${e.message}');
-      debugPrintStack(stackTrace: stackTrace);
+      if (kDebugMode) {
+        debugPrint('OTP Verify Error [${e.code}]: ${e.message}');
+        debugPrintStack(stackTrace: stackTrace);
+      }
       throw AuthFailureException(_firebaseMessage(e));
     } catch (e, stackTrace) {
-      debugPrint('OTP Verify Error: $e');
-      debugPrintStack(stackTrace: stackTrace);
+      if (kDebugMode) {
+        debugPrint('OTP Verify Error: $e');
+        debugPrintStack(stackTrace: stackTrace);
+      }
       throw AuthFailureException('OTP verification failed. Please try again.');
     }
   }
