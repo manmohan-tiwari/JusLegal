@@ -5,19 +5,17 @@ import '../models/document_category_model.dart';
 import '../models/document_type_model.dart';
 import '../services/legal_writing_handler.dart';
 import '../services/ai_service.dart';
+import '../services/pdf/legal_pdf_models.dart';
+import '../services/pdf/legal_pdf_service.dart';
 import '../widgets/legal_writing/category_step.dart';
 import '../widgets/legal_writing/form_step.dart';
 import '../widgets/legal_writing/result_step.dart';
-
-// -- Provider ------------------------------------------------------------------
 
 final _aiServiceProvider = Provider<AIService>((ref) {
   final svc = AIService();
   svc.initialize();
   return svc;
 });
-
-// -- Screen --------------------------------------------------------------------
 
 class LegalWritingScreen extends ConsumerStatefulWidget {
   const LegalWritingScreen({super.key});
@@ -52,17 +50,14 @@ class _LegalWritingScreenState extends ConsumerState<LegalWritingScreen> {
   void _syncControllersWithState() {
     final state = ref.watch(legalWritingProvider);
 
-    // Sync result controller
     if (_resultController.text != state.result) {
       _resultController.text = state.result;
     }
 
-    // Sync extra details controller
     if (_extraDetailsController.text != state.extraDetails) {
       _extraDetailsController.text = state.extraDetails;
     }
 
-    // Sync field controllers
     if (state.type != null) {
       for (final field in state.type!.requiredFields) {
         if (!_fieldControllers.containsKey(field)) {
@@ -79,18 +74,15 @@ class _LegalWritingScreenState extends ConsumerState<LegalWritingScreen> {
   void _selectType(DocumentCategory category, DocumentType type) {
     ref.read(legalWritingProvider.notifier).selectType(category, type);
 
-    // Initialize controllers for new type
     _initializeControllers(type);
   }
 
   void _initializeControllers(DocumentType type) {
-    // Dispose old controllers
     for (final c in _fieldControllers.values) {
       c.dispose();
     }
     _fieldControllers.clear();
 
-    // Create new controllers for required fields
     for (final field in type.requiredFields) {
       _fieldControllers[field] = TextEditingController();
     }
@@ -98,7 +90,6 @@ class _LegalWritingScreenState extends ConsumerState<LegalWritingScreen> {
 
   bool _formValid(LegalWritingState state) {
     if (state.type == null) return false;
-    // At least first required field filled
     final firstField = state.type!.requiredFields.first;
     final firstValue = state.fieldValues[firstField] ?? '';
     return firstValue.trim().isNotEmpty;
@@ -156,7 +147,6 @@ Now write the complete ${type.label}:
       final firstField = state.type!.requiredFields.first;
       final firstValue = state.fieldValues[firstField] ?? '';
 
-      // Use generateLetter with the full custom prompt
       final result = await ref.read(_aiServiceProvider).generateLetter(
             letterType: state.type!.id,
             category: state.category!.label,
@@ -221,6 +211,76 @@ Now write the complete ${type.label}:
       'Last Working Day': 'e.g. 30 June 2024',
     };
     return hints[field] ?? 'Enter $field';
+  }
+
+  LegalDocument _pdfDocumentFor(LegalWritingState state) {
+    final values = state.fieldValues;
+    final type = state.type!;
+    final name = values['Sender'] ??
+        values['Deponent Name'] ??
+        values['Complainant'] ??
+        values['Applicant'] ??
+        (values.isNotEmpty ? values.values.first : 'Applicant');
+    final person = PersonInfo(
+        fullName: name,
+        address: values['Address'] ??
+            values['Property Address'] ??
+            'Address not provided');
+    final body = _resultController.text.trim().isEmpty
+        ? state.result
+        : _resultController.text;
+    final id = type.id.toLowerCase();
+    if (id.contains('affidavit')) {
+      return AffidavitDocument(
+          title: type.label,
+          deponent: person,
+          purpose: type.label,
+          statements: const []);
+    }
+    if (id.contains('rti')) {
+      return RtiDocument(
+          title: type.label,
+          applicant: person,
+          publicAuthority: RecipientInfo(
+              name: values['Department'] ?? values['Public Authority'] ?? '',
+              designation: 'Public Information Officer',
+              address: values['PIO Address'] ?? ''),
+          informationSought: const [],
+          timePeriod: values['Period'] ?? '',
+          preferredFormat: values['Preferred Format'] ?? '',
+          feePaid: values['Fee Method'] ?? '');
+    }
+    if (id.contains('complaint')) {
+      return CourtComplaintDocument(
+          title: type.label,
+          district: '[District]',
+          state: '[State]',
+          complainant: person,
+          oppositeParty: OppositePartyInfo(
+              name: values['Opposite Party'] ?? 'Opposite Party'),
+          reliefSought: [values['Relief Sought'] ?? '']);
+    }
+    if (id.contains('notice')) {
+      return LegalNoticeDocument(
+          title: type.label,
+          sender: person,
+          recipient: RecipientInfo(
+              name: values['Recipient'] ??
+                  values['Opposite Party'] ??
+                  'Recipient'),
+          backgroundFacts: const [],
+          legalViolation: '',
+          reliefDemanded: [
+            values['Relief Sought'] ?? 'Relief as stated above'
+          ]);
+    }
+    return FormalLetterDocument(
+        title: type.label,
+        sender: person,
+        recipient: RecipientInfo(
+            name: values['Recipient'] ?? values['Client'] ?? 'Recipient'),
+        subject: type.label,
+        bodyParagraphs: [body]);
   }
 
   InputDecoration _inputDecoration(String hint) {
@@ -306,26 +366,47 @@ Now write the complete ${type.label}:
                         fieldHintBuilder: _fieldHint,
                         inputDecorationBuilder: _inputDecoration,
                       )
-                    : ResultStep(
-                        selectedCategory: state.category!,
-                        selectedType: state.type!,
-                        selectedTone: state.tone,
-                        loading: state.loading,
-                        error: state.error,
-                        resultController: _resultController,
-                        isEditing: state.isEditing,
-                        onToggleEditing: () {
-                          ref
-                              .read(legalWritingProvider.notifier)
-                              .toggleEditing();
-                        },
-                        onRegenerate: _generate,
-                        onNewDocument: () {
-                          ref
-                              .read(legalWritingProvider.notifier)
-                              .resetToCategory();
-                        },
-                      ),
+                    : Column(children: [
+                        ResultStep(
+                          selectedCategory: state.category!,
+                          selectedType: state.type!,
+                          selectedTone: state.tone,
+                          loading: state.loading,
+                          error: state.error,
+                          resultController: _resultController,
+                          isEditing: state.isEditing,
+                          onToggleEditing: () {
+                            ref
+                                .read(legalWritingProvider.notifier)
+                                .toggleEditing();
+                          },
+                          onRegenerate: _generate,
+                          onNewDocument: () {
+                            ref
+                                .read(legalWritingProvider.notifier)
+                                .resetToCategory();
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              icon: const Icon(Icons.picture_as_pdf),
+                              label: const Text('Download / Print PDF'),
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      Theme.of(context).primaryColor,
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 14)),
+                              onPressed: state.loading
+                                  ? null
+                                  : () => LegalPdfService.showPrintPreview(
+                                        _pdfDocumentFor(state),
+                                        Localizations.localeOf(context)
+                                            .languageCode,
+                                      ),
+                            )),
+                      ]),
           ),
         ),
       ),
