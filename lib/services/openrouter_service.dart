@@ -51,10 +51,8 @@ class OpenRouterService {
 
   /// Sends a conversational request with JusLegal's chat context.
   Future<String> sendMessage(
-    String userMessage,
-    List<Map<String, String>> conversationHistory,
-    {String languageCode = 'en'}
-  ) =>
+          String userMessage, List<Map<String, String>> conversationHistory,
+          {String languageCode = 'en'}) =>
       _sendChatRequest(userMessage, conversationHistory, languageCode);
 
   Future<String> _sendChatRequest(
