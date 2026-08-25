@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class ProblemState {
   final String category;
   final String description;
-  ProblemState({required this.category, required this.description});
+  const ProblemState({required this.category, required this.description});
 
   ProblemState copyWith({String? category, String? description}) =>
       ProblemState(
@@ -21,4 +21,5 @@ class ProblemNotifier extends Notifier<ProblemState> {
       state = state.copyWith(description: description);
 }
 
-final problemProvider = NotifierProvider<ProblemNotifier, ProblemState>(ProblemNotifier.new);
+final problemProvider =
+    NotifierProvider<ProblemNotifier, ProblemState>(ProblemNotifier.new);
