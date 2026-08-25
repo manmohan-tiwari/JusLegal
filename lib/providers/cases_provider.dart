@@ -15,40 +15,43 @@ class CasesNotifier extends Notifier<List<SavedCaseModel>> {
 
   Future<void> _load() async {
     final box = await _box;
-    final items = <SavedCaseModel>[];
-    for (final key in box.keys) {
-      final value = box.get(key);
-      if (value is! Map) continue;
-      try {
-        final raw = Map<String, dynamic>.from(value);
-        final category = raw['category'];
-        final problemSnippet = raw['problemSnippet'];
-        final status = raw['status'];
-        final date =
-            raw['date'] is String ? DateTime.tryParse(raw['date']) : null;
-        final decodedResult = raw['resultJson'] is String
-            ? json.decode(raw['resultJson'] as String)
-            : null;
-        if (category is! String ||
-            problemSnippet is! String ||
-            status is! String ||
-            date == null ||
-            decodedResult is! Map) {
-          continue;
-        }
-        items.add(SavedCaseModel(
-          id: key.toString(),
-          category: category,
-          problemSnippet: problemSnippet,
-          date: date,
-          status: status,
-          resultJson: Map<String, dynamic>.from(decodedResult),
-        ));
-      } on FormatException {
-        // Corrupt locally stored cases are skipped so they cannot crash the UI.
+    state = [
+      for (final key in box.keys)
+        if (_fromHive(key, box.get(key)) case final item?) item,
+    ];
+  }
+
+  SavedCaseModel? _fromHive(Object key, Object? value) {
+    if (value is! Map) return null;
+    try {
+      final raw = Map<String, dynamic>.from(value);
+      final category = raw['category'];
+      final problemSnippet = raw['problemSnippet'];
+      final status = raw['status'];
+      final date =
+          raw['date'] is String ? DateTime.tryParse(raw['date']) : null;
+      final result = raw['resultJson'] is String
+          ? json.decode(raw['resultJson'] as String)
+          : null;
+      if (category is! String ||
+          problemSnippet is! String ||
+          status is! String ||
+          date == null ||
+          result is! Map) {
+        return null;
       }
+      return SavedCaseModel(
+        id: key.toString(),
+        category: category,
+        problemSnippet: problemSnippet,
+        date: date,
+        status: status,
+        resultJson: Map<String, dynamic>.from(result),
+      );
+    } on FormatException {
+      // Corrupt locally stored cases are skipped so they cannot crash the UI.
+      return null;
     }
-    state = items;
   }
 
   Future<void> add(SavedCaseModel c) async {
