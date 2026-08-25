@@ -47,7 +47,8 @@ class AppRouteNames {
   static const String homeLegalWriting = 'legalWriting';
   static const String homeDocumentCreation = 'documentCreation';
   static const String homeDocumentReview = 'documentReview';
-  static const String homeContractNegotiation = 'contractNegotiation';
+  // TODO: complete before enabling
+  // static const String homeContractNegotiation = 'contractNegotiation';
 }
 
 GoRouter buildRouter({required bool firebaseAvailable}) {
@@ -194,12 +195,13 @@ GoRouter buildRouter({required bool firebaseAvailable}) {
             name: AppRouteNames.homeDocumentReview,
             builder: (context, state) => const DocumentReviewScreen(),
           ),
-          GoRoute(
-            path: 'contract-negotiation',
-            name: AppRouteNames.homeContractNegotiation,
-            // Contract review is handled by the document-review workflow.
-            builder: (context, state) => const DocumentReviewScreen(),
-          ),
+          // TODO: complete before enabling
+          // GoRoute(
+          //   path: 'contract-negotiation',
+          //   name: AppRouteNames.homeContractNegotiation,
+          //   // Contract review is handled by the document-review workflow.
+          //   builder: (context, state) => const DocumentReviewScreen(),
+          // ),
         ],
       ),
     ],

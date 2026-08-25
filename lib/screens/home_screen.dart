@@ -302,13 +302,14 @@ class _HomeContent extends StatelessWidget {
         route: '/home/document-review',
         category: 'documents',
       ),
-      _AiFeatureTool(
-        title: l10n.toolContractNegotiationTitle,
-        description: l10n.toolContractNegotiationDesc,
-        icon: Icons.handshake_outlined,
-        route: '/home/contract-negotiation',
-        category: 'documents',
-      ),
+      // TODO: complete before enabling
+      // _AiFeatureTool(
+      //   title: l10n.toolContractNegotiationTitle,
+      //   description: l10n.toolContractNegotiationDesc,
+      //   icon: Icons.handshake_outlined,
+      //   route: '/home/contract-negotiation',
+      //   category: 'documents',
+      // ),
     ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
