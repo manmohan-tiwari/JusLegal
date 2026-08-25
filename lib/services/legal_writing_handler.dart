@@ -1,4 +1,4 @@
-﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/document_category_model.dart';
 import '../models/document_type_model.dart';
 
@@ -46,20 +46,13 @@ Generate the complete document now.
   }
 
   String cleanResponse(String response) {
-    String clean = response.trim();
-
-    if (clean.startsWith('```')) {
-      final lines = clean.split('\n');
-
-      if (lines.length > 2) {
-        clean = lines.sublist(1, lines.length - 1).join('\n');
-      }
-    }
-
-    return clean.trim();
+    final clean = response.trim();
+    final lines = clean.split('\n');
+    return clean.startsWith('```') && lines.length > 2
+        ? lines.sublist(1, lines.length - 1).join('\n').trim()
+        : clean;
   }
 }
-
 
 class LegalWritingState {
   final int step;
@@ -194,6 +187,6 @@ class LegalWritingNotifier extends Notifier<LegalWritingState> {
   }
 }
 
-final legalWritingProvider = NotifierProvider<LegalWritingNotifier, LegalWritingState>(LegalWritingNotifier.new);
-
-
+final legalWritingProvider =
+    NotifierProvider<LegalWritingNotifier, LegalWritingState>(
+        LegalWritingNotifier.new);
