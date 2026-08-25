@@ -3,12 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/config/theme_config.dart';
 import '../services/ai_service.dart';
 
-// -- Pre-built Q&A templates ---------------------------------------------------
-
 class _QTemplate {
-  final String display; // shown in list
-  final String prompt; // sent to AI (placeholder replaced)
-  final String hint; // TextField hint
+  final String display;
+  final String prompt;
+  final String hint;
   final IconData icon;
 
   const _QTemplate({
@@ -95,15 +93,11 @@ const List<_QTemplate> _templates = [
   ),
 ];
 
-// -- Provider ------------------------------------------------------------------
-
 final _aiServiceProvider = Provider<AIService>((ref) {
   final svc = AIService();
   svc.initialize();
   return svc;
 });
-
-// -- Screen --------------------------------------------------------------------
 
 class LegalAdviceScreen extends ConsumerStatefulWidget {
   const LegalAdviceScreen({super.key});
@@ -130,7 +124,8 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
 
   Future<void> _submit() async {
     final input = _controller.text.trim();
-    if (_selected == null || input.isEmpty) return;
+    final selected = _selected;
+    if (selected == null || input.isEmpty) return;
 
     setState(() {
       _loading = true;
@@ -138,7 +133,6 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
       _result = null;
     });
 
-    // Scroll down so user sees loader
     await Future.delayed(const Duration(milliseconds: 100));
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
@@ -149,7 +143,7 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
     }
 
     try {
-      final prompt = _selected!.prompt.replaceFirst('{input}', input);
+      final prompt = selected.prompt.replaceFirst('{input}', input);
       final result =
           await ref.read(_aiServiceProvider).analyzeProblemFromText(prompt);
       setState(() {
@@ -163,7 +157,6 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
       });
     }
 
-    // Scroll to result
     await Future.delayed(const Duration(milliseconds: 150));
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
@@ -185,8 +178,10 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final selected = _selected;
+
     return Scaffold(
-      backgroundColor: Color(0xFFF5F7FF),
+      backgroundColor: const Color(0xFFF5F7FF),
       appBar: AppBar(
         title: const Text('Legal Advice Q&A'),
         leading: BackButton(onPressed: () => Navigator.of(context).pop()),
@@ -198,18 +193,13 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // -- Disclaimer -----------------------------
               _DisclaimerBanner(),
               const SizedBox(height: 20),
-
-              // -- Section label ---------------------------
               _SectionLabel(
-                _selected == null ? 'SELECT A QUESTION' : 'SELECTED QUESTION',
+                selected == null ? 'SELECT A QUESTION' : 'SELECTED QUESTION',
               ),
               const SizedBox(height: 12),
-
-              // -- Question list OR selected chip ----------
-              if (_selected == null) ...[
+              if (selected == null) ...[
                 ListView.separated(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
@@ -226,7 +216,6 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
                   ),
                 ),
               ] else ...[
-                // Selected question chip with change button
                 Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
@@ -237,11 +226,11 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
                   ),
                   child: Row(
                     children: [
-                      Icon(_selected!.icon, color: Color(0xFF0052CC), size: 22),
+                      Icon(selected.icon, color: Color(0xFF0052CC), size: 22),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          _selected!.display,
+                          selected.display,
                           style: const TextStyle(
                             color: Color(0xFF1F2937),
                             fontSize: 14,
@@ -257,8 +246,6 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-
-                // -- Input field ---------------------------
                 _SectionLabel('YOUR DETAILS'),
                 const SizedBox(height: 10),
                 TextField(
@@ -266,7 +253,7 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
                   maxLines: 4,
                   textInputAction: TextInputAction.done,
                   decoration: InputDecoration(
-                    hintText: _selected!.hint,
+                    hintText: selected.hint,
                     hintStyle: TextStyle(color: Color(0xFF6B7280)),
                     filled: true,
                     fillColor: Color(0xFFFFFFFF),
@@ -287,8 +274,6 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-
-                // -- Submit button -------------------------
                 SizedBox(
                   width: double.infinity,
                   height: 50,
@@ -317,8 +302,6 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
                   ),
                 ),
               ],
-
-              // -- Error -----------------------------------
               if (_error != null) ...[
                 const SizedBox(height: 20),
                 Container(
@@ -351,8 +334,6 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
                   ),
                 ),
               ],
-
-              // -- Result ----------------------------------
               if (_result != null) ...[
                 const SizedBox(height: 24),
                 Text(
@@ -366,7 +347,6 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
                 const SizedBox(height: 14),
                 _ResultCard(result: _result!),
                 const SizedBox(height: 16),
-                // Ask another question button
                 Center(
                   child: OutlinedButton.icon(
                     onPressed: _reset,
@@ -389,8 +369,6 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
     );
   }
 }
-
-// -- Question Tile -------------------------------------------------------------
 
 class _QuestionTile extends StatelessWidget {
   final _QTemplate template;
@@ -443,8 +421,6 @@ class _QuestionTile extends StatelessWidget {
   }
 }
 
-// -- Result Card ---------------------------------------------------------------
-
 class _ResultCard extends StatelessWidget {
   final Map<String, dynamic> result;
 
@@ -471,7 +447,6 @@ class _ResultCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Summary
         if (summary.isNotEmpty)
           _InfoBlock(
             icon: Icons.summarize_outlined,
@@ -483,8 +458,6 @@ class _ResultCard extends StatelessWidget {
                     ?.copyWith(color: AppTheme.primaryNavy, height: 1.5)),
           ),
         if (summary.isNotEmpty) const SizedBox(height: 12),
-
-        // Confidence
         if (confidence != null)
           _InfoBlock(
             icon: Icons.bar_chart_rounded,
@@ -495,8 +468,6 @@ class _ResultCard extends StatelessWidget {
                     : int.tryParse(confidence.toString()) ?? 0),
           ),
         if (confidence != null) const SizedBox(height: 12),
-
-        // Legal Analysis
         if (analysis.isNotEmpty)
           _InfoBlock(
             icon: Icons.balance_outlined,
@@ -508,8 +479,6 @@ class _ResultCard extends StatelessWidget {
                     ?.copyWith(color: AppTheme.primaryNavy, height: 1.5)),
           ),
         if (analysis.isNotEmpty) const SizedBox(height: 12),
-
-        // Rights
         if (rights.isNotEmpty)
           _InfoBlock(
             icon: Icons.verified_outlined,
@@ -541,8 +510,6 @@ class _ResultCard extends StatelessWidget {
             ),
           ),
         if (rights.isNotEmpty) const SizedBox(height: 12),
-
-        // Next Steps
         if (steps.isNotEmpty)
           _InfoBlock(
             icon: Icons.checklist_rounded,
@@ -588,8 +555,6 @@ class _ResultCard extends StatelessWidget {
             ),
           ),
         if (steps.isNotEmpty) const SizedBox(height: 12),
-
-        // Relevant Laws chips
         if (laws is List && laws.isNotEmpty)
           _InfoBlock(
             icon: Icons.menu_book_outlined,
@@ -617,8 +582,6 @@ class _ResultCard extends StatelessWidget {
               }).toList(),
             ),
           ),
-
-        // Disclaimer
         const SizedBox(height: 16),
         Container(
           padding: const EdgeInsets.all(12),
@@ -648,8 +611,6 @@ class _ResultCard extends StatelessWidget {
     );
   }
 }
-
-// -- Info Block ----------------------------------------------------------------
 
 class _InfoBlock extends StatelessWidget {
   final IconData icon;
@@ -694,10 +655,8 @@ class _InfoBlock extends StatelessWidget {
   }
 }
 
-// -- Confidence Bar ------------------------------------------------------------
-
 class _ConfidenceBar extends StatelessWidget {
-  final int score; // 0-100
+  final int score;
 
   const _ConfidenceBar({required this.score});
 
@@ -753,8 +712,6 @@ class _ConfidenceBar extends StatelessWidget {
   }
 }
 
-// -- Section Label -------------------------------------------------------------
-
 class _SectionLabel extends StatelessWidget {
   final String title;
 
@@ -778,8 +735,6 @@ class _SectionLabel extends StatelessWidget {
     );
   }
 }
-
-// -- Disclaimer Banner ---------------------------------------------------------
 
 class _DisclaimerBanner extends StatelessWidget {
   const _DisclaimerBanner();
