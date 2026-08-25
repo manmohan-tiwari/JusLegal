@@ -5,7 +5,7 @@ class ComplaintState {
   final int generatedCount;
   final int freeLimit;
   final bool isPro;
-  ComplaintState(
+  const ComplaintState(
       {required this.generatedCount,
       required this.freeLimit,
       required this.isPro});
@@ -22,7 +22,7 @@ class ComplaintNotifier extends Notifier<ComplaintState> {
   @override
   ComplaintState build() {
     _load();
-    return ComplaintState(generatedCount: 0, freeLimit: 3, isPro: false);
+    return const ComplaintState(generatedCount: 0, freeLimit: 3, isPro: false);
   }
 
   Future<void> _load() async {
@@ -42,4 +42,5 @@ class ComplaintNotifier extends Notifier<ComplaintState> {
   }
 }
 
-final complaintProvider = NotifierProvider<ComplaintNotifier, ComplaintState>(ComplaintNotifier.new);
+final complaintProvider =
+    NotifierProvider<ComplaintNotifier, ComplaintState>(ComplaintNotifier.new);
