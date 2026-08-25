@@ -33,14 +33,12 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
   }
 
   Widget _maybeTruncatedLawChip(String text) {
-    final fullText = text;
-    final isTruncated = fullText.length > 30;
-    final displayText =
-        isTruncated ? '${fullText.substring(0, 27)}...' : fullText;
+    final isTruncated = text.length > 30;
+    final displayText = isTruncated ? '${text.substring(0, 27)}...' : text;
     final chip = Chip(label: Text(displayText));
 
     if (!isTruncated) return chip;
-    return Tooltip(message: fullText, child: chip);
+    return Tooltip(message: text, child: chip);
   }
 
   void _share(LegalResultModel result) {
@@ -86,9 +84,9 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
               children: [
                 const Icon(Icons.check_circle_outline, color: Colors.white),
                 const SizedBox(width: 8),
-                Text(
+                const Text(
                   'Case saved to My Cases',
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
@@ -432,10 +430,11 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
   }
 
   Widget _buildRightsContent(ThemeData theme, LegalResultModel result) {
-    if (result.rightsAvailable != null && result.rightsAvailable!.isNotEmpty) {
+    final rights = result.rightsAvailable;
+    if (rights != null && rights.isNotEmpty) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: result.rightsAvailable!
+        children: rights
             .map((r) => Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Row(
@@ -454,13 +453,12 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                 ))
             .toList(),
       );
-    } else {
-      return Text(
-        result.userRights,
-        style:
-            theme.textTheme.bodyMedium?.copyWith(color: AppTheme.primaryNavy),
-      );
     }
+
+    return Text(
+      result.userRights,
+      style: theme.textTheme.bodyMedium?.copyWith(color: AppTheme.primaryNavy),
+    );
   }
 
   Widget _buildStepsContent(LegalResultModel result) {
@@ -485,17 +483,19 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
   }
 
   Widget _buildLawsContent(LegalResultModel result) {
-    List<Widget> chips = [];
-    if (result.relevantLaws != null && result.relevantLaws!.isNotEmpty) {
-      chips = result.relevantLaws!.map((law) {
-        final text = (law['law'] ?? law['section'] ?? '').toString();
-        return _maybeTruncatedLawChip(text);
-      }).toList();
-    } else {
-      final lawText =
-          result.applicableLaw.isNotEmpty ? result.applicableLaw : 'Unknown';
-      chips = [_maybeTruncatedLawChip(lawText)];
-    }
+    final laws = result.relevantLaws;
+    final chips = laws != null && laws.isNotEmpty
+        ? laws.map((law) {
+            final text = (law['law'] ?? law['section'] ?? '').toString();
+            return _maybeTruncatedLawChip(text);
+          }).toList()
+        : [
+            _maybeTruncatedLawChip(
+              result.applicableLaw.isNotEmpty
+                  ? result.applicableLaw
+                  : 'Unknown',
+            ),
+          ];
 
     return Wrap(
       spacing: 8,
