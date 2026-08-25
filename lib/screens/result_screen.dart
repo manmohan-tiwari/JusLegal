@@ -15,6 +15,7 @@ import '../providers/problem_provider.dart';
 import '../widgets/authority_card.dart';
 import '../widgets/shimmer_loader.dart';
 import '../widgets/step_card.dart';
+import '../widgets/legal_disclaimer_banner.dart';
 
 class ResultScreen extends ConsumerStatefulWidget {
   final LegalResultModel? initialResult;
@@ -339,6 +340,8 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                     icon: Icons.account_balance_rounded,
                     child: _buildAuthoritiesContent(result),
                   ),
+                  const SizedBox(height: 16),
+                  const LegalDisclaimerBanner(),
                   const SizedBox(height: 32),
                 ],
               ),

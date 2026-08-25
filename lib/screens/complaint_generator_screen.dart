@@ -10,6 +10,7 @@ import '../providers/complaint_provider.dart';
 import '../providers/problem_provider.dart';
 import '../widgets/pro_upgrade_sheet.dart';
 import '../widgets/shimmer_loader.dart';
+import '../widgets/legal_disclaimer_banner.dart';
 import '../services/storage_service.dart';
 import '../services/pdf/legal_pdf_models.dart';
 import '../services/pdf/legal_pdf_service.dart';
@@ -499,6 +500,8 @@ class _ComplaintGeneratorScreenState
                             ),
                           ],
                         ),
+                        const SizedBox(height: 16),
+                        const LegalDisclaimerBanner(),
                         const SizedBox(height: 24),
                       ],
                     ),
