@@ -45,8 +45,7 @@ class RateUsNotifier extends Notifier<RateUsState> {
 
   Future<void> initAndIncrement() async {
     final prefs = await SharedPreferences.getInstance();
-    
-    // Load existing values
+
     final openCount = prefs.getInt('rate_us_open_count') ?? 0;
     final nextPromptCount = prefs.getInt('rate_us_next_prompt_count') ?? 5;
     final neverAskAgain = prefs.getBool('rate_us_never_ask') ?? false;
@@ -54,7 +53,7 @@ class RateUsNotifier extends Notifier<RateUsState> {
     final newOpenCount = openCount + 1;
     await prefs.setInt('rate_us_open_count', newOpenCount);
 
-    state = RateUsState(
+    state = state.copyWith(
       openCount: newOpenCount,
       nextPromptCount: nextPromptCount,
       neverAskAgain: neverAskAgain,
