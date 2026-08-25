@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/config/theme_config.dart';
 import '../services/ai_service.dart';
+import '../widgets/section_label.dart';
 
 final _aiServiceProvider = Provider<AIService>((ref) {
   final svc = AIService();
@@ -218,7 +219,7 @@ If the term is not a legal term, return:
               ),
               const SizedBox(height: 20),
               if (showPopularTerms) ...[
-                _SectionLabel('POPULAR TERMS'),
+                SectionLabel('POPULAR TERMS'),
                 const SizedBox(height: 12),
                 Wrap(
                   spacing: 8,
@@ -512,30 +513,6 @@ class _InfoBlock extends StatelessWidget {
           child,
         ],
       ),
-    );
-  }
-}
-
-class _SectionLabel extends StatelessWidget {
-  final String title;
-
-  const _SectionLabel(this.title);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(width: 3, height: 14, color: AppColors.trustBlue),
-        const SizedBox(width: 8),
-        Text(
-          title,
-          style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: AppColors.primaryNavy,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0.5,
-              ),
-        ),
-      ],
     );
   }
 }

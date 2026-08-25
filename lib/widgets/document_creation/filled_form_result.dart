@@ -1,7 +1,8 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../core/config/theme_config.dart';
 import '../../models/form_template_model.dart';
+import '../section_label.dart';
 
 class FilledFormResult extends StatefulWidget {
   final String generatedText;
@@ -28,8 +29,7 @@ class _FilledFormResultState extends State<FilledFormResult> {
   @override
   void initState() {
     super.initState();
-    _controller =
-        TextEditingController(text: widget.generatedText);
+    _controller = TextEditingController(text: widget.generatedText);
   }
 
   @override
@@ -84,8 +84,7 @@ class _FilledFormResultState extends State<FilledFormResult> {
               Text(
                 widget.form.actReference,
                 style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.8),
-                    fontSize: 12),
+                    color: Colors.white.withValues(alpha: 0.8), fontSize: 12),
               ),
               const SizedBox(height: 8),
               Container(
@@ -119,14 +118,14 @@ class _FilledFormResultState extends State<FilledFormResult> {
 
         // Documents required
         if (widget.form.documents.isNotEmpty) ...[
-          _SectionLabel('DOCUMENTS TO ATTACH'),
+          SectionLabel('DOCUMENTS TO ATTACH'),
           const SizedBox(height: 10),
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: AppColors.trustBlue.withValues(alpha: 0.05),
-              border: Border.all(
-                  color: AppColors.trustBlue.withValues(alpha: 0.3)),
+              border:
+                  Border.all(color: AppColors.trustBlue.withValues(alpha: 0.3)),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
@@ -137,10 +136,8 @@ class _FilledFormResultState extends State<FilledFormResult> {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Icon(
-                                Icons.attach_file_rounded,
-                                size: 14,
-                                color: AppColors.trustBlue),
+                            const Icon(Icons.attach_file_rounded,
+                                size: 14, color: AppColors.trustBlue),
                             const SizedBox(width: 6),
                             Expanded(
                               child: Text(doc,
@@ -161,14 +158,14 @@ class _FilledFormResultState extends State<FilledFormResult> {
         ],
 
         // Instructions
-        _SectionLabel('SUBMISSION INSTRUCTIONS'),
+        SectionLabel('SUBMISSION INSTRUCTIONS'),
         const SizedBox(height: 10),
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: AppColors.legalGold.withValues(alpha: 0.08),
-            border: Border.all(
-                color: AppColors.legalGold.withValues(alpha: 0.4)),
+            border:
+                Border.all(color: AppColors.legalGold.withValues(alpha: 0.4)),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
@@ -193,7 +190,7 @@ class _FilledFormResultState extends State<FilledFormResult> {
         const SizedBox(height: 16),
 
         // Generated form document
-        _SectionLabel('FILLED FORM'),
+        SectionLabel('FILLED FORM'),
         const SizedBox(height: 10),
         Container(
           width: double.infinity,
@@ -207,8 +204,8 @@ class _FilledFormResultState extends State<FilledFormResult> {
             children: [
               // Toolbar
               Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 12, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 child: Row(
                   children: [
                     const Icon(Icons.article_outlined,
@@ -217,10 +214,7 @@ class _FilledFormResultState extends State<FilledFormResult> {
                     Expanded(
                       child: Text(
                         widget.form.title.toUpperCase(),
-                        style: Theme.of(context)
-                            .textTheme
-                            .labelSmall
-                            ?.copyWith(
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
                               color: AppColors.primaryNavy,
                               fontWeight: FontWeight.w800,
                               letterSpacing: 0.5,
@@ -228,12 +222,9 @@ class _FilledFormResultState extends State<FilledFormResult> {
                       ),
                     ),
                     TextButton.icon(
-                      onPressed: () =>
-                          setState(() => _isEditing = !_isEditing),
+                      onPressed: () => setState(() => _isEditing = !_isEditing),
                       icon: Icon(
-                        _isEditing
-                            ? Icons.lock_outline
-                            : Icons.edit_outlined,
+                        _isEditing ? Icons.lock_outline : Icons.edit_outlined,
                         size: 16,
                       ),
                       label: Text(_isEditing ? 'Lock' : 'Edit'),
@@ -241,8 +232,7 @@ class _FilledFormResultState extends State<FilledFormResult> {
                         foregroundColor: AppColors.trustBlue,
                         padding: EdgeInsets.zero,
                         minimumSize: const Size(0, 0),
-                        tapTargetSize:
-                            MaterialTapTargetSize.shrinkWrap,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
                     ),
                   ],
@@ -324,29 +314,6 @@ class _FilledFormResultState extends State<FilledFormResult> {
               ),
             ),
           ],
-        ),
-      ],
-    );
-  }
-}
-
-class _SectionLabel extends StatelessWidget {
-  final String title;
-  const _SectionLabel(this.title);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(width: 3, height: 14, color: AppColors.trustBlue),
-        const SizedBox(width: 8),
-        Text(
-          title,
-          style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: AppColors.primaryNavy,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0.5,
-              ),
         ),
       ],
     );

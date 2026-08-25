@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import '../core/config/theme_config.dart';
 import '../core/config/templates.dart';
 import '../services/document_handler.dart';
+import '../services/pdf/legal_pdf_models.dart';
+import '../services/pdf/legal_pdf_service.dart';
 import '../widgets/document_creation/form_disclaimer_banner.dart';
 import '../widgets/document_creation/form_field_widget.dart';
 import '../widgets/document_creation/form_preview_card.dart';
 import '../widgets/document_creation/filled_form_result.dart';
+import '../widgets/section_label.dart';
 
 class DocumentCreationScreen extends ConsumerStatefulWidget {
   const DocumentCreationScreen({super.key});
@@ -71,7 +76,7 @@ class _DocumentCreationScreenState
       children: [
         const FormDisclaimerBanner(),
         const SizedBox(height: 20),
-        _SectionLabel('AVAILABLE FORMS'),
+        SectionLabel('AVAILABLE FORMS'),
         const SizedBox(height: 4),
         Padding(
           padding: const EdgeInsets.only(left: 11, bottom: 14),
@@ -209,7 +214,7 @@ class _DocumentCreationScreenState
         const SizedBox(height: 20),
 
         // Form fields
-        _SectionLabel('FILL DETAILS'),
+        SectionLabel('FILL DETAILS'),
         const SizedBox(height: 14),
         ...form.fields.asMap().entries.map((e) {
           final field = e.value;
@@ -327,36 +332,186 @@ class _DocumentCreationScreenState
       );
     }
 
-    return FilledFormResult(
-      generatedText: state.generatedText!,
-      form: state.selectedForm!,
-      onRegenerate: () => notifier.generateForm(),
-      onNewForm: () => notifier.resetToSelection(),
-    );
+    final form = state.selectedForm!;
+    return Column(children: [
+      FilledFormResult(
+        generatedText: state.generatedText!,
+        form: form,
+        onRegenerate: () => notifier.generateForm(),
+        onNewForm: () => notifier.resetToSelection(),
+      ),
+      const SizedBox(height: 16),
+      SizedBox(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            icon: const Icon(Icons.picture_as_pdf),
+            label: const Text('Download / Print PDF'),
+            style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).primaryColor,
+                padding: const EdgeInsets.symmetric(vertical: 14)),
+            onPressed: () async {
+              final locale = Localizations.localeOf(context).languageCode;
+              final document = await _pdfDocumentFor(state);
+              await LegalPdfService.showPrintPreview(document, locale);
+            },
+          )),
+    ]);
   }
-}
 
-// -- Section Label ---------------------------------------------------------
-
-class _SectionLabel extends StatelessWidget {
-  final String title;
-  const _SectionLabel(this.title);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(width: 3, height: 14, color: AppColors.trustBlue),
-        const SizedBox(width: 8),
-        Text(
-          title,
-          style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: AppColors.primaryNavy,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0.5,
-              ),
-        ),
-      ],
-    );
+  Future<LegalDocument> _pdfDocumentFor(DocumentCreationState state) async {
+    final form = state.selectedForm!;
+    final values = state.fieldValues;
+    debugPrint(
+        'FORM FIELDS: ${values.entries.map((entry) => '${entry.key}: ${entry.value}').join(', ')}');
+    final name = values['applicant_name'] ??
+        values['complainant_name'] ??
+        values['name'] ??
+        values['deponent_name'] ??
+        'Applicant';
+    final person = PersonInfo(
+        fullName: name,
+        address: await _addressFor(values),
+        mobile:
+            _firstValue(values, const ['applicant_phone', 'mobile', 'phone']),
+        email: _firstValue(values, const ['applicant_email', 'email']));
+    final id = form.id.toLowerCase();
+    final ai = state.generatedFields;
+    final generatedText = state.generatedText ?? '';
+    if (id.contains('rti')) {
+      final information = ai['information_sought'];
+      return RtiDocument(
+          title: form.title,
+          applicant: person,
+          publicAuthority: RecipientInfo(
+            name: ai['pio_department']?.toString().trim().isNotEmpty == true
+                ? ai['pio_department'].toString()
+                : _firstValue(values, const ['department_name'],
+                    fallback: form.authority),
+            designation:
+                ai['to_designation']?.toString().trim().isNotEmpty == true
+                    ? ai['to_designation'].toString()
+                    : 'Public Information Officer (PIO)',
+            address: ai['pio_address']?.toString() ??
+                _firstValue(values, const ['pio_address']),
+          ),
+          informationSought: _informationSought(
+              information, values['information_sought'] ?? ''),
+          timePeriod: ai['period']?.toString() ?? values['time_period'] ?? '',
+          preferredFormat: ai['preferred_format']?.toString() ??
+              values['format_required'] ??
+              'Certified copies',
+          feePaid: ai['fee_method']?.toString() ??
+              values['fee_details'] ??
+              'cash / Indian Postal Order');
+    }
+    if (id.contains('affidavit')) {
+      return AffidavitDocument(
+          title: form.title,
+          deponent: person,
+          purpose: ai['purpose']?.toString() ?? form.subtitle,
+          statements: _informationSought(ai['statements'], ''));
+    }
+    if (id.contains('notice')) {
+      return LegalNoticeDocument(
+          title: form.title,
+          sender: person,
+          recipient: RecipientInfo(
+              name: _firstValue(values,
+                  const ['recipient_name', 'opposite_party', 'recipient'],
+                  fallback: '')),
+          backgroundFacts: _informationSought(ai['background_facts'], ''),
+          legalViolation: ai['legal_violation']?.toString() ?? '',
+          reliefDemanded: _informationSought(ai['demands'], ''),
+          responseDeadlineDays:
+              int.tryParse(ai['deadline_days']?.toString() ?? '') ?? 30);
+    }
+    if (id.contains('complaint')) {
+      return CourtComplaintDocument(
+          title: form.title,
+          district: values['district'] ?? '[District]',
+          state: values['state'] ?? '[State]',
+          complainant: person,
+          oppositeParty: OppositePartyInfo(
+              name: values['opposite_party'] ?? 'Opposite Party'),
+          consumerStatusReason: ai['consumer_status_reason']?.toString() ?? '',
+          territorialJurisdiction:
+              ai['jurisdiction_territorial']?.toString() ?? '',
+          pecuniaryAmount:
+              ai['jurisdiction_pecuniary_amount']?.toString() ?? '',
+          factsOfCase: _informationSought(ai['facts'], ''),
+          causeOfActionDate: ai['cause_of_action_date']?.toString() ?? '',
+          causeOfActionReason: ai['cause_of_action_reason']?.toString() ?? '',
+          reliefSought: _informationSought(ai['relief'], ''));
+    }
+    return FormalLetterDocument(
+        title: form.title,
+        subtitle: form.actReference,
+        sender: person,
+        recipient: RecipientInfo(name: form.authority),
+        subject: form.title,
+        bodyParagraphs: [generatedText]);
   }
+
+  String _firstValue(Map<String, String> values, List<String> keys,
+      {String fallback = ''}) {
+    for (final key in keys) {
+      final value = values[key]?.trim();
+      if (value != null && value.isNotEmpty) return value;
+    }
+    return fallback;
+  }
+
+  Future<String> _addressFor(Map<String, String> values) async {
+    final formAddress = values.entries
+        .firstWhere(
+          (entry) =>
+              entry.key.toLowerCase().contains('address') &&
+              entry.value.trim().isNotEmpty,
+          orElse: () => const MapEntry('', ''),
+        )
+        .value
+        .trim();
+    if (formAddress.isNotEmpty) return formAddress;
+
+    if (Hive.isBoxOpen('user_profile')) {
+      final profile = Hive.box('user_profile');
+      for (final key in const [
+        'address',
+        'applicant_address',
+        'your_address',
+        'residential_address',
+        'full_address'
+      ]) {
+        final value = profile.get(key)?.toString().trim();
+        if (value != null && value.isNotEmpty) return value;
+      }
+    }
+
+    final displayName = FirebaseAuth.instance.currentUser?.displayName?.trim();
+    return displayName == null || displayName.isEmpty
+        ? 'Address not available'
+        : '$displayName — Address not available';
+  }
+
+  List<String> _informationSought(dynamic raw, String fallback) {
+    if (raw is List) {
+      final items = raw
+          .map((item) => item.toString().trim())
+          .where((item) => item.isNotEmpty)
+          .toList();
+      if (items.isNotEmpty) return items;
+    }
+    if (raw is String && raw.trim().isNotEmpty) {
+      final items = _splitInformation(raw);
+      if (items.isNotEmpty) return items;
+    }
+    final items = _splitInformation(fallback);
+    return items.isEmpty ? const ['Information sought not specified'] : items;
+  }
+
+  List<String> _splitInformation(String value) => value
+      .split(RegExp(r'\r?\n|(?<=\.)\s+(?=\d+\.)'))
+      .map((item) => item.replaceFirst(RegExp(r'^\s*\d+[.)]\s*'), '').trim())
+      .where((item) => item.isNotEmpty)
+      .toList();
 }

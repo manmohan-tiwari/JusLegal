@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/config/theme_config.dart';
 import '../services/ai_service.dart';
+import '../widgets/section_label.dart';
 
 final _aiServiceProvider = Provider<AIService>((ref) {
   final svc = AIService();
@@ -143,7 +144,7 @@ Provide a thorough legal analysis covering all the above points.
               _DisclaimerBanner(),
               const SizedBox(height: 20),
               if (_result == null) ...[
-                _SectionLabel('DESCRIBE YOUR CASE'),
+                SectionLabel('DESCRIBE YOUR CASE'),
                 const SizedBox(height: 12),
                 Wrap(
                   spacing: 8,
@@ -233,7 +234,7 @@ Provide a thorough legal analysis covering all the above points.
               if (_result != null) ...[
                 _OriginalCaseCard(text: _caseController.text.trim()),
                 const SizedBox(height: 20),
-                _SectionLabel('CASE ANALYSIS REPORT'),
+                SectionLabel('CASE ANALYSIS REPORT'),
                 const SizedBox(height: 14),
                 _CaseAnalysisResult(result: _result!),
                 const SizedBox(height: 16),
@@ -811,29 +812,6 @@ class _SuggestionChip extends StatelessWidget {
               ),
         ),
       ),
-    );
-  }
-}
-
-class _SectionLabel extends StatelessWidget {
-  final String title;
-  const _SectionLabel(this.title);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(width: 3, height: 14, color: AppColors.trustBlue),
-        const SizedBox(width: 8),
-        Text(
-          title,
-          style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: AppColors.primaryNavy,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0.5,
-              ),
-        ),
-      ],
     );
   }
 }
