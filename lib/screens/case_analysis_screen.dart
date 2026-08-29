@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/config/theme_config.dart';
 import '../services/ai_service.dart';
 import '../widgets/section_label.dart';
+import '../widgets/siliconflow_image_widget.dart';
 
 final _aiServiceProvider = Provider<AIService>((ref) {
   final svc = AIService();
@@ -142,6 +143,14 @@ Provide a thorough legal analysis covering all the above points.
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _DisclaimerBanner(),
+              const SizedBox(height: 20),
+              Center(
+                child: SiliconFlowImageWidget(
+                  prompt: 'Professional legal case illustration',
+                  width: 400,
+                  height: 300,
+                ),
+              ),
               const SizedBox(height: 20),
               if (_result == null) ...[
                 SectionLabel('DESCRIBE YOUR CASE'),

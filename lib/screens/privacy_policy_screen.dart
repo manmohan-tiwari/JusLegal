@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/constants/app_config.dart';
@@ -137,53 +137,102 @@ class _PrivacyPolicyScreenState extends ConsumerState<PrivacyPolicyScreen> {
               const SizedBox(height: 16),
               _section(
                 context,
-                title: 'Information We Collect',
+                title: '1. Information We Collect',
+                body:
+                    'JusLegal is designed to give you access to consumer legal guidance without requiring unnecessary personal information. When you use the app, we may collect the following types of information:',
                 bullets: const [
-                  'Legal issue details you type into the app.',
-                  'Case data you choose to save locally.',
-                  'Diagnostics and crash information used to improve app stability.',
+                  'Account information: When you sign in (via Google, phone OTP, or email), we collect your basic authentication identifiers (email address, phone number, or Google profile ID) as provided by Firebase Authentication. This is used solely to identify you across sessions and secure your saved data.',
+                  'Legal issue details you submit: Any text, descriptions, or case details you type into the app when requesting analysis, generating documents, or using the AI chat. This information is needed to produce the guidance you request.',
+                  'Saved cases: Case data you choose to save on your device (stored locally via Hive and, where applicable, tied to your authenticated account ID).',
+                  'Diagnostics and usage data: With your consent, anonymous diagnostics and crash information used to improve app stability, reliability, and performance. You can change this at any time from within the app.',
+                  'Device and technical information: Basic device information (app version, operating system, browser type) required to deliver the service and diagnose compatibility issues.',
                 ],
               ),
               _section(
                 context,
-                title: 'How We Use Data',
+                title: '2. How We Use Data',
+                body: 'We use the information we collect only to provide, improve, and secure the JusLegal service.',
                 bullets: const [
-                  'To generate legal guidance and case summaries.',
-                  'To save your cases and restore them later.',
-                  'To improve the reliability, security, and performance of JusLegal.',
+                  'To generate legal guidance, case analyses, document drafts, and chat responses when you request them.',
+                  'To save your cases locally on your device so you can return to them later.',
+                  'To authenticate you and secure access to your account if you choose to sign in.',
+                  'To improve the reliability, security, and performance of JusLegal (with your consent where required by law).',
+                  'To communicate with you about critical service updates, account security, or in response to support requests.',
+                  'To comply with applicable laws, regulations, and valid legal process.',
                 ],
               ),
               _section(
                 context,
-                title: 'Third Party Services',
-                body: 'JusLegal may use third-party services such as Firebase for analytics and crash reporting, and AI providers to generate responses when analysis is requested.',
+                title: '3. Third Party Services',
+                body:
+                    'JusLegal uses reputable third-party services to provide core features. Data is shared with these providers only to the extent necessary to deliver the feature you requested, and each operates under its own terms and privacy policy.',
                 bullets: const [
-                  'Only the data needed to provide the requested feature is processed.',
-                  'Service providers may process data under their own terms and privacy policies.',
+                  'Firebase (Google): Used for authentication (email, phone OTP, Google sign-in), optional analytics, optional crash reporting, and app hosting. See Firebase\'s privacy policy at firebase.google.com/support/privacy.',
+                  'AI Service Providers: When you submit a legal question or request document generation, relevant text is sent to our configured AI providers to produce an answer, identify applicable laws, and suggest next steps.',
+                  'Google Sign-In: If you choose to continue with Google, Google\'s terms and privacy policy apply to the sign-in flow.',
                 ],
               ),
               _section(
                 context,
-                title: 'AI Processing Notice',
-                body: 'When you submit a legal question, relevant text may be sent to AI services to generate an answer, identify laws, and suggest next steps.',
+                title: '4. AI Processing Notice',
+                body:
+                    'When you submit a legal question, problem description, or document to JusLegal, relevant text may be sent to our AI service providers to generate an answer, identify relevant laws, and suggest practical next steps. Please note the following:',
                 bullets: const [
-                  'AI output is informational only.',
-                  'Do not rely on it as legal representation or formal legal advice.',
+                  'All AI output is informational and general in nature.',
+                  'It is NOT legal representation, formal legal advice, a lawyer-client relationship, or a substitute for advice from a qualified advocate.',
+                  'Do not rely on AI-generated content as the sole basis for important legal decisions — always consult a licensed advocate for serious, criminal, or time-sensitive matters.',
                 ],
               ),
               _section(
                 context,
-                title: 'User Rights',
+                title: '5. Account & Data Deletion',
+                body:
+                    'You can permanently delete your account and all associated data at any time, using either of the following methods:',
                 bullets: const [
-                  'You may review and delete cases stored on your device.',
-                  'You can choose not to submit personal information if you prefer.',
-                  'You may contact us for questions about this policy or your data handling.',
+                  'In the app: go to Settings > Account > Delete Account. Follow the confirmation steps (type DELETE and, if required, re-authenticate) to permanently remove your account, all saved cases, and your Firebase authentication record. This action cannot be undone.',
+                  'By email: send a deletion request to support@juslegal.app from your registered email address. Please include your account details so we can verify ownership. We will process your request within a reasonable timeframe and confirm deletion by reply.',
                 ],
               ),
               _section(
                 context,
-                title: 'Contact Information',
-                body: 'For privacy questions or support, contact the JusLegal team at:',
+                title: '6. Data Storage & Security',
+                bullets: const [
+                  'Saved cases are stored locally on your device using Hive, an on-device storage library. Case data does not leave your device unless you explicitly share or export it.',
+                  'Account authentication is handled by Firebase Authentication, which secures credentials using industry-standard encryption.',
+                  'We implement reasonable technical and organizational safeguards to protect your information, but no method of transmission or storage is 100% secure.',
+                ],
+              ),
+              _section(
+                context,
+                title: '7. User Rights',
+                body:
+                    'Depending on your jurisdiction, you may have rights under applicable data protection laws. You can exercise these rights directly in the app or by contacting us.',
+                bullets: const [
+                  'Access: You may review saved cases stored on your device from the "My Cases" screen.',
+                  'Deletion: You may delete individual cases from the "My Cases" screen, or permanently delete your entire account and all data as described in Section 5 above.',
+                  'Withdraw consent: You can change or withdraw your consent to analytics and crash reporting at any time from within the app.',
+                  'Opt out: You can choose not to submit personal information or sign in; you can still use many JusLegal features without an account.',
+                  'Contact us: You may reach out at any time for questions about this policy or how we handle your data.',
+                ],
+              ),
+              _section(
+                context,
+                title: '8. Children\'s Privacy',
+                bullets: const [
+                  'JusLegal is not directed to children under the age of 13, and we do not knowingly collect personal information from children. If you believe a child has provided us with personal information, please contact us and we will promptly delete it.',
+                ],
+              ),
+              _section(
+                context,
+                title: '9. Changes to This Policy',
+                bullets: const [
+                  'We may update this Privacy Policy from time to time. When we make material changes, we will update the "Last updated" date below and, where appropriate, notify you through the app or by email. Your continued use of JusLegal after changes become effective constitutes acceptance of the revised policy.',
+                ],
+              ),
+              _section(
+                context,
+                title: '10. Contact Information',
+                body: 'For privacy questions, deletion requests, or support, contact the JusLegal team at:',
                 bullets: [
                   AppConfig.supportEmail,
                 ],
@@ -238,7 +287,7 @@ class _PrivacyPolicyScreenState extends ConsumerState<PrivacyPolicyScreen> {
                 ),
               ),
               Text(
-                'Last updated: 2 June 2026',
+                'Last updated: 26 August 2026',
                 style: textTheme.bodySmall?.copyWith(color: AppTheme.textSecondary),
               ),
             ],

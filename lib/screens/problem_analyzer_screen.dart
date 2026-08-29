@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -173,8 +174,46 @@ class _ProblemAnalyzerScreenState extends ConsumerState<ProblemAnalyzerScreen> {
     }
   }
 
+  /// Returns true when the device has at least one active network interface.
+  Future<bool> _checkConnectivity() async {
+    final result = await Connectivity().checkConnectivity();
+    // connectivity_plus ^4.x returns a single ConnectivityResult value.
+    final isOnline = result != ConnectivityResult.none;
+    if (!isOnline && mounted) {
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          SnackBar(
+            content: const Row(
+              children: [
+                Icon(Icons.wifi_off_rounded, color: Colors.white, size: 20),
+                SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'No internet connection. Please check your network and try again.',
+                    style: TextStyle(color: Colors.white, fontSize: 13),
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: const Color(0xFFDC2626),
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.all(16),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            duration: const Duration(seconds: 4),
+          ),
+        );
+    }
+    return isOnline;
+  }
+
   Future<void> _analyze() async {
     if (_isAnalyzing) return;
+
+    // Guard: warn and abort when there is no network connection.
+    final isOnline = await _checkConnectivity();
+    if (!isOnline) return;
 
     final summaryText = _summaryController.text.trim();
 

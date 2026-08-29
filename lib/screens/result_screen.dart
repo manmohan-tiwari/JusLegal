@@ -28,9 +28,9 @@ class ResultScreen extends ConsumerStatefulWidget {
 
 class _ResultScreenState extends ConsumerState<ResultScreen> {
   ({Color color, String label}) _confidenceMeta(int confidence) {
-    if (confidence > 70) return (color: AppTheme.success, label: 'Strong case');
-    if (confidence >= 40) return (color: AppTheme.legalGold, label: 'Moderate');
-    return (color: AppTheme.error, label: 'Weak');
+    if (confidence > 70) return (color: AppTheme.success, label: 'Strong supporting evidence');
+    if (confidence >= 40) return (color: AppTheme.legalGold, label: 'Moderate supporting evidence');
+    return (color: AppTheme.error, label: 'Limited supporting evidence');
   }
 
   Widget _maybeTruncatedLawChip(String text) {

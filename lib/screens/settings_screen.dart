@@ -11,6 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../core/config/theme_config.dart';
 import '../core/constants/app_config.dart';
+import '../core/services/analytics_service.dart';
 import '../providers/locale_provider.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -47,32 +48,151 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   Future<void> _showAccountDeletionDialog(AppLocalizations l10n) async {
+    final deleteTextController = TextEditingController();
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
-        return AlertDialog(
-          backgroundColor: AppColors.background,
-          title: Text(l10n.deleteAccountTitle),
-          content: Text(l10n.deleteAccountMessage),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(false),
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.primaryNavy,
+        return StatefulBuilder(
+          builder: (ctx, setDialogState) {
+            final typedValue = deleteTextController.text.trim();
+            final canDelete = typedValue == 'DELETE';
+            return AlertDialog(
+              backgroundColor: AppColors.background,
+              scrollable: true,
+              title: Row(
+                children: [
+                  const Icon(Icons.warning_amber_rounded,
+                      color: Colors.red, size: 28),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      l10n.deleteAccountTitle,
+                      style: const TextStyle(fontSize: 18),
+                    ),
+                  ),
+                ],
               ),
-              child: Text(l10n.cancel),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(true),
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.red,
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withValues(alpha: 0.06),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.red.withValues(alpha: 0.2)),
+                    ),
+                    child: Text(
+                      l10n.deleteAccountMessage,
+                      style: TextStyle(
+                        color: Colors.red.shade900,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        height: 1.45,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    l10n.deleteAccountConfirmMessage,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFF6B7280),
+                      height: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  Text(
+                    l10n.typeDeleteToConfirm,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF1F2937),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  TextField(
+                    controller: deleteTextController,
+                    onChanged: (_) => setDialogState(() {}),
+                    textCapitalization: TextCapitalization.characters,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.5,
+                      fontSize: 16,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: l10n.typeDeleteHint,
+                      hintStyle: TextStyle(
+                        letterSpacing: 1.5,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey.shade400,
+                      ),
+                      isDense: true,
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 12),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(
+                            color: canDelete
+                                ? Colors.red
+                                : AppColors.primaryNavy),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    l10n.deleteButtonDisabledHint,
+                    style: TextStyle(
+                      fontSize: 11,
+                      color:
+                          canDelete ? Colors.green.shade700 : Color(0xFF9CA3AF),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
-              child: Text(l10n.delete),
-            ),
-          ],
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(false),
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.primaryNavy,
+                  ),
+                  child: Text(l10n.cancel),
+                ),
+                TextButton(
+                  onPressed: canDelete
+                      ? () => Navigator.of(dialogContext).pop(true)
+                      : null,
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: canDelete ? Colors.red : Colors.grey.shade300,
+                    disabledBackgroundColor: Colors.grey.shade300,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text(l10n.delete),
+                ),
+              ],
+            );
+          },
         );
       },
     );
+    deleteTextController.dispose();
 
     if (confirmed != true) return;
 
@@ -85,11 +205,40 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       return;
     }
 
-    Future<void> cleanupAndNavigateToLogin() async {
-      await SharedPreferences.getInstance().then((p) => p.clear());
-      await Hive.deleteFromDisk();
-      await FirebaseAuth.instance.signOut();
+    Future<void> cleanupAndNavigateToLogin({String? successMessage}) async {
+      try {
+        await SafeAnalytics.setUserId(id: null);
+      } catch (_) {}
+      try {
+        SafeAnalytics.reset();
+      } catch (_) {}
+      try {
+        await SharedPreferences.getInstance().then((p) => p.clear());
+      } catch (_) {}
+      try {
+        if (Hive.isBoxOpen('cases')) {
+          final casesBox = Hive.box('cases');
+          await casesBox.clear();
+        }
+        if (Hive.isBoxOpen('settings')) {
+          final settingsBox = Hive.box('settings');
+          await settingsBox.clear();
+        }
+      } catch (_) {}
+      try {
+        await FirebaseAuth.instance.signOut();
+        await GoogleSignIn().signOut();
+      } catch (_) {}
       if (!mounted) return;
+      if (successMessage != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(successMessage),
+            backgroundColor: Colors.green.shade700,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
       context.go('/login');
     }
 
@@ -97,11 +246,67 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       await user.delete();
     }
 
-    try {
-      await attemptDelete();
-      await cleanupAndNavigateToLogin();
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'requires-recent-login') {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        return PopScope(
+          canPop: false,
+          child: AlertDialog(
+            backgroundColor: AppColors.background,
+            content: Row(
+              children: [
+                const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2.5),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    l10n.deletingAccount,
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    Future<bool> handleReauthRequired() async {
+      Navigator.of(context).pop();
+
+      final providerData = user.providerData;
+      String? method;
+      for (final p in providerData) {
+        if (p.providerId == GoogleAuthProvider.GOOGLE_SIGN_IN_METHOD ||
+            p.providerId == 'google.com') {
+          method = 'google';
+          break;
+        }
+        if (p.providerId == EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD ||
+            p.providerId == 'password') {
+          method = 'password';
+          break;
+        }
+        if (p.providerId == PhoneAuthProvider.PHONE_SIGN_IN_METHOD ||
+            p.providerId == 'phone') {
+          method = 'phone';
+          break;
+        }
+      }
+
+      if (!mounted) return false;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.requiresRecentLogin),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+
+      if (method == 'google') {
         try {
           final googleUser = await GoogleSignIn().signIn();
           final googleAuth = await googleUser?.authentication;
@@ -109,11 +314,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           final idToken = googleAuth?.idToken;
 
           if (accessToken == null || idToken == null) {
-            if (!mounted) return;
+            if (!mounted) return false;
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(l10n.reauthenticationFailed)),
             );
-            return;
+            return false;
           }
 
           final credential = GoogleAuthProvider.credential(
@@ -122,26 +327,195 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           );
 
           await user.reauthenticateWithCredential(credential);
+          return true;
+        } on FirebaseAuthException catch (e) {
+          if (!mounted) return false;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(e.message ?? l10n.reauthenticationFailed)),
+          );
+          return false;
+        } catch (_) {
+          if (!mounted) return false;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.reauthenticationFailed)),
+          );
+          return false;
+        }
+      }
+
+      if (method == 'password') {
+        if (!mounted) return false;
+        final email = user.email ?? '';
+        final password = await showDialog<String?>(
+          context: context,
+          builder: (pwdCtx) {
+            final pwdController = TextEditingController();
+            return StatefulBuilder(
+              builder: (ctx, setPwdState) {
+                return AlertDialog(
+                  backgroundColor: AppColors.background,
+                  title: Text(l10n.reauthenticationRequired),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        email.isNotEmpty ? email : l10n.email,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: Color(0xFF6B7280),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: pwdController,
+                        obscureText: true,
+                        autofocus: true,
+                        decoration: InputDecoration(
+                          labelText: l10n.password,
+                          border: const OutlineInputBorder(),
+                          isDense: true,
+                        ),
+                        onSubmitted: (_) =>
+                            Navigator.of(pwdCtx).pop(pwdController.text),
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(pwdCtx).pop(null),
+                      child: Text(l10n.cancel),
+                    ),
+                    TextButton(
+                      onPressed: pwdController.text.isNotEmpty
+                          ? () =>
+                              Navigator.of(pwdCtx).pop(pwdController.text)
+                          : null,
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppColors.primaryNavy,
+                      ),
+                      child: Text(l10n.ok),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        );
+
+        if (password == null || password.isEmpty) {
+          if (!mounted) return false;
+          return false;
+        }
+
+        try {
+          final credential = EmailAuthProvider.credential(
+            email: email,
+            password: password,
+          );
+          await user.reauthenticateWithCredential(credential);
+          return true;
+        } on FirebaseAuthException catch (e) {
+          if (!mounted) return false;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(e.message ?? l10n.reauthenticationFailed),
+            ),
+          );
+          return false;
+        } catch (_) {
+          if (!mounted) return false;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l10n.reauthenticationFailed)),
+          );
+          return false;
+        }
+      }
+
+      if (method == 'phone' || method == null) {
+        try {
+          await FirebaseAuth.instance.signOut();
+          await GoogleSignIn().signOut();
+        } catch (_) {}
+        if (!mounted) return false;
+        context.go('/login');
+        return false;
+      }
+
+      return false;
+    }
+
+    try {
+      await attemptDelete();
+      Navigator.of(context).pop();
+      await cleanupAndNavigateToLogin(
+          successMessage: l10n.accountDeletedSuccess);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'requires-recent-login') {
+        final reauthOk = await handleReauthRequired();
+        if (!reauthOk) {
+          try {
+            Navigator.of(context).pop();
+          } catch (_) {}
+          return;
+        }
+        showDialog<void>(
+          context: context,
+          barrierDismissible: false,
+          builder: (ctx) {
+            return PopScope(
+              canPop: false,
+              child: AlertDialog(
+                backgroundColor: AppColors.background,
+                content: Row(
+                  children: [
+                    const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2.5),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Text(
+                        l10n.deletingAccount,
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+        try {
           await attemptDelete();
-          await cleanupAndNavigateToLogin();
+          Navigator.of(context).pop();
+          await cleanupAndNavigateToLogin(
+              successMessage: l10n.accountDeletedSuccess);
         } on FirebaseAuthException catch (e2) {
+          Navigator.of(context).pop();
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e2.message ?? l10n.unableToDeleteAccount)),
+            SnackBar(
+              content: Text(e2.message ?? l10n.unableToDeleteAccount),
+            ),
           );
         } catch (_) {
+          Navigator.of(context).pop();
           if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(l10n.unableToDeleteAccount)),
           );
         }
       } else {
+        Navigator.of(context).pop();
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(e.message ?? l10n.unableToDeleteAccount)),
         );
       }
     } catch (_) {
+      Navigator.of(context).pop();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.unableToDeleteAccount)),
@@ -271,7 +645,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ),
               ListTile(
                 title: Text(l10n.privacyPolicy),
-                onTap: () => context.go('/privacy-policy'),
+                onTap: () => _launchURL(AppConfig.privacyPolicyUrl),
                 trailing: Icon(
                   Icons.chevron_right,
                   size: 20,

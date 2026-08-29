@@ -1,8 +1,10 @@
+import 'dart:async';
+
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'dart:async';
 
 import 'package:flutter/foundation.dart' show kDebugMode, defaultTargetPlatform;
 import 'package:device_preview/device_preview.dart';
@@ -26,22 +28,32 @@ Future<void> main() async {
   // Initialize Firebase with error handling
   bool firebaseInitialized = false;
   try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    firebaseInitialized = true;
-    if (kDebugMode) {
-      debugPrint('[Main] Firebase initialized successfully');
-      debugPrint(
-          '[Main] Firebase Apps: ${Firebase.apps.map((e) => e.name).toList()}');
+    final existingApps = Firebase.apps;
+    final hasDefaultApp = existingApps.any((app) => app.name == defaultFirebaseAppName);
+    if (hasDefaultApp) {
+      firebaseInitialized = true;
+      if (kDebugMode) {
+        debugPrint('[Main] Firebase default app already initialized (via JS SDK on web)');
+        debugPrint(
+            '[Main] Firebase Apps: ${Firebase.apps.map((e) => e.name).toList()}');
+      }
+    } else {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+      firebaseInitialized = true;
+      if (kDebugMode) {
+        debugPrint('[Main] Firebase initialized successfully');
+        debugPrint(
+            '[Main] Firebase Apps: ${Firebase.apps.map((e) => e.name).toList()}');
+      }
     }
-  } catch (_) {
+  } catch (e, stackTrace) {
     if (kDebugMode) {
-      debugPrint('[Main] Firebase initialization failed');
+      debugPrint('[Main] Firebase initialization failed: $e');
+      debugPrintStack(stackTrace: stackTrace);
       debugPrint(
           '[Main] Continuing without Firebase (app will work with limited functionality)');
-    }
-    if (kDebugMode) {
       debugPrint('[Main] Firebase-dependent features are unavailable');
     }
   }
@@ -87,19 +99,31 @@ Future<void> main() async {
       child: JusLegalApp(firebaseAvailable: firebaseInitialized)));
 }
 
-class JusLegalApp extends ConsumerWidget {
+class JusLegalApp extends ConsumerStatefulWidget {
   const JusLegalApp({super.key, required this.firebaseAvailable});
 
   final bool firebaseAvailable;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final router = buildRouter(firebaseAvailable: firebaseAvailable);
+  ConsumerState<JusLegalApp> createState() => _JusLegalAppState();
+}
+
+class _JusLegalAppState extends ConsumerState<JusLegalApp> {
+  late final GoRouter _router;
+
+  @override
+  void initState() {
+    super.initState();
+    _router = buildRouter(firebaseAvailable: widget.firebaseAvailable);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final locale = ref.watch(localeProvider);
     return MaterialApp.router(
       title: 'JusLegal',
       theme: AppTheme.lightTheme,
-      routerConfig: router,
+      routerConfig: _router,
       debugShowCheckedModeBanner: false,
       locale: kDebugMode ? DevicePreview.locale(context) ?? locale : locale,
       localizationsDelegates: const [

@@ -6,8 +6,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:juslegal/l10n/gen/app_localizations.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../core/constants/app_animations.dart';
+import '../core/constants/app_config.dart';
 import '../core/constants/categories.dart';
 import '../core/config/theme_config.dart';
 import '../services/auth_handler.dart';
@@ -454,7 +456,12 @@ class _HomeContent extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         _DisclaimerBanner(
-          onTap: () => context.push('/privacy-policy'),
+          onTap: () async {
+            final uri = Uri.parse(AppConfig.privacyPolicyUrl);
+            if (await canLaunchUrl(uri)) {
+              await launchUrl(uri);
+            }
+          },
           text: l10n.aiGuidanceOnlyNotLegalAdvice,
           moreText: l10n.learnMore,
         ),

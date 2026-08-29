@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/config/theme_config.dart';
 import '../services/ai_service.dart';
+import '../widgets/legal_disclaimer_banner.dart';
 
 class _QTemplate {
   final String display;
@@ -19,74 +20,74 @@ class _QTemplate {
 
 const List<_QTemplate> _templates = [
   _QTemplate(
-    display: 'What legal steps should I take after an incident?',
+    display: 'What legal steps are generally considered after an incident?',
     prompt:
-        'What legal steps should I take after the following incident: {input}? Explain under Indian law.',
+        'What are the potential legal steps generally considered after the following incident under Indian law: {input}? Provide an informational overview of the considerations — this is for general awareness, not a substitute for professional legal advice.',
     hint: 'Describe the incident (e.g. product damaged during delivery)',
     icon: Icons.directions_walk_outlined,
   ),
   _QTemplate(
-    display: 'Should I file a lawsuit for this issue?',
+    display: 'What factors are relevant when considering a lawsuit?',
     prompt:
-        'Should I file a lawsuit for the following issue under Indian consumer law: {input}? Give pros, cons and recommendation.',
+        'What are the general factors to be aware of when considering whether to file a lawsuit for the following issue under Indian consumer law: {input}? Present the considerations informatively and objectively — this does not constitute legal advice.',
     hint: 'Describe the issue (e.g. seller refused refund for defective item)',
     icon: Icons.gavel_outlined,
   ),
   _QTemplate(
-    display: 'How can I protect myself legally in this scenario?',
+    display: 'What legal protections exist in this scenario?',
     prompt:
-        'How can I protect myself legally in the following scenario under Indian law: {input}?',
+        'What legal protections are generally available in the following scenario under Indian law: {input}? Provide an informational overview — this is not legal advice.',
     hint:
         'Describe the scenario (e.g. landlord not returning security deposit)',
     icon: Icons.shield_outlined,
   ),
   _QTemplate(
-    display: 'Is it advisable to sign a contract with this clause?',
+    display: 'What are the general implications of this contract clause?',
     prompt:
-        'Is it advisable to sign a contract that includes the following clause under Indian contract law: {input}? Explain risks.',
+        'What are the general legal implications of the following contract clause under Indian contract law: {input}? Explain the potential considerations and risks from an informational standpoint — this is not a substitute for qualified legal review.',
     hint: 'Paste or describe the clause',
     icon: Icons.edit_document,
   ),
   _QTemplate(
-    display: 'What are my legal options if this situation occurs?',
+    display: 'What legal options are generally available in this situation?',
     prompt:
-        'What are my legal options if the following situation occurs under Indian law: {input}?',
+        'What legal options are generally available if the following situation occurs under Indian law: {input}? Provide an informational overview — this does not constitute legal advice.',
     hint: 'Describe the situation (e.g. employer withheld salary)',
     icon: Icons.account_tree_outlined,
   ),
   _QTemplate(
-    display: 'What legal risks are involved in this action?',
+    display: 'What legal considerations are involved in this action?',
     prompt:
-        'What legal risks are involved in the following action under Indian law: {input}?',
+        'What legal considerations should generally be kept in mind for the following action under Indian law: {input}? Present the information objectively — this is not legal advice.',
     hint: 'Describe the action (e.g. starting a food business from home)',
     icon: Icons.warning_amber_outlined,
   ),
   _QTemplate(
-    display: 'Can I represent myself in this type of case?',
+    display: 'What are the general considerations for self-representation?',
     prompt:
-        'Can I represent myself in the following type of case in Indian courts: {input}? What are the practical implications?',
+        'What are the general considerations for self-representation in the following type of case in Indian courts: {input}? Explain the practical factors informatively — this does not constitute legal advice.',
     hint:
         'Describe the case type (e.g. consumer court complaint under Rs.20 lakh)',
     icon: Icons.person_outlined,
   ),
   _QTemplate(
-    display: 'Should I settle or go to trial for this dispute?',
+    display: 'What are the considerations between settlement and trial?',
     prompt:
-        'Should I settle or go to trial for the following dispute under Indian law: {input}? Give a balanced analysis.',
+        'What are the general considerations when evaluating settlement versus trial for the following dispute under Indian law: {input}? Present a balanced, informational overview — this does not constitute legal advice.',
     hint: 'Describe the dispute (e.g. builder delayed possession by 2 years)',
     icon: Icons.balance_outlined,
   ),
   _QTemplate(
-    display: 'What kind of lawyer should I hire for this case?',
+    display: 'What type of legal expertise is typically relevant for this case?',
     prompt:
-        'What kind of lawyer should I hire for the following case in India: {input}? Describe the specialisation needed.',
+        'What legal specialisation is typically associated with the following case in India: {input}? Describe the relevant expertise from an informational perspective — this does not constitute legal advice.',
     hint: 'Describe the case (e.g. cheque bounce / NI Act case)',
     icon: Icons.support_agent_outlined,
   ),
   _QTemplate(
-    display: 'How can I appeal a decision related to this case?',
+    display: 'What does the general appeal process involve for this case?',
     prompt:
-        'How can I appeal a decision related to the following case under Indian law: {input}? Explain the appeal process step by step.',
+        'What does the general appeal process involve for decisions related to the following case under Indian law: {input}? Explain the steps from an informational standpoint — this is not legal advice.',
     hint:
         'Describe the case and decision (e.g. consumer forum ruled against me)',
     icon: Icons.upload_outlined,
@@ -183,7 +184,7 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FF),
       appBar: AppBar(
-        title: const Text('Legal Advice Q&A'),
+        title: const Text('Legal Information Q&A'),
         leading: BackButton(onPressed: () => Navigator.of(context).pop()),
       ),
       body: SafeArea(
@@ -193,7 +194,10 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _DisclaimerBanner(),
+              const LegalDisclaimerBanner(
+                margin: EdgeInsets.zero,
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              ),
               const SizedBox(height: 20),
               _SectionLabel(
                 selected == null ? 'SELECT A QUESTION' : 'SELECTED QUESTION',
@@ -296,7 +300,7 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
                             ),
                           )
                         : const Text(
-                            'Get Legal Advice',
+                            'Get Legal Information',
                             style: TextStyle(fontWeight: FontWeight.w700),
                           ),
                   ),
@@ -337,7 +341,7 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
               if (_result != null) ...[
                 const SizedBox(height: 24),
                 Text(
-                  'AI ANALYSIS',
+                  'AI-GENERATED INFORMATION',
                   style: const TextStyle(
                     color: Color(0xFF0052CC),
                     fontSize: 14,
@@ -461,7 +465,7 @@ class _ResultCard extends StatelessWidget {
         if (confidence != null)
           _InfoBlock(
             icon: Icons.bar_chart_rounded,
-            title: 'Case Strength',
+            title: 'Evidence Strength Indicator',
             child: _ConfidenceBar(
                 score: (confidence is num)
                     ? confidence.toInt()
@@ -667,9 +671,9 @@ class _ConfidenceBar extends StatelessWidget {
   }
 
   String get _label {
-    if (score >= 70) return 'Strong';
-    if (score >= 40) return 'Moderate';
-    return 'Weak';
+    if (score >= 70) return 'Strong evidence';
+    if (score >= 40) return 'Moderate evidence';
+    return 'Limited evidence';
   }
 
   @override
@@ -736,38 +740,4 @@ class _SectionLabel extends StatelessWidget {
   }
 }
 
-class _DisclaimerBanner extends StatelessWidget {
-  const _DisclaimerBanner();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppTheme.legalGold.withValues(alpha: 0.10),
-        border: Border.all(color: AppTheme.legalGold),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.info_outline_rounded,
-              color: AppTheme.legalGold, size: 18),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              'This AI tool provides general information based on Indian law. It is NOT a substitute for professional legal advice from a qualified lawyer.',
-              style: const TextStyle(
-                color: Color(0xFF6B7280),
-                fontSize: 12,
-                fontWeight: FontWeight.w400,
-              ).copyWith(
-                color: AppTheme.primaryNavy.withValues(alpha: 0.7),
-                height: 1.4,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+// _DisclaimerBanner removed — LegalDisclaimerBanner (shared widget) is now used directly.

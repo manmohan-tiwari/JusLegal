@@ -73,7 +73,28 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get deleteAccountMessage =>
-      'यह आपका Firebase खाता स्थायी रूप से हटा देगा। इस कार्रवाई को वापस नहीं किया जा सकता।';
+      'यह आपका खाता, सभी सहेजे गए मामले और आपका Firebase प्रमाणीकरण रिकॉर्ड स्थायी रूप से हटा देगा। यह कार्रवाई वापस नहीं की जा सकती।';
+
+  @override
+  String get deleteAccountConfirmMessage =>
+      'पुष्टि करने के लिए, नीचे दिए गए फ़ील्ड में DELETE टाइप करें। सुरक्षा के लिए आपको पुनः प्रमाणित करने के लिए भी कहा जा सकता है।';
+
+  @override
+  String get typeDeleteToConfirm => 'पुष्टि करने के लिए DELETE टाइप करें';
+
+  @override
+  String get typeDeleteHint => 'DELETE';
+
+  @override
+  String get deleteButtonDisabledHint =>
+      'सक्षम करने के लिए सटीक DELETE टाइप करें';
+
+  @override
+  String get deletingAccount => 'आपका खाता हटाया जा रहा है...';
+
+  @override
+  String get accountDeletedSuccess =>
+      'आपका खाता और सभी डेटा स्थायी रूप से हटा दिए गए हैं।';
 
   @override
   String get delete => 'हटाएँ';
@@ -91,6 +112,29 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get reauthenticationFailed =>
       'पुनः प्रमाणीकरण विफल रहा। कृपया फिर से प्रयास करें।';
+
+  @override
+  String get reauthenticationRequired =>
+      'सुरक्षा के लिए, कृपया अपना खाता हटाने से पहले फिर से साइन इन करें।';
+
+  @override
+  String get requiresRecentLogin =>
+      'आपका सेशन बहुत पुराना है। कृपया अपना खाता हटाने के लिए फिर से साइन इन करें।';
+
+  @override
+  String get accountDataDeletionTitle => 'खाता और डेटा विलोपन';
+
+  @override
+  String get accountDataDeletionDesc =>
+      'आप किसी भी समय अपना खाता और सभी संबंधित डेटा स्थायी रूप से हटा सकते हैं।';
+
+  @override
+  String get accountDataDeletionInApp =>
+      'ऐप में: सेटिंग्स > खाता > खाता हटाएँ पर जाएँ। अपना खाता, सहेजे गए मामले और प्रमाणीकरण रिकॉर्ड हटाने के लिए पुष्टि चरणों का पालन करें।';
+
+  @override
+  String get accountDataDeletionEmail =>
+      'ईमेल द्वारा: अपने पंजीकृत ईमेल पते से support@juslegal.app पर विलोपन अनुरोध भेजें। हम आपके अनुरोध को उचित समय सीमा के भीतर संसाधित करेंगे।';
 
   @override
   String get legalDisclaimer => 'कानूनी अस्वीकरण';

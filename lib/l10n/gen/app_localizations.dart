@@ -227,8 +227,44 @@ abstract class AppLocalizations {
   /// No description provided for @deleteAccountMessage.
   ///
   /// In en, this message translates to:
-  /// **'This will permanently delete your Firebase account. This action cannot be undone.'**
+  /// **'This will permanently delete your account, all saved cases, and your Firebase authentication record. This action CANNOT be undone.'**
   String get deleteAccountMessage;
+
+  /// No description provided for @deleteAccountConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'To confirm, type DELETE in the field below. You may also be asked to re-authenticate for security.'**
+  String get deleteAccountConfirmMessage;
+
+  /// No description provided for @typeDeleteToConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Type DELETE to confirm'**
+  String get typeDeleteToConfirm;
+
+  /// No description provided for @typeDeleteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'DELETE'**
+  String get typeDeleteHint;
+
+  /// No description provided for @deleteButtonDisabledHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Type DELETE exactly to enable'**
+  String get deleteButtonDisabledHint;
+
+  /// No description provided for @deletingAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting your account...'**
+  String get deletingAccount;
+
+  /// No description provided for @accountDeletedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account and all data have been permanently deleted.'**
+  String get accountDeletedSuccess;
 
   /// No description provided for @delete.
   ///
@@ -259,6 +295,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Re-authentication failed. Please try again.'**
   String get reauthenticationFailed;
+
+  /// No description provided for @reauthenticationRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'For security, please sign in again before deleting your account.'**
+  String get reauthenticationRequired;
+
+  /// No description provided for @requiresRecentLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Your session is too old. Please sign in again to delete your account.'**
+  String get requiresRecentLogin;
+
+  /// No description provided for @accountDataDeletionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Account & Data Deletion'**
+  String get accountDataDeletionTitle;
+
+  /// No description provided for @accountDataDeletionDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'You can permanently delete your account and all associated data at any time.'**
+  String get accountDataDeletionDesc;
+
+  /// No description provided for @accountDataDeletionInApp.
+  ///
+  /// In en, this message translates to:
+  /// **'In the app: go to Settings > Account > Delete Account. Follow the confirmation steps to remove your account, saved cases, and authentication record.'**
+  String get accountDataDeletionInApp;
+
+  /// No description provided for @accountDataDeletionEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'By email: send a deletion request to support@juslegal.app from your registered email address. We will process your request within a reasonable timeframe.'**
+  String get accountDataDeletionEmail;
 
   /// No description provided for @legalDisclaimer.
   ///

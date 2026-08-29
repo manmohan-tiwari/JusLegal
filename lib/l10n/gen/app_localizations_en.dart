@@ -73,7 +73,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteAccountMessage =>
-      'This will permanently delete your Firebase account. This action cannot be undone.';
+      'This will permanently delete your account, all saved cases, and your Firebase authentication record. This action CANNOT be undone.';
+
+  @override
+  String get deleteAccountConfirmMessage =>
+      'To confirm, type DELETE in the field below. You may also be asked to re-authenticate for security.';
+
+  @override
+  String get typeDeleteToConfirm => 'Type DELETE to confirm';
+
+  @override
+  String get typeDeleteHint => 'DELETE';
+
+  @override
+  String get deleteButtonDisabledHint => 'Type DELETE exactly to enable';
+
+  @override
+  String get deletingAccount => 'Deleting your account...';
+
+  @override
+  String get accountDeletedSuccess =>
+      'Your account and all data have been permanently deleted.';
 
   @override
   String get delete => 'Delete';
@@ -91,6 +111,29 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get reauthenticationFailed =>
       'Re-authentication failed. Please try again.';
+
+  @override
+  String get reauthenticationRequired =>
+      'For security, please sign in again before deleting your account.';
+
+  @override
+  String get requiresRecentLogin =>
+      'Your session is too old. Please sign in again to delete your account.';
+
+  @override
+  String get accountDataDeletionTitle => 'Account & Data Deletion';
+
+  @override
+  String get accountDataDeletionDesc =>
+      'You can permanently delete your account and all associated data at any time.';
+
+  @override
+  String get accountDataDeletionInApp =>
+      'In the app: go to Settings > Account > Delete Account. Follow the confirmation steps to remove your account, saved cases, and authentication record.';
+
+  @override
+  String get accountDataDeletionEmail =>
+      'By email: send a deletion request to support@juslegal.app from your registered email address. We will process your request within a reasonable timeframe.';
 
   @override
   String get legalDisclaimer => 'Legal Disclaimer';

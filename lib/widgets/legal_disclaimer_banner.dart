@@ -1,6 +1,7 @@
-﻿import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../core/config/theme_config.dart';
+import '../core/constants/app_config.dart';
 
 class LegalDisclaimerBanner extends StatelessWidget {
   final EdgeInsetsGeometry? margin;
@@ -12,8 +13,11 @@ class LegalDisclaimerBanner extends StatelessWidget {
     this.padding,
   });
 
-  void _openPrivacyPolicy(BuildContext context) {
-    context.push('/privacy-policy');
+  Future<void> _openPrivacyPolicy(BuildContext context) async {
+    final uri = Uri.parse(AppConfig.privacyPolicyUrl);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
   }
 
   @override

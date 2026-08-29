@@ -76,8 +76,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   }
 
   Future<void> _openPrivacy() async {
-    if (context.mounted) {
-      context.push('/privacy-policy');
+    final uri = Uri.parse(AppConfig.privacyPolicyUrl);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
   }
 
