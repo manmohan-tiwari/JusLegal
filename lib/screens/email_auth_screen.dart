@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -137,7 +137,7 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen>
     final compact = size.width < 600;
 
     return Scaffold(
-      backgroundColor: AppTheme.darkText,
+      backgroundColor: AppColors.background,
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: LayoutBuilder(
@@ -199,11 +199,12 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen>
                                             topRight: Radius.circular(24),
                                           )
                                         : BorderRadius.circular(24),
+                                    border: Border.all(color: AppTheme.border),
                                     boxShadow: compact
                                         ? null
                                         : const [
                                             BoxShadow(
-                                              color: Color(0x22000000),
+                                              color: AppColors.shadowBlack,
                                               blurRadius: 24,
                                               offset: Offset(0, 12),
                                             ),
@@ -234,7 +235,7 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen>
                                                     border: Border(
                                                       bottom: BorderSide(
                                                         color: _isLoginMode
-                                                            ? AppTheme.trustBlue
+                                                            ? AppTheme.legalGold
                                                             : AppTheme.border,
                                                         width: 2,
                                                       ),
@@ -249,7 +250,7 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen>
                                                           ? FontWeight.bold
                                                           : FontWeight.w500,
                                                       color: _isLoginMode
-                                                          ? AppTheme.trustBlue
+                                                          ? AppTheme.legalGold
                                                           : AppTheme
                                                               .textSecondary,
                                                     ),
@@ -271,7 +272,7 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen>
                                                     border: Border(
                                                       bottom: BorderSide(
                                                         color: !_isLoginMode
-                                                            ? AppTheme.trustBlue
+                                                            ? AppTheme.legalGold
                                                             : AppTheme.border,
                                                         width: 2,
                                                       ),
@@ -286,7 +287,7 @@ class _EmailAuthScreenState extends ConsumerState<EmailAuthScreen>
                                                           ? FontWeight.bold
                                                           : FontWeight.w500,
                                                       color: !_isLoginMode
-                                                          ? AppTheme.trustBlue
+                                                          ? AppTheme.legalGold
                                                           : AppTheme
                                                               .textSecondary,
                                                     ),

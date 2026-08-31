@@ -574,7 +574,7 @@ class _AiToolCard extends StatelessWidget {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: AppColors.primaryNavy,
+                    color: AppColors.textPrimary,
                     fontWeight: FontWeight.w800,
                   ),
             ),
@@ -739,10 +739,10 @@ class _HeroContent extends StatelessWidget {
           child: ElevatedButton(
             onPressed: () => context.go('/home/analyzer'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryNavy,
-              foregroundColor: AppColors.white,
+              backgroundColor: AppColors.legalGold,
+              foregroundColor: const Color(0xFF0B0F19),
               elevation: 8,
-              shadowColor: AppColors.shadow,
+              shadowColor: AppColors.shadowGold,
               minimumSize: const Size.fromHeight(48),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               shape: RoundedRectangleBorder(
@@ -750,7 +750,7 @@ class _HeroContent extends StatelessWidget {
               ),
               textStyle: const TextStyle(
                 fontSize: 15,
-                fontWeight: FontWeight.w700,
+                fontWeight: FontWeight.w800,
               ),
             ),
             child: const Text('Get Started'),
@@ -816,7 +816,7 @@ class _CategoryCard extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: AppColors.primaryNavy,
+                      color: AppColors.textPrimary,
                       fontWeight: FontWeight.w800,
                     ),
               ),
@@ -890,7 +890,7 @@ class _BenefitItem extends StatelessWidget {
                 Text(
                   title,
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: AppColors.primaryNavy,
+                        color: AppColors.textPrimary,
                         fontWeight: FontWeight.w800,
                       ),
                 ),
@@ -954,11 +954,11 @@ class _DisclaimerBanner extends StatelessWidget {
               child: RichText(
                 text: TextSpan(
                   style: const TextStyle(
-                    color: Color(0xFF6B7280),
+                    color: Color(0xFF94A3B8),
                     fontSize: 12,
                     fontWeight: FontWeight.w400,
                   ).copyWith(
-                    color: AppColors.primaryNavy,
+                    color: AppColors.textPrimary,
                     height: 1.4,
                   ),
                   children: [
@@ -1005,11 +1005,8 @@ class _SectionLabel extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
-              color: Color(0xFF0052CC),
+              color: AppColors.textPrimary,
               fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ).copyWith(
-              color: AppColors.primaryNavy,
               fontWeight: FontWeight.w800,
               letterSpacing: 0,
             ),
@@ -1059,9 +1056,9 @@ class _DesktopHeader extends StatelessWidget implements PreferredSizeWidget {
               label: Text(items[index].label),
               style: TextButton.styleFrom(
                 foregroundColor:
-                    selected ? AppColors.primaryNavy : AppColors.textSecondary,
+                    selected ? AppColors.legalGold : AppColors.textSecondary,
                 backgroundColor:
-                    selected ? const Color(0xFFDCEBFF) : Colors.transparent,
+                    selected ? const Color(0xFF1F2937) : Colors.transparent,
                 minimumSize: const Size(48, 48),
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -1090,6 +1087,14 @@ class _HeaderLogo extends StatelessWidget {
       child: Image.asset(
         'assets/images/juslegal_logo.png',
         fit: BoxFit.contain,
+        errorBuilder: (context, error, stackTrace) {
+          return const Center(
+            child: Icon(
+              Icons.balance_rounded,
+              color: AppColors.white,
+            ),
+          );
+        },
       ),
     );
   }
@@ -1120,20 +1125,20 @@ class _FloatingBottomNav extends StatelessWidget {
               gradient: const LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [Color(0xFFFFFFFF), Color(0xFFF1F7FF)],
+                colors: [Color(0xFF111827), Color(0xFF1F2937)],
               ),
               borderRadius: BorderRadius.circular(24),
               border:
-                  Border.all(color: AppColors.white.withValues(alpha: 0.88)),
+                  Border.all(color: AppColors.border),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primaryNavy.withValues(alpha: 0.20),
-                  blurRadius: 34,
-                  offset: const Offset(0, 10),
+                  color: AppColors.shadowBlack,
+                  blurRadius: 28,
+                  offset: const Offset(0, 8),
                 ),
                 BoxShadow(
-                  color: AppColors.shadowGold.withValues(alpha: 0.18),
-                  blurRadius: 18,
+                  color: AppColors.shadowGold.withValues(alpha: 0.12),
+                  blurRadius: 16,
                   offset: const Offset(0, 2),
                 ),
               ],
@@ -1153,15 +1158,18 @@ class _FloatingBottomNav extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       decoration: BoxDecoration(
                         color: selected
-                            ? AppColors.primaryNavy
+                            ? const Color(0xFF1F2937)
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(20),
+                        border: selected
+                            ? Border.all(color: AppColors.legalGold.withValues(alpha: 0.4), width: 1)
+                            : null,
                         boxShadow: selected
                             ? [
                                 BoxShadow(
-                                  color: AppColors.shadow,
-                                  blurRadius: 12,
-                                  offset: const Offset(0, 4),
+                                  color: AppColors.shadowGold.withValues(alpha: 0.2),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 2),
                                 ),
                               ]
                             : null,
@@ -1172,7 +1180,7 @@ class _FloatingBottomNav extends StatelessWidget {
                           Icon(
                             selected ? item.selectedIcon : item.icon,
                             color: selected
-                                ? AppColors.white
+                                ? AppColors.legalGold
                                 : AppColors.textSecondary,
                             size: 24,
                           ),
@@ -1181,14 +1189,11 @@ class _FloatingBottomNav extends StatelessWidget {
                             item.label,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Color(0xFF6B7280),
-                              fontSize: 11,
-                              fontWeight: FontWeight.w400,
-                            ).copyWith(
+                            style: TextStyle(
                               color: selected
-                                  ? AppColors.white
+                                  ? AppColors.legalGold
                                   : AppColors.textSecondary,
+                              fontSize: 11,
                               fontWeight:
                                   selected ? FontWeight.w700 : FontWeight.w600,
                             ),

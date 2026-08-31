@@ -16,6 +16,7 @@ import '../../screens/legal_advice_screen.dart';
 import '../../screens/legal_terms_screen.dart';
 import '../../screens/legal_writing_screen.dart';
 import '../../screens/login_screen.dart';
+import '../../screens/login_screen_new.dart';
 import '../../screens/my_cases_screen.dart';
 import '../../screens/otp_screen.dart';
 import '../../screens/privacy_policy_screen.dart';
@@ -95,7 +96,7 @@ GoRouter buildRouter({required bool firebaseAvailable}) {
       GoRoute(
         path: '/login',
         name: AppRouteNames.login,
-        builder: (context, state) => const LoginScreen(),
+        builder: (context, state) => const LoginScreenNew(),
       ),
       GoRoute(
         path: '/email-auth',

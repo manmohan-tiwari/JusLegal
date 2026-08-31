@@ -16,6 +16,7 @@ import '../widgets/authority_card.dart';
 import '../widgets/shimmer_loader.dart';
 import '../widgets/step_card.dart';
 import '../widgets/legal_disclaimer_banner.dart';
+import '../widgets/siliconflow_image_widget.dart';
 
 class ResultScreen extends ConsumerStatefulWidget {
   final LegalResultModel? initialResult;
@@ -315,6 +316,11 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  CaseHeaderImageWidget(
+                    caseTitle: result.category,
+                    category: result.applicableLaw,
+                  ),
+                  const SizedBox(height: 20),
                   _buildConfidenceScore(Theme.of(context), result.confidence),
                   const SizedBox(height: 24),
                   _ReportCard(
@@ -448,7 +454,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                         child: Text(
                           r,
                           style: theme.textTheme.bodyMedium
-                              ?.copyWith(color: AppTheme.primaryNavy),
+                              ?.copyWith(color: AppTheme.textPrimary),
                         ),
                       ),
                     ],
@@ -460,7 +466,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
 
     return Text(
       result.userRights,
-      style: theme.textTheme.bodyMedium?.copyWith(color: AppTheme.primaryNavy),
+      style: theme.textTheme.bodyMedium?.copyWith(color: AppTheme.textPrimary),
     );
   }
 
@@ -554,7 +560,7 @@ class _ReportCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: AppTheme.background,
+      color: AppTheme.surface,
       clipBehavior: Clip.antiAlias,
       elevation: 0,
       margin: EdgeInsets.zero,
@@ -566,18 +572,18 @@ class _ReportCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            color: AppTheme.surface,
+            color: AppTheme.surfaceBright,
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                Icon(icon, color: AppTheme.trustBlue, size: 18),
+                Icon(icon, color: AppTheme.legalGold, size: 18),
                 const SizedBox(width: 8),
                 Text(
                   title,
                   style: const TextStyle(
-                    color: Color(0xFF1F2937),
+                    color: AppTheme.textPrimary,
                     fontSize: 16,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ],

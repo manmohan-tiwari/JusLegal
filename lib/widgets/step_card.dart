@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../core/config/theme_config.dart';
 
 class StepCard extends StatelessWidget {
@@ -20,10 +20,10 @@ class StepCard extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: AppTheme.cardGradientFor(AppTheme.primaryBlue),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.88)),
+        border: Border.all(color: AppTheme.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.10),
+            color: AppColors.shadowBlack,
             blurRadius: 16,
             offset: const Offset(0, 7),
           ),

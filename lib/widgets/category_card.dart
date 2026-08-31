@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../core/constants/app_animations.dart';
 import '../core/config/theme_config.dart';
 
@@ -30,10 +30,10 @@ class CategoryCard extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: AppTheme.cardGradientFor(iconColor),
           borderRadius: radius,
-          border: Border.all(color: Colors.white.withValues(alpha: 0.88)),
+          border: Border.all(color: AppTheme.border),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.13),
+              color: AppColors.shadowBlack,
               blurRadius: 18,
               offset: const Offset(0, 8),
             ),

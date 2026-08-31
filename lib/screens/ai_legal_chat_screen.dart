@@ -200,7 +200,7 @@ class _AILegalChatScreenState extends ConsumerState<AILegalChatScreen> {
                     hintText: 'Describe your legal issue...',
                     hintStyle: const TextStyle(color: AppColors.textSecondary),
                     filled: true,
-                    fillColor: const Color(0xFFF8FBFF),
+                    fillColor: AppColors.surfaceBright,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(24),
                       borderSide: const BorderSide(color: AppColors.border),
@@ -212,7 +212,7 @@ class _AILegalChatScreenState extends ConsumerState<AILegalChatScreen> {
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(24),
                       borderSide: const BorderSide(
-                          color: AppColors.primary, width: 1.5),
+                          color: AppColors.legalGold, width: 1.5),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                         horizontal: 18, vertical: 12),
@@ -230,7 +230,7 @@ class _AILegalChatScreenState extends ConsumerState<AILegalChatScreen> {
                   onPressed: chat.isSending ? null : _sendMessage,
                   style: IconButton.styleFrom(
                     minimumSize: const Size(48, 48),
-                    foregroundColor: AppColors.textPrimary,
+                    foregroundColor: const Color(0xFF0B0F19),
                   ),
                   icon: const Icon(Icons.send_rounded),
                 ),
@@ -509,9 +509,9 @@ class _SuggestionChip extends StatelessWidget {
             child: Text(
               label,
               style: const TextStyle(
-                color: AppColors.primaryNavy,
+                color: AppColors.textPrimary,
                 fontSize: 14,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),

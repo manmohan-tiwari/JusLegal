@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import '../core/exceptions/ai_exceptions.dart';
@@ -102,9 +101,12 @@ class SiliconFlowService {
       } else if (e.type == DioExceptionType.receiveTimeout) {
         throw TimeoutException('Receive timeout while generating image');
       } else if (e.response?.statusCode == 401) {
-        throw UnauthorizedException('Invalid or expired SiliconFlow API key');
+        throw ApiKeyException('SiliconFlow');
       } else if (e.response?.statusCode == 429) {
-        throw RateLimitException('SiliconFlow rate limit exceeded. Please try again later.');
+        throw RateLimitException(
+          'SiliconFlow rate limit exceeded. Please try again later.',
+          'SiliconFlow',
+        );
       }
 
       throw Exception('Image generation failed: ${e.message}');

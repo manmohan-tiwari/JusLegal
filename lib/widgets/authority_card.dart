@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../core/config/theme_config.dart';
 
 class AuthorityCard extends StatelessWidget {
@@ -21,10 +21,10 @@ class AuthorityCard extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: AppTheme.cardGradientFor(AppTheme.primaryBlue),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.88)),
+        border: Border.all(color: AppTheme.border),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.12),
+            color: AppColors.shadowBlack,
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -84,15 +84,15 @@ class AuthorityCard extends StatelessWidget {
           TextButton(
             onPressed: onAction,
             style: TextButton.styleFrom(
-              foregroundColor: AppTheme.primaryBlue,
+              foregroundColor: AppTheme.legalGold,
               minimumSize: const Size(48, 48),
             ),
             child: Text(
               action,
-              style: TextStyle(
-                color: AppTheme.primaryBlue,
+              style: const TextStyle(
+                color: AppTheme.legalGold,
                 fontSize: 14,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),

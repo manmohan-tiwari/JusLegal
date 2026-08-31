@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:juslegal/l10n/gen/app_localizations.dart';
 
+import '../core/config/theme_config.dart';
 import '../services/auth_handler.dart';
 import '../widgets/loading_widget.dart';
 
@@ -172,12 +173,12 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     final displayError = authState.error ?? _localError;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF1F2937)),
+          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
           onPressed: () => context.pop(),
         ),
       ),
@@ -194,7 +195,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                     style: GoogleFonts.merriweather(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFF1F2937),
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -202,7 +203,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                     l10n.otpSentTo(
                         widget.phoneNumber.replaceFirst('+91', '').trim()),
                     style: const TextStyle(
-                      color: Color(0xFF6B7280),
+                      color: AppColors.textSecondary,
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
                     ),
@@ -232,7 +233,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                                 style: GoogleFonts.inter(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
-                                  color: const Color(0xFF1F2937),
+                                  color: AppColors.textPrimary,
                                 ),
                                 decoration: const InputDecoration(
                                   counterText: "",
@@ -302,7 +303,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                           : TextButton(
                               onPressed: isLoading ? null : _resendOtp,
                               style: TextButton.styleFrom(
-                                foregroundColor: const Color(0xFF0052CC),
+                                foregroundColor: AppColors.legalGold,
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 12,
                                   horizontal: 8,

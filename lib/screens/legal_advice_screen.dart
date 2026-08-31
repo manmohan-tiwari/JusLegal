@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/config/theme_config.dart';
 import '../services/ai_service.dart';
 import '../widgets/legal_disclaimer_banner.dart';
+import '../widgets/siliconflow_image_widget.dart';
 
 class _QTemplate {
   final String display;
@@ -182,7 +183,7 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
     final selected = _selected;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FF),
+      backgroundColor: AppTheme.background,
       appBar: AppBar(
         title: const Text('Legal Information Q&A'),
         leading: BackButton(onPressed: () => Navigator.of(context).pop()),
@@ -223,20 +224,20 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
                 Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: Color(0xFF0052CC).withValues(alpha: 0.07),
+                    color: const Color(0xFF1F2937),
                     border: Border.all(
-                        color: Color(0xFF0052CC).withValues(alpha: 0.4)),
+                        color: AppTheme.legalGold.withValues(alpha: 0.5)),
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Row(
                     children: [
-                      Icon(selected.icon, color: Color(0xFF0052CC), size: 22),
+                      Icon(selected.icon, color: AppTheme.legalGold, size: 22),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           selected.display,
                           style: const TextStyle(
-                            color: Color(0xFF1F2937),
+                            color: AppTheme.textPrimary,
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                           ),
@@ -244,9 +245,22 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
                       ),
                       TextButton(
                         onPressed: _reset,
+                        style: TextButton.styleFrom(
+                          foregroundColor: AppTheme.legalGold,
+                        ),
                         child: const Text('Change'),
                       ),
                     ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Center(
+                  child: SiliconFlowImageWidget(
+                    prompt:
+                        'Professional Indian legal illustration for: ${selected.display}',
+                    width: double.infinity,
+                    height: 180,
+                    borderRadius: BorderRadius.circular(14),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -256,23 +270,24 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
                   controller: _controller,
                   maxLines: 4,
                   textInputAction: TextInputAction.done,
+                  style: const TextStyle(color: AppTheme.textPrimary),
                   decoration: InputDecoration(
                     hintText: selected.hint,
-                    hintStyle: TextStyle(color: Color(0xFF6B7280)),
+                    hintStyle: const TextStyle(color: AppColors.textSecondary),
                     filled: true,
-                    fillColor: Color(0xFFFFFFFF),
+                    fillColor: AppTheme.surface,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide(color: Color(0xFFE5E7EB)),
+                      borderSide: const BorderSide(color: AppTheme.border),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide(color: Color(0xFFE5E7EB)),
+                      borderSide: const BorderSide(color: AppTheme.border),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide:
-                          BorderSide(color: Color(0xFF0052CC), width: 1.5),
+                          const BorderSide(color: AppTheme.legalGold, width: 1.5),
                     ),
                     contentPadding: const EdgeInsets.all(14),
                   ),
@@ -284,8 +299,10 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
                   child: ElevatedButton(
                     onPressed: _loading ? null : _submit,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF1F2937),
-                      foregroundColor: Colors.white,
+                      backgroundColor: AppTheme.legalGold,
+                      foregroundColor: const Color(0xFF0B0F19),
+                      elevation: 4,
+                      shadowColor: AppColors.shadowGold,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
@@ -296,12 +313,12 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
                             height: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: Colors.white,
+                              color: Color(0xFF0B0F19),
                             ),
                           )
                         : const Text(
                             'Get Legal Information',
-                            style: TextStyle(fontWeight: FontWeight.w700),
+                            style: TextStyle(fontWeight: FontWeight.w800),
                           ),
                   ),
                 ),
@@ -343,7 +360,7 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
                 Text(
                   'AI-GENERATED INFORMATION',
                   style: const TextStyle(
-                    color: Color(0xFF0052CC),
+                    color: AppTheme.legalGold,
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
                   ),
@@ -357,8 +374,8 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
                     icon: const Icon(Icons.refresh_rounded, size: 18),
                     label: const Text('Ask Another Question'),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: Color(0xFF1F2937),
-                      side: BorderSide(color: Color(0xFFE5E7EB)),
+                      foregroundColor: AppTheme.legalGold,
+                      side: const BorderSide(color: AppTheme.legalGold),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -400,23 +417,23 @@ class _QuestionTile extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: AppTheme.trustBlue.withValues(alpha: 0.08),
+                  color: const Color(0xFF1F2937),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Icon(template.icon, color: AppTheme.trustBlue, size: 20),
+                child: Icon(template.icon, color: AppTheme.legalGold, size: 20),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   template.display,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppTheme.primaryNavy,
+                        color: AppTheme.textPrimary,
                         fontWeight: FontWeight.w500,
                       ),
                 ),
               ),
               const Icon(Icons.chevron_right_rounded,
-                  color: Color(0xFF9CA3AF), size: 20),
+                  color: AppColors.textSecondary, size: 20),
             ],
           ),
         ),
@@ -725,15 +742,15 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Container(width: 3, height: 14, color: AppTheme.trustBlue),
+        Container(width: 3, height: 14, color: AppTheme.legalGold),
         const SizedBox(width: 8),
         Text(
           title,
           style: const TextStyle(
-            color: Color(0xFF1F2937),
+            color: AppTheme.textPrimary,
             fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ).copyWith(color: AppTheme.primaryNavy),
+            fontWeight: FontWeight.w700,
+          ),
         ),
       ],
     );

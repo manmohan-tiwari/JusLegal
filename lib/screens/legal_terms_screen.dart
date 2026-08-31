@@ -201,8 +201,8 @@ If the term is not a legal term, return:
                             ? null
                             : () => _search(_searchController.text),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryNavy,
-                          foregroundColor: Colors.white,
+                          backgroundColor: AppColors.legalGold,
+                          foregroundColor: const Color(0xFF0B0F19),
                           elevation: 0,
                           padding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 10),
@@ -211,7 +211,10 @@ If the term is not a legal term, return:
                           ),
                         ),
                         child: const Text('Search',
-                            style: TextStyle(fontWeight: FontWeight.w700)),
+                            style: TextStyle(
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF0B0F19),
+                            )),
                       ),
                     ),
                   ],
@@ -301,7 +304,7 @@ If the term is not a legal term, return:
                     icon: const Icon(Icons.search_rounded, size: 18),
                     label: const Text('Search Another Term'),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.primaryNavy,
+                      foregroundColor: AppColors.legalGold,
                       side: const BorderSide(color: AppColors.border),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),

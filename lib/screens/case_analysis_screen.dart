@@ -203,7 +203,7 @@ Provide a thorough legal analysis covering all the above points.
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide:
-                          BorderSide(color: AppColors.trustBlue, width: 1.5),
+                          const BorderSide(color: AppColors.legalGold, width: 1.5),
                     ),
                     contentPadding: const EdgeInsets.all(14),
                   ),
@@ -219,16 +219,19 @@ Provide a thorough legal analysis covering all the above points.
                             width: 18,
                             height: 18,
                             child: CircularProgressIndicator(
-                                strokeWidth: 2, color: Colors.white),
+                                strokeWidth: 2, color: Color(0xFF0B0F19)),
                           )
                         : const Icon(Icons.track_changes_rounded, size: 20),
                     label: Text(
                       _loading ? 'Analyzing...' : 'Analyze My Case',
-                      style: const TextStyle(fontWeight: FontWeight.w700),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF0B0F19),
+                      ),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryNavy,
-                      foregroundColor: Colors.white,
+                      backgroundColor: AppColors.legalGold,
+                      foregroundColor: const Color(0xFF0B0F19),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
                       ),
@@ -255,8 +258,8 @@ Provide a thorough legal analysis covering all the above points.
                         icon: const Icon(Icons.refresh_rounded, size: 18),
                         label: const Text('New Analysis'),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.primaryNavy,
-                          side: BorderSide(color: AppColors.border),
+                          foregroundColor: AppColors.legalGold,
+                          side: const BorderSide(color: AppColors.border),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -290,8 +293,8 @@ class _OriginalCaseCardState extends State<_OriginalCaseCard> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.trustBlue.withValues(alpha: 0.05),
-        border: Border.all(color: AppColors.trustBlue.withValues(alpha: 0.3)),
+        color: AppColors.surfaceBright,
+        border: Border.all(color: AppColors.border),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
@@ -299,13 +302,13 @@ class _OriginalCaseCardState extends State<_OriginalCaseCard> {
         children: [
           Row(
             children: [
-              Icon(Icons.description_outlined,
-                  size: 16, color: AppColors.trustBlue),
+              const Icon(Icons.description_outlined,
+                  size: 16, color: AppColors.legalGold),
               const SizedBox(width: 6),
               Text(
                 'YOUR CASE',
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: AppColors.primaryNavy,
+                      color: AppColors.textPrimary,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.5,
                     ),
@@ -316,7 +319,7 @@ class _OriginalCaseCardState extends State<_OriginalCaseCard> {
                 child: Text(
                   _expanded ? 'Show less' : 'Show more',
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: AppColors.trustBlue,
+                        color: AppColors.legalGold,
                         fontWeight: FontWeight.w600,
                       ),
                 ),
@@ -329,7 +332,7 @@ class _OriginalCaseCardState extends State<_OriginalCaseCard> {
             maxLines: _expanded ? null : 2,
             overflow: _expanded ? TextOverflow.visible : TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.primaryNavy,
+                  color: AppColors.textSecondary,
                   height: 1.5,
                 ),
           ),

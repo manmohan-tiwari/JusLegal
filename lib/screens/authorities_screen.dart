@@ -386,7 +386,7 @@ class _AuthoritiesScreenState extends State<AuthoritiesScreen> {
                     Text(
                       name,
                       style: const TextStyle(
-                        color: Color(0xFF1F2937),
+                        color: AppColors.textPrimary,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -395,7 +395,7 @@ class _AuthoritiesScreenState extends State<AuthoritiesScreen> {
                     Text(
                       purpose,
                       style: const TextStyle(
-                        color: Color(0xFF6B7280),
+                        color: AppColors.textSecondary,
                         fontSize: 12,
                         fontWeight: FontWeight.w400,
                       ),
@@ -409,7 +409,7 @@ class _AuthoritiesScreenState extends State<AuthoritiesScreen> {
                 Icon(
                   actionIcon,
                   size: 16,
-                  color: AppColors.trustBlue,
+                  color: AppColors.legalGold,
                 ),
                 const SizedBox(width: 6),
               ],
@@ -430,7 +430,7 @@ class _AuthoritiesScreenState extends State<AuthoritiesScreen> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.background,
-        foregroundColor: AppColors.primaryNavy,
+        foregroundColor: AppColors.textPrimary,
         elevation: 0,
         title: const Text('Legal Authorities'),
       ),
@@ -502,7 +502,7 @@ class _ContactActionIcon extends StatelessWidget {
             Icon(
               icon,
               size: 18,
-              color: AppColors.primaryNavy,
+              color: AppColors.legalGold,
             ),
             const SizedBox(width: 6),
             Text(

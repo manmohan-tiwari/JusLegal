@@ -161,7 +161,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      backgroundColor: const Color(0xFFEAF1FF),
+      backgroundColor: AppColors.background,
       body: Stack(
         children: [
           const Positioned.fill(child: _LawLibraryBackdrop()),
@@ -302,7 +302,7 @@ class _TopBrandLockup extends StatelessWidget {
               padding: const EdgeInsets.all(12),
               child: const Icon(
                 Icons.balance_rounded,
-                color: AppColors.primaryNavy,
+                color: AppColors.primary,
                 size: 42,
               ),
             ),
@@ -313,7 +313,7 @@ class _TopBrandLockup extends StatelessWidget {
           'JusLegal. Your rights, our duty.',
           textAlign: TextAlign.center,
           style: GoogleFonts.inter(
-            color: const Color(0xFF102A56),
+            color: AppColors.textPrimary,
             fontSize: compact ? 24 : 28,
             height: 1.2,
             fontWeight: FontWeight.w800,
@@ -324,7 +324,7 @@ class _TopBrandLockup extends StatelessWidget {
           AppLocalizations.of(context).secureAccessPortal,
           textAlign: TextAlign.center,
           style: GoogleFonts.inter(
-            color: AppColors.grey700,
+            color: AppColors.textSecondary,
             fontSize: compact ? 14 : 15,
             fontWeight: FontWeight.w500,
           ),
@@ -366,14 +366,14 @@ class _AuthCard extends StatelessWidget {
         filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.94),
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(32),
             border: Border.all(
-              color: const Color(0xFFE1E8F7),
+              color: AppColors.border,
             ),
             boxShadow: const [
               BoxShadow(
-                color: Color(0x190A2D6F),
+                color: AppColors.shadowBlack,
                 blurRadius: 36,
                 offset: Offset(0, 18),
               ),
@@ -423,7 +423,7 @@ class _AuthCard extends StatelessWidget {
                     Text(
                       l10n.signInInstantlyWithPhoneOtp,
                       style: GoogleFonts.inter(
-                        color: const Color(0xFF102A56),
+                        color: AppColors.textPrimary,
                         fontSize: compact ? 16 : 17,
                         fontWeight: FontWeight.w800,
                       ),
@@ -453,16 +453,16 @@ class _AuthCard extends StatelessWidget {
                         ),
                         prefixIcon: const Icon(
                           Icons.phone_iphone_rounded,
-                          color: Color(0xFF4B638B),
+                          color: AppColors.legalGold,
                         ),
                         prefixText: '+91 ',
                         prefixStyle: GoogleFonts.inter(
-                          color: const Color(0xFF213A66),
+                          color: AppColors.legalGold,
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
                         ),
                         filled: true,
-                        fillColor: const Color(0xFFF7FAFF),
+                        fillColor: AppColors.surfaceBright,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 18,
                           vertical: 18,
@@ -470,13 +470,13 @@ class _AuthCard extends StatelessWidget {
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(18),
                           borderSide: const BorderSide(
-                            color: Color(0xFFD7E1F3),
+                            color: AppColors.border,
                           ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(18),
                           borderSide: const BorderSide(
-                            color: AppColors.primary,
+                            color: AppColors.legalGold,
                             width: 1.6,
                           ),
                         ),
@@ -496,11 +496,11 @@ class _AuthCard extends StatelessWidget {
                         onPressed: isLoading ? null : onOtpTap,
                         style: ElevatedButton.styleFrom(
                           elevation: 0,
-                          backgroundColor: AppColors.primary,
-                          disabledBackgroundColor: AppColors.primary.withValues(
+                          backgroundColor: AppColors.legalGold,
+                          disabledBackgroundColor: AppColors.legalGold.withValues(
                             alpha: 0.45,
                           ),
-                          foregroundColor: Colors.white,
+                          foregroundColor: const Color(0xFF0B0F19),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(18),
                           ),
@@ -510,6 +510,7 @@ class _AuthCard extends StatelessWidget {
                           style: GoogleFonts.inter(
                             fontSize: 16,
                             fontWeight: FontWeight.w800,
+                            color: const Color(0xFF0B0F19),
                           ),
                         ),
                       ),
@@ -533,9 +534,9 @@ class _AuthCard extends StatelessWidget {
                             onPressed: isLoading ? null : onEmailTap,
                             style: OutlinedButton.styleFrom(
                               minimumSize: const Size.fromHeight(48),
-                              backgroundColor: const Color(0xFFF8FAFD),
+                              backgroundColor: AppColors.surfaceBright,
                               side: const BorderSide(
-                                color: Color(0xFFE0E6F0),
+                                color: AppColors.border,
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
@@ -545,7 +546,7 @@ class _AuthCard extends StatelessWidget {
                               l10n.continueWithEmail,
                               textAlign: TextAlign.center,
                               style: GoogleFonts.inter(
-                                color: AppColors.grey700,
+                                color: AppColors.textPrimary,
                                 fontSize: compact ? 12 : 13,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -557,7 +558,7 @@ class _AuthCard extends StatelessWidget {
                           onPressed: isLoading ? null : onHelpTap,
                           style: TextButton.styleFrom(
                             minimumSize: const Size(92, 48),
-                            foregroundColor: const Color(0xFF2A74F5),
+                            foregroundColor: AppColors.legalGold,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14),
                             ),

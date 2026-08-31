@@ -53,6 +53,7 @@ flutter:
   generate: true
 
   assets:
+    - .env
     - assets/legal_kb.json
     - assets/images/juslegal_logo.png
 

@@ -108,7 +108,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF1F2937),
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 6),
@@ -120,33 +120,34 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       fontWeight: FontWeight.w700,
                       letterSpacing: 1.5,
                       fontSize: 16,
+                      color: AppColors.textPrimary,
                     ),
                     decoration: InputDecoration(
                       hintText: l10n.typeDeleteHint,
-                      hintStyle: TextStyle(
+                      hintStyle: const TextStyle(
                         letterSpacing: 1.5,
                         fontWeight: FontWeight.w600,
-                        color: Colors.grey.shade400,
+                        color: AppColors.textSecondary,
                       ),
                       isDense: true,
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: AppColors.surface,
                       contentPadding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 12),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                        borderSide: const BorderSide(color: AppColors.border),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
+                        borderSide: const BorderSide(color: AppColors.border),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
                         borderSide: BorderSide(
                             color: canDelete
                                 ? Colors.red
-                                : AppColors.primaryNavy),
+                                : AppColors.legalGold),
                       ),
                     ),
                   ),
@@ -166,7 +167,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 TextButton(
                   onPressed: () => Navigator.of(dialogContext).pop(false),
                   style: TextButton.styleFrom(
-                    foregroundColor: AppColors.primaryNavy,
+                    foregroundColor: AppColors.textSecondary,
                   ),
                   child: Text(l10n.cancel),
                 ),
@@ -246,6 +247,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       await user.delete();
     }
 
+    if (!mounted) return;
     showDialog<void>(
       context: context,
       barrierDismissible: false,
@@ -447,6 +449,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
     try {
       await attemptDelete();
+      if (!mounted) return;
       Navigator.of(context).pop();
       await cleanupAndNavigateToLogin(
           successMessage: l10n.accountDeletedSuccess);
@@ -454,11 +457,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       if (e.code == 'requires-recent-login') {
         final reauthOk = await handleReauthRequired();
         if (!reauthOk) {
+          if (!mounted) return;
           try {
             Navigator.of(context).pop();
           } catch (_) {}
           return;
         }
+        if (!mounted) return;
         showDialog<void>(
           context: context,
           barrierDismissible: false,
@@ -489,34 +494,35 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         );
         try {
           await attemptDelete();
+          if (!mounted) return;
           Navigator.of(context).pop();
           await cleanupAndNavigateToLogin(
               successMessage: l10n.accountDeletedSuccess);
         } on FirebaseAuthException catch (e2) {
-          Navigator.of(context).pop();
           if (!mounted) return;
+          Navigator.of(context).pop();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(e2.message ?? l10n.unableToDeleteAccount),
             ),
           );
         } catch (_) {
-          Navigator.of(context).pop();
           if (!mounted) return;
+          Navigator.of(context).pop();
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(l10n.unableToDeleteAccount)),
           );
         }
       } else {
-        Navigator.of(context).pop();
         if (!mounted) return;
+        Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(e.message ?? l10n.unableToDeleteAccount)),
         );
       }
     } catch (_) {
-      Navigator.of(context).pop();
       if (!mounted) return;
+      Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.unableToDeleteAccount)),
       );
@@ -532,7 +538,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           title: Text(
             l10n.legalDisclaimer,
             style: const TextStyle(
-              color: Color(0xFF1F2937),
+              color: AppColors.textPrimary,
               fontSize: 16,
               fontWeight: FontWeight.w700,
             ),
@@ -540,7 +546,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           content: Text(
             AppConfig.onboardingDisclaimer,
             style: const TextStyle(
-              color: Color(0xFF6B7280),
+              color: AppColors.textSecondary,
               fontSize: 12,
               fontWeight: FontWeight.w400,
             ),
@@ -549,7 +555,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
               style: TextButton.styleFrom(
-                foregroundColor: AppColors.primaryNavy,
+                foregroundColor: AppColors.legalGold,
               ),
               child: Text(l10n.ok),
             ),
@@ -571,7 +577,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         title: Text(l10n.settings),
         backgroundColor: AppColors.background,
         elevation: 0,
-        foregroundColor: AppColors.primaryNavy,
+        foregroundColor: AppColors.textPrimary,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -583,9 +589,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   l10n.preferences.toUpperCase(),
                   style: const TextStyle(
                     letterSpacing: 1.0,
-                    color: Color(0xFF6B7280),
+                    color: AppColors.legalGold,
                     fontSize: 11,
-                    fontWeight: FontWeight.w400,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
@@ -608,9 +614,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   l10n.appInfo.toUpperCase(),
                   style: const TextStyle(
                     letterSpacing: 1.0,
-                    color: Color(0xFF6B7280),
+                    color: AppColors.legalGold,
                     fontSize: 11,
-                    fontWeight: FontWeight.w400,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
@@ -637,9 +643,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   l10n.legal.toUpperCase(),
                   style: const TextStyle(
                     letterSpacing: 1.0,
-                    color: Color(0xFF6B7280),
+                    color: AppColors.legalGold,
                     fontSize: 11,
-                    fontWeight: FontWeight.w400,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
@@ -689,9 +695,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   l10n.account.toUpperCase(),
                   style: const TextStyle(
                     letterSpacing: 1.0,
-                    color: Color(0xFF6B7280),
+                    color: AppColors.legalGold,
                     fontSize: 11,
-                    fontWeight: FontWeight.w400,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ),

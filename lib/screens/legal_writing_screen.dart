@@ -299,7 +299,7 @@ Now write the complete ${type.label}:
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: AppColors.trustBlue, width: 1.5),
+        borderSide: const BorderSide(color: AppColors.legalGold, width: 1.5),
       ),
       contentPadding: const EdgeInsets.all(12),
     );
@@ -394,8 +394,8 @@ Now write the complete ${type.label}:
                               icon: const Icon(Icons.picture_as_pdf),
                               label: const Text('Download / Print PDF'),
                               style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      Theme.of(context).primaryColor,
+                                  backgroundColor: AppColors.legalGold,
+                                  foregroundColor: const Color(0xFF0B0F19),
                                   padding:
                                       const EdgeInsets.symmetric(vertical: 14)),
                               onPressed: state.loading

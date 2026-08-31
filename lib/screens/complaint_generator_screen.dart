@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../core/config/theme_config.dart';
 import '../providers/ai_provider.dart';
 import '../providers/complaint_provider.dart';
 import '../providers/problem_provider.dart';
@@ -321,22 +322,22 @@ class _ComplaintGeneratorScreenState
                       children: [
                         // Status Card
                         Card(
-                          color: Color(0xFFF5F7FF),
+                          color: AppColors.surface,
                           elevation: 0,
                           margin: EdgeInsets.zero,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
-                            side: const BorderSide(color: Color(0xFFE5E7EB)),
+                            side: const BorderSide(color: AppColors.border),
                           ),
                           child: Padding(
                             padding: const EdgeInsets.all(16),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
+                                const Text(
                                   'Recipient',
-                                  style: const TextStyle(
-                                      color: Color(0xFF1F2937),
+                                  style: TextStyle(
+                                      color: AppColors.textPrimary,
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600),
                                 ),
@@ -344,7 +345,7 @@ class _ComplaintGeneratorScreenState
                                 Text(
                                   parsedAuthority,
                                   style: const TextStyle(
-                                      color: Color(0xFF1F2937),
+                                      color: AppColors.textPrimary,
                                       fontSize: 14,
                                       fontWeight: FontWeight.w400),
                                 ),
@@ -357,7 +358,7 @@ class _ComplaintGeneratorScreenState
                                     Text(
                                       date,
                                       style: const TextStyle(
-                                          color: Color(0xFF6B7280),
+                                          color: AppColors.textSecondary,
                                           fontSize: 12,
                                           fontWeight: FontWeight.w400),
                                     ),
@@ -370,10 +371,10 @@ class _ComplaintGeneratorScreenState
                         const SizedBox(height: 24),
 
                         // Tone Selector
-                        Text(
+                        const Text(
                           'Select Tone',
-                          style: const TextStyle(
-                              color: Color(0xFF1F2937),
+                          style: TextStyle(
+                              color: AppColors.textPrimary,
                               fontSize: 16,
                               fontWeight: FontWeight.w600),
                         ),
@@ -395,19 +396,26 @@ class _ComplaintGeneratorScreenState
                                         },
                                   style: OutlinedButton.styleFrom(
                                     backgroundColor: isSelected
-                                        ? Color(0xFF0052CC)
-                                        : Color(0xFFF5F7FF),
+                                        ? AppColors.legalGold
+                                        : AppColors.surfaceBright,
                                     foregroundColor: isSelected
-                                        ? Color(0xFFF5F7FF)
-                                        : Color(0xFF1F2937),
+                                        ? const Color(0xFF0B0F19)
+                                        : AppColors.textPrimary,
                                     side: BorderSide(
                                         color: isSelected
-                                            ? Color(0xFF0052CC)
-                                            : Color(0xFFE5E7EB)),
+                                            ? AppColors.legalGold
+                                            : AppColors.border),
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 12),
                                   ),
-                                  child: Text(tone),
+                                  child: Text(
+                                    tone,
+                                    style: TextStyle(
+                                      fontWeight: isSelected
+                                          ? FontWeight.w800
+                                          : FontWeight.w500,
+                                    ),
+                                  ),
                                 ),
                               ),
                             );
@@ -416,21 +424,21 @@ class _ComplaintGeneratorScreenState
                         const SizedBox(height: 24),
 
                         // Letter Preview Card
-                        Text(
+                        const Text(
                           'Letter Preview',
-                          style: const TextStyle(
-                              color: Color(0xFF1F2937),
+                          style: TextStyle(
+                              color: AppColors.textPrimary,
                               fontSize: 16,
                               fontWeight: FontWeight.w600),
                         ),
                         const SizedBox(height: 12),
                         Card(
-                          color: Color(0xFFFFFFFF),
+                          color: AppColors.surface,
                           elevation: 0,
                           margin: EdgeInsets.zero,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
-                            side: const BorderSide(color: Color(0xFFE5E7EB)),
+                            side: const BorderSide(color: AppColors.border),
                           ),
                           child: Column(
                             children: [

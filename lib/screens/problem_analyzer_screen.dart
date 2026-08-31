@@ -284,9 +284,9 @@ Summary: $summaryText
       children: [
         LinearProgressIndicator(
           value: _currentStep / 3,
-          backgroundColor: const Color(0xFFFFFFFF),
-          color: const Color(0xFF0052CC),
-          minHeight: 2,
+          backgroundColor: AppColors.surfaceBright,
+          color: AppColors.legalGold,
+          minHeight: 3,
         ),
       ],
     );
@@ -331,7 +331,7 @@ Summary: $summaryText
                       icon: category.icon,
                       title: category.name,
                       subtitle: category.description,
-                      iconColor: const Color(0xFF0052CC),
+                      iconColor: AppColors.legalGold,
                       onTap: () {
                         HapticFeedback.lightImpact();
                         setState(() {
@@ -501,28 +501,28 @@ Summary: $summaryText
             ),
           ),
           const SizedBox(height: 24),
-          Text('Evidence',
-              style: const TextStyle(
-                color: Color(0xFF1F2937),
+          const Text('Evidence',
+              style: TextStyle(
+                color: AppColors.textPrimary,
                 fontSize: 14,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w700,
               )),
           const SizedBox(height: 8),
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFFFFF),
-              borderRadius: BorderRadius.circular(8),
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: const Color(0xFFE5E7EB),
+                color: AppColors.border,
                 width: 1,
               ),
             ),
             child: Column(
               children: [
                 const Icon(Icons.cloud_upload_outlined,
-                    color: Color(0xFF0052CC), size: 32),
+                    color: AppColors.legalGold, size: 32),
                 const SizedBox(height: 8),
                 TextButton(
                   onPressed: () async {
@@ -624,19 +624,19 @@ Summary: $summaryText
           child: Text(
             stepLabel,
             style: const TextStyle(
-              color: Color(0xFF6B7280),
+              color: AppColors.textSecondary,
               fontSize: 12,
-              fontWeight: FontWeight.w400,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ),
         Card(
-          color: const Color(0xFFF5F7FF),
+          color: AppColors.surface,
           elevation: 0,
           margin: const EdgeInsets.symmetric(horizontal: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(color: Color(0xFFE5E7EB)),
+            side: const BorderSide(color: AppColors.border),
           ),
           child: Padding(
             padding: const EdgeInsets.all(16),

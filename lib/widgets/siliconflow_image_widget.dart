@@ -11,13 +11,13 @@ class SiliconFlowImageWidget extends ConsumerWidget {
   final BorderRadius? borderRadius;
 
   const SiliconFlowImageWidget({
-    Key? key,
+    super.key,
     required this.prompt,
     this.width,
     this.height,
     this.fit = BoxFit.cover,
     this.borderRadius,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -105,11 +105,11 @@ class CaseHeaderImageWidget extends ConsumerWidget {
   final VoidCallback? onRetry;
 
   const CaseHeaderImageWidget({
-    Key? key,
+    super.key,
     required this.caseTitle,
     required this.category,
     this.onRetry,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -150,7 +150,7 @@ class CaseHeaderImageWidget extends ConsumerWidget {
                     end: Alignment.bottomCenter,
                     colors: [
                       Colors.transparent,
-                      Colors.black.withOpacity(0.5),
+                      Colors.black.withValues(alpha: 0.5),
                     ],
                   ),
                 ),
@@ -236,11 +236,11 @@ class CaseTimelineVisualizationWidget extends ConsumerWidget {
   final double? imageHeight;
 
   const CaseTimelineVisualizationWidget({
-    Key? key,
+    super.key,
     required this.caseType,
     required this.stages,
     this.imageHeight = 180,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

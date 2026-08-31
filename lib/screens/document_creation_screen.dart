@@ -171,15 +171,14 @@ class _DocumentCreationScreenState
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: AppColors.trustBlue.withValues(alpha: 0.06),
-            border:
-                Border.all(color: AppColors.trustBlue.withValues(alpha: 0.3)),
+            color: AppColors.surfaceBright,
+            border: Border.all(color: AppColors.border),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
             children: [
-              Icon(Icons.auto_awesome_rounded,
-                  color: AppColors.trustBlue, size: 18),
+              const Icon(Icons.auto_awesome_rounded,
+                  color: AppColors.legalGold, size: 18),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
@@ -188,8 +187,8 @@ class _DocumentCreationScreenState
                     Text(
                       'AI Enhancement',
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: AppColors.primaryNavy,
-                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                            fontWeight: FontWeight.w700,
                           ),
                     ),
                     Text(
@@ -205,7 +204,7 @@ class _DocumentCreationScreenState
               Switch(
                 value: state.useAI,
                 onChanged: (v) => notifier.toggleAI(v),
-                activeThumbColor: AppColors.trustBlue,
+                activeThumbColor: AppColors.legalGold,
               ),
             ],
           ),
@@ -252,11 +251,14 @@ class _DocumentCreationScreenState
                 : const Icon(Icons.check_circle_outline, size: 20),
             label: Text(
               state.isLoading ? 'Generating...' : 'Generate Form',
-              style: const TextStyle(fontWeight: FontWeight.w700),
+              style: const TextStyle(
+                fontWeight: FontWeight.w800,
+                color: Color(0xFF0B0F19),
+              ),
             ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryNavy,
-              foregroundColor: Colors.white,
+              backgroundColor: AppColors.legalGold,
+              foregroundColor: const Color(0xFF0B0F19),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
               ),
