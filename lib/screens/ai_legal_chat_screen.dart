@@ -6,8 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../core/constants/app_animations.dart';
-import '../core/config/theme_config.dart';
+import 'package:juslegal/core/core.dart';
 import '../models/chat_message_model.dart';
 import '../providers/ai_provider.dart';
 

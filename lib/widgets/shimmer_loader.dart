@@ -1,7 +1,7 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
-import '../core/config/theme_config.dart';
+import 'package:juslegal/core/core.dart';
 
 /// A shimmer loading widget that displays 3 stacked placeholder cards
 /// with a shimmer effect while content is being loaded.

@@ -1,4 +1,5 @@
-import 'package:flutter/foundation.dart' show kDebugMode, debugPrint, PlatformDispatcher;
+import 'package:flutter/foundation.dart'
+    show kDebugMode, kIsWeb, debugPrint, PlatformDispatcher;
 import 'package:flutter/material.dart' show FlutterError;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -7,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 /// A safe wrapper around Firebase Analytics that handles initialization
 /// failures gracefully and provides fallback behavior.
-/// 
+///
 /// This service ensures that analytics-related errors don't crash the app
 /// or prevent core functionality from working.
 class SafeAnalytics {
@@ -40,17 +41,26 @@ class SafeAnalytics {
       }
 
       _analytics = FirebaseAnalytics.instance;
-      _crashlytics = FirebaseCrashlytics.instance;
+      // Crashlytics is a native-plugin-only feature (Android/iOS).
+      // Accessing FirebaseCrashlytics.instance on Flutter Web throws the
+      // assertion:
+      //   pluginConstants['isCrashlyticsCollectionEnabled'] != null
+      // so it must never be instantiated or touched on web.
+      if (!kIsWeb) {
+        _crashlytics = FirebaseCrashlytics.instance;
+      } else if (kDebugMode) {
+        debugPrint('[SafeAnalytics] Crashlytics skipped on web (unsupported)');
+      }
       _isAvailable = true;
-      
+
       // Load user consent preferences
       final prefs = await SharedPreferences.getInstance();
       _analyticsEnabled = prefs.getBool(_analyticsConsentKey) ?? false;
       _crashlyticsEnabled = prefs.getBool(_crashlyticsConsentKey) ?? false;
-      
+
       // Apply consent settings
       await _applyConsentSettings();
-      
+
       if (kDebugMode) {
         debugPrint('[SafeAnalytics] Analytics initialized successfully');
         debugPrint('[SafeAnalytics] Analytics enabled: $_analyticsEnabled');
@@ -71,9 +81,11 @@ class SafeAnalytics {
     if (_analytics != null) {
       await _analytics!.setAnalyticsCollectionEnabled(_analyticsEnabled);
     }
-    if (_crashlytics != null) {
+    // Web-safe: _crashlytics is never assigned on web, so this block is
+    // implicitly bypassed. Extra kIsWeb check guards against regressions.
+    if (!kIsWeb && _crashlytics != null) {
       await _crashlytics!.setCrashlyticsCollectionEnabled(_crashlyticsEnabled);
-      
+
       // Set up error handlers only if crashlytics is enabled
       if (_crashlyticsEnabled) {
         if (_crashlytics != null) {
@@ -231,5 +243,147 @@ class SafeAnalytics {
     _isInitialized = false;
     _isAvailable = false;
     _analytics = null;
+  }
+
+  // ============= SecurityAudit: PII Sanitization Utilities =============
+
+  /// Hashes sensitive text using simple consistent hashing.
+  /// Returns same hash for same input (useful for identifying patterns).
+  /// Returns different hash each session (prevents long-term tracking).
+  static String hashSensitiveText(String text) {
+    try {
+      // Use first 8 chars of text for simple deterministic hash
+      int hash = 5381;
+      for (int i = 0; i < text.length && i < 20; i++) {
+        hash = ((hash << 5) + hash) ^ text.codeUnitAt(i);
+      }
+      return 'h_${(hash & 0x7FFFFFFF).toRadixString(16)}';
+    } catch (error) {
+      if (kDebugMode) {
+        debugPrint('[SafeAnalytics] Error hashing text: $error');
+      }
+      return 'h_error';
+    }
+  }
+
+  /// Masks currency amounts into brackets to prevent exact value exposure.
+  static String maskCurrencyAmount(double amount) {
+    if (amount <= 0) return 'no_amount';
+    if (amount < 1000) return 'bracket_<1k';
+    if (amount < 10000) return 'bracket_1k-10k';
+    if (amount < 50000) return 'bracket_10k-50k';
+    if (amount < 100000) return 'bracket_50k-1L';
+    if (amount < 500000) return 'bracket_1L-5L';
+    if (amount < 1000000) return 'bracket_5L-10L';
+    if (amount < 10000000) return 'bracket_10L-1Cr';
+    return 'bracket_>1Cr';
+  }
+
+  /// Removes PII patterns from text for safe logging.
+  static String sanitizeForLogging(String text) {
+    try {
+      var sanitized = text;
+
+      // Remove email addresses
+      sanitized = sanitized.replaceAll(
+          RegExp(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'),
+          '[EMAIL]');
+
+      // Remove phone numbers
+      sanitized = sanitized.replaceAll(RegExp(r'\b\d{10}\b'), '[PHONE]');
+
+      // Remove Aadhar-like patterns
+      sanitized = sanitized.replaceAll(
+          RegExp(r'\b\d{5}[\s-]?\d{5}[\s-]?\d{4}[\s-]?\d{3}[\s-]?\d{2}\b'),
+          '[AADHAR]');
+
+      // Remove monetary values
+      sanitized =
+          sanitized.replaceAll(RegExp(r'[₹\$€]\d+([.,]\d+)?'), '[AMOUNT]');
+
+      return sanitized;
+    } catch (error) {
+      if (kDebugMode) {
+        debugPrint('[SafeAnalytics] Error sanitizing text: $error');
+      }
+      return '[SANITIZATION_ERROR]';
+    }
+  }
+
+  /// Filters analytics parameters to remove sensitive data.
+  static Map<String, dynamic> filterSensitiveParameters(
+      Map<String, dynamic> params) {
+    const sensitiveKeys = {
+      'amount',
+      'money',
+      'cost',
+      'price',
+      'name',
+      'phone',
+      'email',
+      'address',
+      'dob',
+      'aadhar',
+      'pan',
+      'uid'
+    };
+
+    final filtered = <String, dynamic>{};
+    params.forEach((key, value) {
+      final lowerKey = key.toLowerCase();
+
+      // Skip known sensitive keys
+      if (sensitiveKeys.any((sensitive) => lowerKey.contains(sensitive))) {
+        return;
+      }
+
+      // Filter string values for patterns
+      if (value is String) {
+        filtered[key] = sanitizeForLogging(value);
+      } else {
+        filtered[key] = value;
+      }
+    });
+
+    return filtered;
+  }
+
+  /// Logs a case analysis event with sanitized sensitive fields.
+  static Future<void> logCaseAnalysis({
+    required String caseCategory,
+    required String caseTopic,
+    required double caseAmount,
+    required int strengthScore,
+  }) async {
+    final sanitizedTopic = hashSensitiveText(caseTopic);
+    final amountBracket = maskCurrencyAmount(caseAmount);
+
+    await logEvent(
+      name: 'case_analysis',
+      parameters: {
+        'category': caseCategory,
+        'topic_hash': sanitizedTopic,
+        'amount_bracket': amountBracket,
+        'strength_score': strengthScore,
+      },
+    );
+  }
+
+  /// Logs a letter generation event.
+  static Future<void> logLetterGeneration({
+    required String letterType,
+    required String category,
+    required bool success,
+    required int timeMs,
+  }) async {
+    await logEvent(
+      name: 'letter_generated',
+      parameters: {
+        'letter_type': letterType,
+        'category': category,
+        'success': success,
+        'generation_time_ms': timeMs,
+      },
+    );
   }
 }

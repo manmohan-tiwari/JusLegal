@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../core/config/theme_config.dart';
+import 'package:juslegal/core/core.dart';
 import '../providers/ai_provider.dart';
 import '../providers/complaint_provider.dart';
 import '../providers/problem_provider.dart';

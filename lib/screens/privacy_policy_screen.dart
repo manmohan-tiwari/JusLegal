@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../core/constants/app_config.dart';
-import '../core/config/theme_config.dart';
+import 'package:juslegal/core/core.dart';
 import '../core/services/analytics_service.dart';
 
 class PrivacyPolicyScreen extends ConsumerStatefulWidget {

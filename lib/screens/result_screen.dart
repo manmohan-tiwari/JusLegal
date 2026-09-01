@@ -5,7 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../core/config/theme_config.dart';
+import 'package:juslegal/core/core.dart';
+import 'package:juslegal/l10n/gen/app_localizations.dart';
 import '../models/legal_result_model.dart';
 import '../models/saved_case_model.dart';
 
@@ -28,10 +29,10 @@ class ResultScreen extends ConsumerStatefulWidget {
 }
 
 class _ResultScreenState extends ConsumerState<ResultScreen> {
-  ({Color color, String label}) _confidenceMeta(int confidence) {
-    if (confidence > 70) return (color: AppTheme.success, label: 'Strong supporting evidence');
-    if (confidence >= 40) return (color: AppTheme.legalGold, label: 'Moderate supporting evidence');
-    return (color: AppTheme.error, label: 'Limited supporting evidence');
+  ({Color color, String label}) _confidenceMeta(AppLocalizations l10n, int confidence) {
+    if (confidence > 70) return (color: AppTheme.success, label: l10n.strongCase);
+    if (confidence >= 40) return (color: AppTheme.legalGold, label: l10n.moderateCase);
+    return (color: AppTheme.error, label: l10n.weakCase);
   }
 
   Widget _maybeTruncatedLawChip(String text) {
@@ -62,6 +63,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
 
   Future<void> _saveCase(
       BuildContext context, WidgetRef ref, LegalResultModel result) async {
+    final l10n = AppLocalizations.of(context);
     final problem = ref.read(problemProvider);
 
     final caseModel = SavedCaseModel(
@@ -86,8 +88,8 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
               children: [
                 const Icon(Icons.check_circle_outline, color: Colors.white),
                 const SizedBox(width: 8),
-                const Text(
-                  'Case saved to My Cases',
+                Text(
+                  l10n.caseSavedToMyCases,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 14,
@@ -103,7 +105,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Unable to save case. Please try again.'),
+            content: Text(l10n.unableToSaveCase),
             backgroundColor: AppTheme.error,
           ),
         );
@@ -114,6 +116,8 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
   void _generateComplaint(BuildContext context) {
     context.push('/home/complaint');
   }
+
+  AppLocalizations _l10n(BuildContext context) => AppLocalizations.of(context);
 
   Future<void> _launchAuthorityWebsite(String website) async {
     final cleaned = website.trim();
@@ -131,6 +135,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = _l10n(context);
     final analysisAsync = ref.watch(analysisProvider);
     final fallbackResult =
         widget.initialResult ?? ref.watch(lastResultProvider);
@@ -139,7 +144,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
       data: (state) {
         final result = fallbackResult ?? state.result?.value;
         if (result == null) {
-          return _buildNoAnalysisScreen(context);
+          return _buildNoAnalysisScreen(context, l10n);
         }
         return _buildResultScreen(context, ref, result);
       },
@@ -149,7 +154,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
               isRefreshing: true);
         }
         return Scaffold(
-          appBar: AppBar(title: const Text('Your Legal Analysis')),
+          appBar: AppBar(title: Text(l10n.yourLegalAnalysis)),
           body: const ShimmerLoader(),
         );
       },
@@ -158,17 +163,18 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
           return _buildResultScreen(context, ref, fallbackResult,
               errorMessage: error.toString());
         }
-        return _buildErrorScreen(context, ref, error.toString());
+        return _buildErrorScreen(context, ref, l10n, error.toString());
       },
     );
   }
 
-  Widget _buildNoAnalysisScreen(BuildContext context) {
+  Widget _buildNoAnalysisScreen(
+      BuildContext context, AppLocalizations l10n) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Your Legal Analysis')),
+      appBar: AppBar(title: Text(l10n.yourLegalAnalysis)),
       body: Center(
         child: Text(
-          'No analysis available',
+          l10n.noAnalysisAvailable,
           style: const TextStyle(
             color: Color(0xFF1F2937),
             fontSize: 16,
@@ -180,9 +186,9 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
   }
 
   Widget _buildErrorScreen(
-      BuildContext context, WidgetRef ref, String errorMessage) {
+      BuildContext context, WidgetRef ref, AppLocalizations l10n, String errorMessage) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Your Legal Analysis')),
+      appBar: AppBar(title: Text(l10n.yourLegalAnalysis)),
       body: Center(
         child: Card(
           color: AppTheme.background,
@@ -203,7 +209,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'Something went wrong',
+                  l10n.somethingWentWrong,
                   style: const TextStyle(
                     color: Color(0xFF1F2937),
                     fontSize: 16,
@@ -227,7 +233,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                     HapticFeedback.lightImpact();
                     ref.invalidate(analysisProvider);
                   },
-                  child: const Text('Retry'),
+                  child: Text(l10n.retry),
                 ),
               ],
             ),
@@ -244,6 +250,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
     bool isRefreshing = false,
     String? errorMessage,
   }) {
+    final l10n = _l10n(context);
     final canGenerateComplaint = result.steps.isNotEmpty;
     final generateComplaintButton = ElevatedButton(
       onPressed: canGenerateComplaint
@@ -252,18 +259,18 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
               _generateComplaint(context);
             }
           : null,
-      child: const Text('Generate Complaint'),
+      child: Text(l10n.generateComplaint),
     );
     final generateComplaintButtonWithState = canGenerateComplaint
         ? generateComplaintButton
         : Tooltip(
-            message: 'Analysis incomplete',
+          message: l10n.analysisIncomplete,
             child: AbsorbPointer(child: generateComplaintButton),
           );
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Your Legal Analysis'),
+        title: Text(l10n.yourLegalAnalysis),
         actions: [
           IconButton(
             onPressed: () => _share(result),
@@ -290,7 +297,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      errorMessage ?? 'Updating analysis...',
+                      errorMessage ?? l10n.updatingAnalysisStatus,
                       style: TextStyle(
                         color: errorMessage != null
                             ? Colors.white
@@ -305,7 +312,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                         HapticFeedback.lightImpact();
                         ref.invalidate(analysisProvider);
                       },
-                      child: const Text('Retry'),
+                      child: Text(l10n.retry),
                     ),
                 ],
               ),
@@ -321,28 +328,28 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                     category: result.applicableLaw,
                   ),
                   const SizedBox(height: 20),
-                  _buildConfidenceScore(Theme.of(context), result.confidence),
+                  _buildConfidenceScore(Theme.of(context), _l10n(context), result.confidence),
                   const SizedBox(height: 24),
                   _ReportCard(
-                    title: 'Your Rights',
+                    title: l10n.yourRights,
                     icon: Icons.gavel_rounded,
                     child: _buildRightsContent(Theme.of(context), result),
                   ),
                   const SizedBox(height: 16),
                   _ReportCard(
-                    title: 'Recommended Steps',
+                    title: l10n.recommendedSteps,
                     icon: Icons.checklist_rtl_rounded,
                     child: _buildStepsContent(result),
                   ),
                   const SizedBox(height: 16),
                   _ReportCard(
-                    title: 'Relevant Laws',
+                    title: l10n.relevantLaws,
                     icon: Icons.menu_book_rounded,
                     child: _buildLawsContent(result),
                   ),
                   const SizedBox(height: 16),
                   _ReportCard(
-                    title: 'Authorities to Contact',
+                    title: l10n.authoritiesToContact,
                     icon: Icons.account_balance_rounded,
                     child: _buildAuthoritiesContent(result),
                   ),
@@ -367,7 +374,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                       HapticFeedback.lightImpact();
                       _saveCase(context, ref, result);
                     },
-                    child: const Text('Save Case'),
+                    child: Text(l10n.saveCase),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -382,8 +389,9 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
     );
   }
 
-  Widget _buildConfidenceScore(ThemeData theme, int confidence) {
-    final meta = _confidenceMeta(confidence);
+  Widget _buildConfidenceScore(
+      ThemeData theme, AppLocalizations l10n, int confidence) {
+    final meta = _confidenceMeta(l10n, confidence);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -391,7 +399,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
           children: [
             Expanded(
               child: Text(
-                'Confidence Score',
+                l10n.confidenceScore,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: AppTheme.textSecondary,
                 ),
@@ -502,7 +510,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
             _maybeTruncatedLawChip(
               result.applicableLaw.isNotEmpty
                   ? result.applicableLaw
-                  : 'Unknown',
+                  : AppLocalizations.of(context).unknown,
             ),
           ];
 
@@ -516,7 +524,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
   Widget _buildAuthoritiesContent(LegalResultModel result) {
     if ((result.authoritiesDetailed ?? []).isEmpty &&
         result.authorities.isEmpty) {
-      return const Text('No authorities listed for this case.');
+      return Text(AppLocalizations.of(context).noAuthoritiesListedForThisCase);
     }
     return Column(
       children:
@@ -535,7 +543,9 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                 map['purpose'] ??
                 map['why_relevant'] ??
                 map['action'],
-            action: website.isNotEmpty ? 'Visit Website' : 'Learn More',
+            action: website.isNotEmpty
+                ? AppLocalizations.of(context).visitWebsite
+                : AppLocalizations.of(context).learnMoreAction,
             onAction: website.isNotEmpty
                 ? () => _launchAuthorityWebsite(website)
                 : () {},

@@ -1,7 +1,7 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:juslegal/screens/ai_legal_chat_screen.dart';
-import '../core/config/theme_config.dart';
+import 'package:juslegal/core/core.dart';
 
 /// Floating AI Assistant Button
 /// Place this widget in your Scaffold using a Stack or floatingActionButton

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../core/config/theme_config.dart';
+import 'package:juslegal/core/core.dart';
 import '../models/document_category_model.dart';
 import '../models/document_type_model.dart';
 import '../services/legal_writing_handler.dart';

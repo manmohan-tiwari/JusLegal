@@ -15,10 +15,11 @@
 		"nodejs_compat"
 	],
 	"vars": {
-		"ALLOWED_ORIGIN": "https://juslegal-2196.web.app"
+		"ALLOWED_ORIGIN": "https://juslegal-2196.web.app",
+		"FIREBASE_PROJECT_ID": "juslegal-2196"
 	},
 	"secrets": {
-		"required": ["GROQ_API_KEY", "OPENROUTER_API_KEY", "PROXY_AUTH_TOKEN"]
+		"required": ["GROQ_API_KEY", "OPENROUTER_API_KEY"]
 	}
 	/**
 	 * Smart Placement

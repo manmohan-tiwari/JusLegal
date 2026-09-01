@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../core/config/theme_config.dart';
+import 'package:juslegal/core/core.dart';
 import '../core/constants/categories.dart';
 import '../models/problem_model.dart';
 import '../widgets/empty_state_widget.dart';

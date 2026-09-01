@@ -1,13 +1,13 @@
 name: juslegal
 description: "Consumer legal guidance app for Indian citizens."
 
-publish_to: 'none' 
+publish_to: 'none'
 
 version: 1.0.0+1
 
 environment:
   sdk: '>=3.2.3 <4.0.0'
-  
+
 dependencies:
   flutter:
     sdk: flutter
@@ -25,6 +25,7 @@ dependencies:
   package_info_plus: ^8.0.0
   intl: ^0.20.2
   shared_preferences: ^2.3.0
+  flutter_secure_storage: ^9.2.4
   cupertino_icons: ^1.0.2
   shimmer: ^3.0.0
   connectivity_plus: ^4.0.0
@@ -40,7 +41,7 @@ dependencies:
   firebase_auth: 6.5.2
   google_sign_in: ^6.2.0
   file_picker: ^8.1.0
-  
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -53,9 +54,7 @@ flutter:
   generate: true
 
   assets:
-    - .env
     - assets/legal_kb.json
-    - assets/images/juslegal_logo.png
 
   fonts:
     - family: NotoSansDevanagari

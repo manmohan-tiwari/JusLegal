@@ -1,4 +1,7 @@
-import 'package:flutter/material.dart';
+// -----------------------------------------------------------------------------
+// app_config.animations.dart — Animations (formerly core/constants/app_animations.dart)
+// -----------------------------------------------------------------------------
+part of 'app_config.dart';
 
 class AppAnimations {
   // Durations

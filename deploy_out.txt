@@ -1,0 +1,138 @@
+[2026-09-01T13:04:19.353Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[2026-09-01T13:04:19.358Z] > authorizing via signed-in user (mohan.bca.tech@gmail.com)
+[2026-09-01T13:04:19.361Z] [iam] checking project juslegal-2196 for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[2026-09-01T13:04:19.366Z] Checked if tokens are valid: false, expires at: 1788193784435
+[2026-09-01T13:04:19.368Z] Checked if tokens are valid: false, expires at: 1788193784435
+[2026-09-01T13:04:19.369Z] > refreshing access token with scopes: []
+[2026-09-01T13:04:19.373Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[2026-09-01T13:04:19.374Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[2026-09-01T13:04:20.019Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[2026-09-01T13:04:20.022Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[2026-09-01T13:04:20.045Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/juslegal-2196:testIamPermissions [none]
+[2026-09-01T13:04:20.046Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/juslegal-2196:testIamPermissions  x-goog-user-project=juslegal-2196
+[2026-09-01T13:04:20.047Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/juslegal-2196:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[2026-09-01T13:04:20.321Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[2026-09-01T13:04:20.325Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[2026-09-01T13:04:21.975Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/juslegal-2196:testIamPermissions 200
+[2026-09-01T13:04:21.978Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/juslegal-2196:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[2026-09-01T13:04:21.980Z] Checked if tokens are valid: true, expires at: 1788271459023
+[2026-09-01T13:04:21.981Z] Checked if tokens are valid: true, expires at: 1788271459023
+[2026-09-01T13:04:21.983Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/juslegal-2196 [none]
+[2026-09-01T13:04:22.934Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/juslegal-2196 200
+[2026-09-01T13:04:22.938Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/juslegal-2196 {"projectId":"juslegal-2196","projectNumber":"1098590842305","displayName":"juslegal","name":"projects/juslegal-2196","resources":{"hostingSite":"juslegal-2196"},"state":"ACTIVE","labels":{"firebase":"enabled"},"etag":"1_eb0748b5-17f3-41bd-803d-f68505ce2717"}
+
+=== Deploying to 'juslegal-2196'...
+
+i  deploying hosting 
+[2026-09-01T13:04:22.958Z] Checked if tokens are valid: true, expires at: 1788271459023
+[2026-09-01T13:04:22.960Z] Checked if tokens are valid: true, expires at: 1788271459023
+[2026-09-01T13:04:22.961Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/juslegal-2196/versions [none]
+[2026-09-01T13:04:22.962Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/juslegal-2196/versions {"status":"CREATED","labels":{"deployment-tool":"cli-firebase"}}
+[2026-09-01T13:04:25.132Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/juslegal-2196/versions 200
+[2026-09-01T13:04:25.166Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/juslegal-2196/versions {"name":"projects/1098590842305/sites/juslegal-2196/versions/99d678be7fbdb6fe","status":"CREATED","config":{},"labels":{"deployment-tool":"cli-firebase"}}
+i  hosting[juslegal-2196]: beginning deploy... 
+i  hosting[juslegal-2196]: found 40 files in build/web 
+[2026-09-01T13:04:25.238Z] [hosting] uploading with 200 concurrency
+[2026-09-01T13:04:26.168Z] Checked if tokens are valid: true, expires at: 1788271459023
+[2026-09-01T13:04:26.186Z] Checked if tokens are valid: true, expires at: 1788271459023
+[2026-09-01T13:04:26.189Z] [hosting] hash cache [YnVpbGRcd2Vi] stored for 40 files
+[2026-09-01T13:04:26.191Z] [hosting][hash queue][FINAL] {"max":923,"min":1,"avg":51.825,"active":0,"complete":40,"success":40,"errored":0,"retried":0,"total":40,"elapsed":950}
+[2026-09-01T13:04:26.193Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/1098590842305/sites/juslegal-2196/versions/99d678be7fbdb6fe:populateFiles [none]
+[2026-09-01T13:04:26.193Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/1098590842305/sites/juslegal-2196/versions/99d678be7fbdb6fe:populateFiles {"files":{"/manifest.json":"3f382fe2fed02a2a6c97219ba3ee0202b38a158d1c8bbba781bd671452604ce8","/flutter.js":"f18220d166d49cbef02491208c46f2c5e54db9739184e304fc55b199b5724407","/favicon.png":"19880e004e8357a51f6a64f5d1fdc8828a6432fe9c781f8acb6b730eced2cd13","/terms/index.html":"c9a68e86bc144459b2309d5306d811120b5189772657ff3190d7a03ac5be2c55","/privacy/index.html":"f4477d3c2c88254fd43143bd6a55b273cd1ca6e1b51d5e1bbb70619ff0bbe31e","/icons/Icon-maskable-512.png":"ea58e5c49bc4dcdc5db0a9fe2f25b2a3152f85ef9094f0d020de0aa318451a1d","/icons/Icon-maskable-192.png":"f7ac56197638aec92f195c5344d15395c2cbf8a5ae74e846c5b4156b64f05e38","/icons/Icon-512.png":"1de493563deb283e6ad70f0d5a89cfd61e37343df3b919c9862c5a41699ac5bc","/icons/Icon-192.png":"5fd961c51d8eb53baacac01f8e53743a76f66a43390a11f5df042e8c618ad64a","/canvaskit/wimp.wasm":"77abd773ba1776b6ce7b029866621aa42ec8a22dc43dd220af4896049260cb0a","/canvaskit/wimp.js.symbols":"cb643fbb407efb3d6735f5909c4ffd84bed8c3d8ce4840f72eb06471b18d8454","/canvaskit/wimp.js":"23db45b93eec24dd6db46ac5a6fafbf0063eb50c0dcd7d253f774e050ab1baa3","/canvaskit/skwasm_heavy.wasm":"acebd34ce89ba97c086405163d12ce74336e41bb7cca4e2fcd5011ecfabd945c","/canvaskit/skwasm_heavy.js.symbols":"d43798c11b7dbd26872e27d20df1c6c43637ebb95b4cc41fd19ff092ab2565bd","/canvaskit/skwasm_heavy.js":"dd3642e247a1ea4a8c519b76278011bb194471c590373ae2659f1d3cb793287c","/canvaskit/skwasm.wasm":"ad393be86fb17a251e0af39e56bcae5c26a4b9f20adbce626e0b7df796d89368","/canvaskit/skwasm.js.symbols":"91b787a0cd397c3cd089dc81519200c5bc35bfafa2996bb5ed4b1159553973f5","/canvaskit/skwasm.js":"91ea675d523ad0a19696479888658953e290f9798a43dae6b87d9ab60cc40c1a","/canvaskit/canvaskit.js.symbols":"a03cf8cdedf01be4a751225fa1bceadf8a783cb512ff87336bf76bb329fb29db","/canvaskit/chromium/canvaskit.wasm":"b3c17e127e4e8e4912409c050050f6f63a718b6f9618a7ec388948f2493174a6","/canvaskit/chromium/canvaskit.js.symbols":"17bdb78398d7be0b2662ad813c7f9387f79014aee6f1e3b7bf39dfe81e6b8b90","/canvaskit/chromium/canvaskit.js":"ed67753aa5382460fefd96876bf5dc40c5d242d56b37664abc8468a6772478df","/assets/assets/legal_kb.json":"f3228bac2c32ccc47ca1ebf4c1fb7c5f26139d5918ab6e62c50e88b878f55572","/assets/assets/Fonts/NotoSansDevanagari-Regular.ttf":"d1f8e5b03b8c4c56e104227aa0942c60f4bfd5b64ba7df3e5c972022e6b8e0ec","/assets/assets/Fonts/NotoSansDevanagari-Bold.ttf":"52418dbc8b06e034996773a11511f22dab27d6ba92c62b245b1ec6dfed23ecc6","/version.json":"2f15aa6c1859305b024a51aac8e3805d50ede82d510bf65237da77699778ab59","/index.html":"406527c51721406fa526a03df0e7e79d2eee392d5376bcae9b9d77eccba115ba","/flutter_service_worker.js":"c73b271847ffc78c576de35e95f6b46187eefb1d97dcb08eb9d84c45954ff310","/flutter_bootstrap.js":"b5be44a6996303e422bcb683f2f1463747f1f6b72801a1d67373d694bc3f8ca8","/assets/FontManifest.json":"a7d9a0f25bbacee898edb17136741d48a152f9d9ce9cffe02c134beca5c3e1dc","/assets/AssetManifest.bin.json":"0ff347c9b4d646670f6c97f3c7697f168ae6193ad4aa6397b12d965a40e8d051","/assets/AssetManifest.bin":"6d60301e4c260f104f88810ec527627eeeca2710e502883ada30d29ec7a7661c","/assets/shaders/stretch_effect.frag":"df37894a7ac7854986bfa5d515e9af03d9138bb77be4d027db848785ebe9e357","/assets/shaders/ink_sparkle.frag":"9d529f4d93e5dabf338537416221237a0042f9cee61c98a357340d0273c67293","/assets/fonts/MaterialIcons-Regular.otf":"0d8a6f9503b45664c8569e37a73de7d0c8c86306f9e3d36f545f871f04fa83ea","/assets/packages/cupertino_icons/assets/CupertinoIcons.ttf":"d41473de1f7708a0702d7f19327693486512db442f6ab0cf7774e6d6576f9fcb","/canvaskit/canvaskit.js":"ed67753aa5382460fefd96876bf5dc40c5d242d56b37664abc8468a6772478df","/assets/NOTICES":"3ce0c9815da5de16562308884c61d5eb785f7ccb8e673f95881cf718c4f0eb90","/canvaskit/canvaskit.wasm":"b3c17e127e4e8e4912409c050050f6f63a718b6f9618a7ec388948f2493174a6","/main.dart.js":"3e49846ebb4e6e3df07e7542db8f5b3d8e88a77fb1da6225a6649f250a5b17c6"}}
+i  hosting: adding files to version [0/40] (0%) 
+[2026-09-01T13:04:27.783Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/1098590842305/sites/juslegal-2196/versions/99d678be7fbdb6fe:populateFiles 200
+[2026-09-01T13:04:27.817Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/1098590842305/sites/juslegal-2196/versions/99d678be7fbdb6fe:populateFiles {"uploadRequiredHashes":["3e49846ebb4e6e3df07e7542db8f5b3d8e88a77fb1da6225a6649f250a5b17c6","3ce0c9815da5de16562308884c61d5eb785f7ccb8e673f95881cf718c4f0eb90","b5be44a6996303e422bcb683f2f1463747f1f6b72801a1d67373d694bc3f8ca8","0ff347c9b4d646670f6c97f3c7697f168ae6193ad4aa6397b12d965a40e8d051","0d8a6f9503b45664c8569e37a73de7d0c8c86306f9e3d36f545f871f04fa83ea","6d60301e4c260f104f88810ec527627eeeca2710e502883ada30d29ec7a7661c"],"uploadUrl":"https://upload-firebasehosting.googleapis.com/upload/sites/juslegal-2196/versions/99d678be7fbdb6fe/files"}
+[2026-09-01T13:04:27.819Z] Checked if tokens are valid: true, expires at: 1788271459023
+[2026-09-01T13:04:27.820Z] Checked if tokens are valid: true, expires at: 1788271459023
+[2026-09-01T13:04:27.821Z] Checked if tokens are valid: true, expires at: 1788271459023
+[2026-09-01T13:04:27.822Z] Checked if tokens are valid: true, expires at: 1788271459023
+[2026-09-01T13:04:27.823Z] Checked if tokens are valid: true, expires at: 1788271459023
+[2026-09-01T13:04:27.824Z] Checked if tokens are valid: true, expires at: 1788271459023
+[2026-09-01T13:04:27.825Z] Checked if tokens are valid: true, expires at: 1788271459023
+[2026-09-01T13:04:27.825Z] Checked if tokens are valid: true, expires at: 1788271459023
+[2026-09-01T13:04:27.826Z] Checked if tokens are valid: true, expires at: 1788271459023
+[2026-09-01T13:04:27.827Z] Checked if tokens are valid: true, expires at: 1788271459023
+[2026-09-01T13:04:27.827Z] Checked if tokens are valid: true, expires at: 1788271459023
+[2026-09-01T13:04:27.828Z] Checked if tokens are valid: true, expires at: 1788271459023
+[2026-09-01T13:04:27.828Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/juslegal-2196/versions/99d678be7fbdb6fe/files/3e49846ebb4e6e3df07e7542db8f5b3d8e88a77fb1da6225a6649f250a5b17c6 [none]
+[2026-09-01T13:04:27.830Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/juslegal-2196/versions/99d678be7fbdb6fe/files/3e49846ebb4e6e3df07e7542db8f5b3d8e88a77fb1da6225a6649f250a5b17c6 [stream]
+[2026-09-01T13:04:27.834Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/juslegal-2196/versions/99d678be7fbdb6fe/files/3ce0c9815da5de16562308884c61d5eb785f7ccb8e673f95881cf718c4f0eb90 [none]
+[2026-09-01T13:04:27.835Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/juslegal-2196/versions/99d678be7fbdb6fe/files/3ce0c9815da5de16562308884c61d5eb785f7ccb8e673f95881cf718c4f0eb90 [stream]
+[2026-09-01T13:04:27.839Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/juslegal-2196/versions/99d678be7fbdb6fe/files/b5be44a6996303e422bcb683f2f1463747f1f6b72801a1d67373d694bc3f8ca8 [none]
+[2026-09-01T13:04:27.840Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/juslegal-2196/versions/99d678be7fbdb6fe/files/b5be44a6996303e422bcb683f2f1463747f1f6b72801a1d67373d694bc3f8ca8 [stream]
+[2026-09-01T13:04:27.843Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/juslegal-2196/versions/99d678be7fbdb6fe/files/0ff347c9b4d646670f6c97f3c7697f168ae6193ad4aa6397b12d965a40e8d051 [none]
+[2026-09-01T13:04:27.844Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/juslegal-2196/versions/99d678be7fbdb6fe/files/0ff347c9b4d646670f6c97f3c7697f168ae6193ad4aa6397b12d965a40e8d051 [stream]
+[2026-09-01T13:04:27.856Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/juslegal-2196/versions/99d678be7fbdb6fe/files/0d8a6f9503b45664c8569e37a73de7d0c8c86306f9e3d36f545f871f04fa83ea [none]
+[2026-09-01T13:04:27.859Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/juslegal-2196/versions/99d678be7fbdb6fe/files/0d8a6f9503b45664c8569e37a73de7d0c8c86306f9e3d36f545f871f04fa83ea [stream]
+[2026-09-01T13:04:27.868Z] >>> [apiv2][query] POST https://upload-firebasehosting.googleapis.com/upload/sites/juslegal-2196/versions/99d678be7fbdb6fe/files/6d60301e4c260f104f88810ec527627eeeca2710e502883ada30d29ec7a7661c [none]
+[2026-09-01T13:04:27.869Z] >>> [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/juslegal-2196/versions/99d678be7fbdb6fe/files/6d60301e4c260f104f88810ec527627eeeca2710e502883ada30d29ec7a7661c [stream]
+[2026-09-01T13:04:27.872Z] [hosting][populate queue][FINAL] {"max":1660,"min":1660,"avg":1660,"active":0,"complete":1,"success":1,"errored":0,"retried":0,"total":1,"elapsed":1704}
+[2026-09-01T13:04:27.872Z] [hosting] uploads queued: 6
+i  hosting: uploading new files [0/6] (0%) 
+[2026-09-01T13:04:29.874Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/juslegal-2196/versions/99d678be7fbdb6fe/files/b5be44a6996303e422bcb683f2f1463747f1f6b72801a1d67373d694bc3f8ca8 200
+[2026-09-01T13:04:29.909Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/juslegal-2196/versions/99d678be7fbdb6fe/files/b5be44a6996303e422bcb683f2f1463747f1f6b72801a1d67373d694bc3f8ca8 [stream]
+[2026-09-01T13:04:29.920Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/juslegal-2196/versions/99d678be7fbdb6fe/files/6d60301e4c260f104f88810ec527627eeeca2710e502883ada30d29ec7a7661c 200
+[2026-09-01T13:04:29.921Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/juslegal-2196/versions/99d678be7fbdb6fe/files/6d60301e4c260f104f88810ec527627eeeca2710e502883ada30d29ec7a7661c [stream]
+[2026-09-01T13:04:29.924Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/juslegal-2196/versions/99d678be7fbdb6fe/files/3ce0c9815da5de16562308884c61d5eb785f7ccb8e673f95881cf718c4f0eb90 200
+[2026-09-01T13:04:29.925Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/juslegal-2196/versions/99d678be7fbdb6fe/files/3ce0c9815da5de16562308884c61d5eb785f7ccb8e673f95881cf718c4f0eb90 [stream]
+[2026-09-01T13:04:29.965Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/juslegal-2196/versions/99d678be7fbdb6fe/files/0ff347c9b4d646670f6c97f3c7697f168ae6193ad4aa6397b12d965a40e8d051 200
+[2026-09-01T13:04:29.984Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/juslegal-2196/versions/99d678be7fbdb6fe/files/0ff347c9b4d646670f6c97f3c7697f168ae6193ad4aa6397b12d965a40e8d051 [stream]
+[2026-09-01T13:04:29.987Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/juslegal-2196/versions/99d678be7fbdb6fe/files/0d8a6f9503b45664c8569e37a73de7d0c8c86306f9e3d36f545f871f04fa83ea 200
+[2026-09-01T13:04:29.988Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/juslegal-2196/versions/99d678be7fbdb6fe/files/0d8a6f9503b45664c8569e37a73de7d0c8c86306f9e3d36f545f871f04fa83ea [stream]
+[2026-09-01T13:04:30.464Z] <<< [apiv2][status] POST https://upload-firebasehosting.googleapis.com/upload/sites/juslegal-2196/versions/99d678be7fbdb6fe/files/3e49846ebb4e6e3df07e7542db8f5b3d8e88a77fb1da6225a6649f250a5b17c6 200
+[2026-09-01T13:04:30.498Z] <<< [apiv2][body] POST https://upload-firebasehosting.googleapis.com/upload/sites/juslegal-2196/versions/99d678be7fbdb6fe/files/3e49846ebb4e6e3df07e7542db8f5b3d8e88a77fb1da6225a6649f250a5b17c6 [stream]
+[2026-09-01T13:04:30.499Z] [hosting][upload queue][FINAL] {"max":2681,"min":2088,"avg":2215.8333333333335,"active":0,"complete":6,"success":6,"errored":0,"retried":0,"total":6,"elapsed":2681}
+i  hosting: upload complete 
++  hosting[juslegal-2196]: file upload complete 
+[2026-09-01T13:04:30.501Z] [hosting] deploy completed after 5318ms
+[2026-09-01T13:04:30.501Z] [
+  {
+    "config": {
+      "public": "build/web",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "/terms",
+          "destination": "/terms/index.html"
+        },
+        {
+          "source": "/privacy",
+          "destination": "/privacy/index.html"
+        },
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ],
+      "site": "juslegal-2196"
+    },
+    "version": "projects/1098590842305/sites/juslegal-2196/versions/99d678be7fbdb6fe"
+  }
+]
+i  hosting[juslegal-2196]: finalizing version... 
+[2026-09-01T13:04:30.505Z] Checked if tokens are valid: true, expires at: 1788271459023
+[2026-09-01T13:04:30.506Z] Checked if tokens are valid: true, expires at: 1788271459023
+[2026-09-01T13:04:30.507Z] >>> [apiv2][query] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/juslegal-2196/versions/99d678be7fbdb6fe updateMask=status%2Cconfig
+[2026-09-01T13:04:30.507Z] >>> [apiv2][body] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/juslegal-2196/versions/99d678be7fbdb6fe {"status":"FINALIZED","config":{"rewrites":[{"glob":"/terms","path":"/terms/index.html"},{"glob":"/privacy","path":"/privacy/index.html"},{"glob":"**","path":"/index.html"}]}}
+[2026-09-01T13:04:31.552Z] <<< [apiv2][status] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/juslegal-2196/versions/99d678be7fbdb6fe 200
+[2026-09-01T13:04:31.556Z] <<< [apiv2][body] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/juslegal-2196/versions/99d678be7fbdb6fe {"name":"projects/1098590842305/sites/juslegal-2196/versions/99d678be7fbdb6fe","status":"FINALIZED","config":{"rewrites":[{"glob":"/terms","path":"/terms/index.html"},{"glob":"/privacy","path":"/privacy/index.html"},{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2026-09-01T13:04:24.267666Z","createUser":{"email":"mohan.bca.tech@gmail.com"},"finalizeTime":"2026-09-01T13:04:31.372469Z","finalizeUser":{"email":"mohan.bca.tech@gmail.com"}}
+[2026-09-01T13:04:31.557Z] [hosting] finalized version for juslegal-2196:[object Object]
++  hosting[juslegal-2196]: version finalized 
+i  hosting[juslegal-2196]: releasing new version... 
+[2026-09-01T13:04:31.559Z] Checked if tokens are valid: true, expires at: 1788271459023
+[2026-09-01T13:04:31.559Z] Checked if tokens are valid: true, expires at: 1788271459023
+[2026-09-01T13:04:31.560Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/juslegal-2196/channels/live/releases versionName=projects%2F1098590842305%2Fsites%2Fjuslegal-2196%2Fversions%2F99d678be7fbdb6fe
+[2026-09-01T13:04:31.560Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/juslegal-2196/channels/live/releases {}
+[2026-09-01T13:04:32.630Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/juslegal-2196/channels/live/releases 200
+[2026-09-01T13:04:32.665Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/juslegal-2196/channels/live/releases {"name":"projects/1098590842305/sites/juslegal-2196/channels/live/releases/1788267871762000","version":{"name":"projects/1098590842305/sites/juslegal-2196/versions/99d678be7fbdb6fe","status":"FINALIZED","config":{"rewrites":[{"glob":"/terms","path":"/terms/index.html"},{"glob":"/privacy","path":"/privacy/index.html"},{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2026-09-01T13:04:24.267666Z","createUser":{"email":"mohan.bca.tech@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocLww4og7ZzGgB5HUNs7C-X6fiKvYxhuCtl6o7SEge1cR3vWXA=mo"},"finalizeTime":"2026-09-01T13:04:31.372469Z","finalizeUser":{"email":"mohan.bca.tech@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocLww4og7ZzGgB5HUNs7C-X6fiKvYxhuCtl6o7SEge1cR3vWXA=mo"}},"type":"DEPLOY","releaseTime":"2026-09-01T13:04:31.762Z","releaseUser":{"email":"mohan.bca.tech@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocLww4og7ZzGgB5HUNs7C-X6fiKvYxhuCtl6o7SEge1cR3vWXA=mo"}}
+[2026-09-01T13:04:32.666Z] [hosting] release: {"name":"projects/1098590842305/sites/juslegal-2196/channels/live/releases/1788267871762000","version":{"name":"projects/1098590842305/sites/juslegal-2196/versions/99d678be7fbdb6fe","status":"FINALIZED","config":{"rewrites":[{"glob":"/terms","path":"/terms/index.html"},{"glob":"/privacy","path":"/privacy/index.html"},{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2026-09-01T13:04:24.267666Z","createUser":{"email":"mohan.bca.tech@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocLww4og7ZzGgB5HUNs7C-X6fiKvYxhuCtl6o7SEge1cR3vWXA=mo"},"finalizeTime":"2026-09-01T13:04:31.372469Z","finalizeUser":{"email":"mohan.bca.tech@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocLww4og7ZzGgB5HUNs7C-X6fiKvYxhuCtl6o7SEge1cR3vWXA=mo"}},"type":"DEPLOY","releaseTime":"2026-09-01T13:04:31.762Z","releaseUser":{"email":"mohan.bca.tech@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocLww4og7ZzGgB5HUNs7C-X6fiKvYxhuCtl6o7SEge1cR3vWXA=mo"}}
++  hosting[juslegal-2196]: release complete 
+
++  Deploy complete! 
+
+Project Console: https://console.firebase.google.com/project/juslegal-2196/overview
+Hosting URL: https://juslegal-2196.web.app

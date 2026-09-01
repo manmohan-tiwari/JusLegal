@@ -5,13 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:juslegal/l10n/gen/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../core/constants/app_animations.dart';
-import '../core/constants/app_config.dart';
-import '../core/constants/categories.dart';
-import '../core/config/theme_config.dart';
+import 'package:juslegal/core/core.dart';
 import '../services/auth_handler.dart';
 import '../providers/rate_us_provider.dart';
 import '../widgets/empty_state_widget.dart';
@@ -32,13 +30,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     statusBarIconBrightness: Brightness.dark,
     statusBarBrightness: Brightness.light,
   );
-  static const SystemUiOverlayStyle _gradientOverlayStyle =
-      SystemUiOverlayStyle(
-    statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.light,
-    statusBarBrightness: Brightness.dark,
-  );
-
   int _tabIndex = 0;
   late ScrollController _scrollController;
 
@@ -106,8 +97,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             defaultTargetPlatform == TargetPlatform.android && !kIsWeb
                 ? const BouncingScrollPhysics()
                 : const ClampingScrollPhysics();
-        final homeCategories =
-            AppCategories.categories.take(4).toList(growable: false);
+        const homeCategories = _HomeContent.popularCategories;
         final navItems = [
           _BottomNavItem(l10n.home, Icons.home_outlined, Icons.home_rounded),
           _BottomNavItem(
@@ -132,14 +122,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   elevation: 8,
                   shadowColor: AppColors.shadowStrong,
                   backgroundColor: Colors.transparent,
-                  foregroundColor: AppColors.white,
+                  foregroundColor: AppColors.deepForest,
                   surfaceTintColor: Colors.transparent,
-                  flexibleSpace: Container(
-                    decoration:
-                        const BoxDecoration(gradient: AppColors.appBarGradient),
-                  ),
+                  flexibleSpace: const ColoredBox(color: AppColors.surface),
                   centerTitle: false,
-                  systemOverlayStyle: _gradientOverlayStyle,
+                  systemOverlayStyle: _lightSurfaceOverlayStyle,
                   title: const Align(
                     alignment: Alignment.centerLeft,
                     child: _HeaderLogo(iconHeight: 40),
@@ -238,8 +225,35 @@ class _AiFeatureTool {
 // ---------------------------------------------
 
 class _HomeContent extends StatelessWidget {
-  final List<LegalCategory> categories;
+  final List<_PopularLegalCategory> categories;
   final bool isDesktop;
+
+  static const popularCategories = <_PopularLegalCategory>[
+    _PopularLegalCategory(
+      title: 'Consumer Protection',
+      description: 'Purchases, refunds and unfair practices',
+      icon: Icons.receipt_long_outlined,
+      categoryId: 'E-commerce & Shopping',
+    ),
+    _PopularLegalCategory(
+      title: 'Property Law',
+      description: 'Housing, builders and ownership disputes',
+      icon: Icons.home_work_outlined,
+      categoryId: 'Housing & Real Estate',
+    ),
+    _PopularLegalCategory(
+      title: 'Labor Rights',
+      description: 'Pay, workplace rights and PF matters',
+      icon: Icons.work_outline_rounded,
+      categoryId: 'Employment',
+    ),
+    _PopularLegalCategory(
+      title: 'Cyber Law',
+      description: 'Digital fraud and online safety',
+      icon: Icons.shield_outlined,
+      categoryId: 'Banking & UPI Fraud',
+    ),
+  ];
 
   static const double _categorySectionTopSpacingDesktop = 48;
   static const double _categorySectionTopSpacingMobile = 48;
@@ -354,7 +368,7 @@ class _HomeContent extends StatelessWidget {
                       _CategoryCard(
                         category: categories[index],
                         onTap: () => context.go(
-                          '/home/analyzer?category=${Uri.encodeComponent(categories[index].name)}',
+                          '/home/analyzer?category=${Uri.encodeComponent(categories[index].categoryId)}',
                         ),
                       ),
                       index,
@@ -641,12 +655,10 @@ class _HeroSection extends StatelessWidget {
 
   const _HeroSection({required this.isDesktop});
 
-  static const Color _heroAccentTextColor = AppColors.legalGold;
-
   @override
   Widget build(BuildContext context) {
-    final horizontalPadding = isDesktop ? 28.0 : 18.0;
-    final verticalPadding = isDesktop ? 30.0 : 22.0;
+    final horizontalPadding = isDesktop ? 48.0 : 24.0;
+    final verticalPadding = isDesktop ? 44.0 : 30.0;
 
     return Container(
       width: double.infinity,
@@ -656,17 +668,12 @@ class _HeroSection extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         gradient: AppColors.heroGradient,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppTheme.radiusM),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryNavy.withValues(alpha: 0.28),
-            blurRadius: 32,
-            offset: const Offset(0, 16),
-          ),
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.18),
-            blurRadius: 18,
-            offset: const Offset(0, 4),
+            color: AppColors.deepForest.withValues(alpha: 0.26),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
@@ -678,19 +685,21 @@ class _HeroSection extends StatelessWidget {
                   flex: 6,
                   child: _HeroContent(isDesktop: true),
                 ),
-                const Spacer(),
+                const SizedBox(width: 32),
                 Expanded(
                   flex: 4,
-                  child: Align(
-                    alignment: Alignment.topRight,
-                    child: Container(
-                      constraints: const BoxConstraints(minHeight: 220),
-                    ),
-                  ),
+                  child: _LegalOfficeIllustration(height: 248),
                 ),
               ],
             )
-          : const _HeroContent(isDesktop: false),
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                _HeroContent(isDesktop: false),
+                SizedBox(height: 24),
+                _LegalOfficeIllustration(height: 156),
+              ],
+            ),
     );
   }
 }
@@ -704,13 +713,13 @@ class _HeroContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.sizeOf(context).width;
     final compactMobile = !isDesktop && screenWidth <= 360;
-    final headlineStyle = TextStyle(
+    final headlineStyle = GoogleFonts.notoSans(
       color: Colors.white,
-      fontSize: isDesktop ? 34 : (compactMobile ? 25 : 28),
-      fontWeight: FontWeight.w800,
+      fontSize: isDesktop ? 40 : (compactMobile ? 28 : 32),
+      fontWeight: FontWeight.w700,
       height: compactMobile ? 1.15 : 1.2,
     );
-    final bodyStyle = TextStyle(
+    final bodyStyle = GoogleFonts.notoSans(
       color: Colors.white,
       fontSize: compactMobile ? 13 : 14,
       fontWeight: FontWeight.w400,
@@ -721,16 +730,13 @@ class _HeroContent extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text('Know Your Rights.', style: headlineStyle),
         Text(
-          'Take Action.',
-          style: headlineStyle.copyWith(
-            color: _HeroSection._heroAccentTextColor,
-          ),
+          'Navigate Indian Law\nwith Confidence',
+          style: headlineStyle,
         ),
         SizedBox(height: compactMobile ? 10 : 12),
         Text(
-          'Get instant AI-powered legal guidance for your consumer issues.',
+          'Clear, AI-powered legal guidance and practical next steps for the moments that matter.',
           style: bodyStyle,
         ),
         SizedBox(height: compactMobile ? 18 : 20),
@@ -739,18 +745,18 @@ class _HeroContent extends StatelessWidget {
           child: ElevatedButton(
             onPressed: () => context.go('/home/analyzer'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.legalGold,
-              foregroundColor: const Color(0xFF0B0F19),
-              elevation: 8,
-              shadowColor: AppColors.shadowGold,
+              backgroundColor: AppColors.brightEmerald,
+              foregroundColor: AppColors.deepForestDark,
+              elevation: 2,
+              shadowColor: Colors.black26,
               minimumSize: const Size.fromHeight(48),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(AppTheme.radiusM),
               ),
-              textStyle: const TextStyle(
+              textStyle: GoogleFonts.notoSans(
                 fontSize: 15,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w700,
               ),
             ),
             child: const Text('Get Started'),
@@ -761,8 +767,125 @@ class _HeroContent extends StatelessWidget {
   }
 }
 
+/// A code-native legal office illustration so the hero remains sharp on web,
+/// mobile, and high-density screens without loading a bitmap at runtime.
+class _LegalOfficeIllustration extends StatelessWidget {
+  final double height;
+
+  const _LegalOfficeIllustration({required this.height});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: height,
+      width: double.infinity,
+      child: CustomPaint(
+        painter: _LegalOfficePainter(),
+      ),
+    );
+  }
+}
+
+class _LegalOfficePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final forest = Paint()..color = const Color(0xFF062B20);
+    const emerald = AppColors.brightEmerald;
+    final glass = Paint()..color = Colors.white.withValues(alpha: 0.10);
+    final light = Paint()..color = Colors.white.withValues(alpha: 0.72);
+    final plant = Paint()..color = const Color(0xFF74D995);
+
+    canvas.drawRRect(
+        RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(8)),
+        glass);
+    // Window grid and warm office desk.
+    final window = Rect.fromLTWH(size.width * .12, size.height * .08,
+        size.width * .76, size.height * .54);
+    canvas.drawRRect(
+        RRect.fromRectAndRadius(window, const Radius.circular(6)), forest);
+    for (var x = window.left + window.width / 3;
+        x < window.right;
+        x += window.width / 3) {
+      canvas.drawRect(Rect.fromLTWH(x, window.top, 2, window.height), glass);
+    }
+    canvas.drawRect(
+        Rect.fromLTWH(
+            window.left, window.top + window.height * .52, window.width, 2),
+        glass);
+    canvas.drawRRect(
+        RRect.fromRectAndRadius(
+            Rect.fromLTWH(size.width * .08, size.height * .72, size.width * .84,
+                size.height * .12),
+            const Radius.circular(4)),
+        light);
+    canvas.drawRect(
+        Rect.fromLTWH(
+            size.width * .19, size.height * .82, 8, size.height * .13),
+        forest);
+    canvas.drawRect(
+        Rect.fromLTWH(
+            size.width * .79, size.height * .82, 8, size.height * .13),
+        forest);
+    // Justice scales on the desk.
+    final center = Offset(size.width * .50, size.height * .64);
+    final stroke = Paint()
+      ..color = emerald
+      ..strokeWidth = 4
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+    canvas.drawLine(
+        center, Offset(center.dx, center.dy + size.height * .12), stroke);
+    canvas.drawLine(Offset(center.dx - size.width * .19, center.dy),
+        Offset(center.dx + size.width * .19, center.dy), stroke);
+    canvas.drawLine(
+        Offset(center.dx - size.width * .13, center.dy),
+        Offset(center.dx - size.width * .18, center.dy + size.height * .10),
+        stroke);
+    canvas.drawLine(
+        Offset(center.dx + size.width * .13, center.dy),
+        Offset(center.dx + size.width * .18, center.dy + size.height * .10),
+        stroke);
+    canvas.drawArc(
+        Rect.fromCenter(
+            center: Offset(
+                center.dx - size.width * .18, center.dy + size.height * .10),
+            width: size.width * .16,
+            height: size.height * .08),
+        0,
+        3.14,
+        false,
+        stroke);
+    canvas.drawArc(
+        Rect.fromCenter(
+            center: Offset(
+                center.dx + size.width * .18, center.dy + size.height * .10),
+            width: size.width * .16,
+            height: size.height * .08),
+        0,
+        3.14,
+        false,
+        stroke);
+    // Plant leaves create the rainforest accent.
+    for (final offset in [
+      Offset(size.width * .09, size.height * .67),
+      Offset(size.width * .14, size.height * .60),
+      Offset(size.width * .05, size.height * .58)
+    ]) {
+      canvas.drawOval(
+          Rect.fromCenter(
+              center: offset,
+              width: size.width * .12,
+              height: size.height * .06),
+          plant);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
 class _CategoryCard extends StatelessWidget {
-  final LegalCategory category;
+  final _PopularLegalCategory category;
   final VoidCallback onTap;
 
   const _CategoryCard({
@@ -772,7 +895,7 @@ class _CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(18);
+    final radius = BorderRadius.circular(AppTheme.radiusM);
     return AppAnimations.pressScale(
       onTap: onTap,
       borderRadius: radius,
@@ -780,9 +903,10 @@ class _CategoryCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          gradient: AppColors.cardBlueGradient,
+          color: AppColors.white,
           borderRadius: radius,
-          border: Border.all(color: AppColors.border),
+          border: Border.all(
+              color: AppColors.brightEmerald.withValues(alpha: 0.28)),
           boxShadow: [
             BoxShadow(
               color: AppColors.shadowBlack,
@@ -799,12 +923,12 @@ class _CategoryCard extends StatelessWidget {
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: AppColors.backgroundBlue,
-                shape: BoxShape.circle,
+                color: AppColors.brightEmerald.withValues(alpha: 0.14),
+                borderRadius: BorderRadius.circular(AppTheme.radiusM),
               ),
               child: Icon(
                 category.icon,
-                color: AppColors.primaryNavy,
+                color: AppColors.deepForest,
                 size: 30,
               ),
             ),
@@ -837,6 +961,22 @@ class _CategoryCard extends StatelessWidget {
       ),
     );
   }
+}
+
+class _PopularLegalCategory {
+  final String title;
+  final String description;
+  final IconData icon;
+  final String categoryId;
+
+  const _PopularLegalCategory({
+    required this.title,
+    required this.description,
+    required this.icon,
+    required this.categoryId,
+  });
+
+  String get name => title;
 }
 
 class _BenefitItem extends StatelessWidget {
@@ -1040,7 +1180,7 @@ class _DesktopHeader extends StatelessWidget implements PreferredSizeWidget {
       scrolledUnderElevation: 0,
       title: const Align(
         alignment: Alignment.centerLeft,
-        child: _HeaderLogo(iconHeight: 82),
+        child: _HeaderLogo(iconHeight: 48),
       ),
       actions: [
         ...List.generate(items.length, (index) {
@@ -1082,22 +1222,74 @@ class _HeaderLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox.square(
-      dimension: iconHeight,
-      child: Image.asset(
-        'assets/images/juslegal_logo.png',
-        fit: BoxFit.contain,
-        errorBuilder: (context, error, stackTrace) {
-          return const Center(
-            child: Icon(
-              Icons.balance_rounded,
-              color: AppColors.white,
+    return SizedBox(
+      height: iconHeight,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            height: iconHeight * .72,
+            width: iconHeight * .72,
+            child: CustomPaint(painter: _JusLegalMarkPainter()),
+          ),
+          SizedBox(width: iconHeight * .18),
+          Text(
+            'JusLegal',
+            style: GoogleFonts.notoSans(
+              color: AppColors.deepForest,
+              fontSize: iconHeight * .43,
+              fontWeight: FontWeight.w700,
+              letterSpacing: -.6,
             ),
-          );
-        },
+          ),
+        ],
       ),
     );
   }
+}
+
+class _JusLegalMarkPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = AppColors.deepForest
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = size.width * .085
+      ..strokeCap = StrokeCap.round;
+    final center = Offset(size.width / 2, size.height * .30);
+    canvas.drawCircle(
+        center, size.width * .075, Paint()..color = AppColors.brightEmerald);
+    canvas.drawLine(center, Offset(center.dx, size.height * .78), paint);
+    canvas.drawLine(Offset(size.width * .16, size.height * .44),
+        Offset(size.width * .84, size.height * .44), paint);
+    canvas.drawLine(Offset(size.width * .27, size.height * .44),
+        Offset(size.width * .16, size.height * .67), paint);
+    canvas.drawLine(Offset(size.width * .73, size.height * .44),
+        Offset(size.width * .84, size.height * .67), paint);
+    canvas.drawArc(
+        Rect.fromCenter(
+            center: Offset(size.width * .16, size.height * .67),
+            width: size.width * .28,
+            height: size.height * .15),
+        0,
+        3.14,
+        false,
+        paint);
+    canvas.drawArc(
+        Rect.fromCenter(
+            center: Offset(size.width * .84, size.height * .67),
+            width: size.width * .28,
+            height: size.height * .15),
+        0,
+        3.14,
+        false,
+        paint);
+    canvas.drawLine(Offset(size.width * .27, size.height * .85),
+        Offset(size.width * .73, size.height * .85), paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _FloatingBottomNav extends StatelessWidget {
@@ -1128,8 +1320,7 @@ class _FloatingBottomNav extends StatelessWidget {
                 colors: [Color(0xFF111827), Color(0xFF1F2937)],
               ),
               borderRadius: BorderRadius.circular(24),
-              border:
-                  Border.all(color: AppColors.border),
+              border: Border.all(color: AppColors.border),
               boxShadow: [
                 BoxShadow(
                   color: AppColors.shadowBlack,
@@ -1162,12 +1353,16 @@ class _FloatingBottomNav extends StatelessWidget {
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(20),
                         border: selected
-                            ? Border.all(color: AppColors.legalGold.withValues(alpha: 0.4), width: 1)
+                            ? Border.all(
+                                color:
+                                    AppColors.legalGold.withValues(alpha: 0.4),
+                                width: 1)
                             : null,
                         boxShadow: selected
                             ? [
                                 BoxShadow(
-                                  color: AppColors.shadowGold.withValues(alpha: 0.2),
+                                  color: AppColors.shadowGold
+                                      .withValues(alpha: 0.2),
                                   blurRadius: 10,
                                   offset: const Offset(0, 2),
                                 ),

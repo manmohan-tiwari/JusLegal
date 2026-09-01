@@ -9,7 +9,6 @@ Set the API keys as encrypted Cloudflare Worker secrets. Do not add them to `wra
 ```sh
 wrangler secret put GROQ_API_KEY
 wrangler secret put OPENROUTER_API_KEY
-wrangler secret put PROXY_AUTH_TOKEN
 ```
 
 Deploy the Worker after setting the secrets:
@@ -18,11 +17,10 @@ Deploy the Worker after setting the secrets:
 wrangler deploy
 ```
 
-`ALLOWED_ORIGIN` is set to the production web app origin. The Worker requires
-`Authorization: Bearer <PROXY_AUTH_TOKEN>` for every provider request. Supply
-the matching client token through the app's build configuration; do not add it
-to source control. A Firebase/App Check token verifier is the recommended
-long-term replacement for a shared client token.
+`ALLOWED_ORIGIN` and `FIREBASE_PROJECT_ID` are configured in `wrangler.jsonc`.
+The Worker requires `Authorization: Bearer <Firebase ID token>` for every
+provider request. Provider API keys must remain Worker secrets and must never
+be placed in the Flutter app's `.env` file.
 
 Rate limiting is intentionally not enabled until this account has a Cloudflare
 Rate Limiting binding and namespace. Add that binding before high-volume use.

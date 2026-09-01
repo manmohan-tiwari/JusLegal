@@ -1,32 +1,38 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
+// -----------------------------------------------------------------------------
+// app_config.theme.dart — Theme/color system (formerly core/config/theme_config.dart)
+// -----------------------------------------------------------------------------
+part of 'app_config.dart';
 
 /// Forest-inspired green color system for legal guidance application.
 /// Centers on growth, stability, and natural order with a calm, life-affirming environment.
 class AppColors {
+  // Tropical Rainforest design tokens.
+  static const Color deepForest = Color(0xFF0B3D2E);
+  static const Color deepForestDark = Color(0xFF062B20);
+  static const Color brightEmerald = Color(0xFF50C878);
+
   // Surface Colors
-  static const Color surface = Color(0xFFF3FFCA);
-  static const Color surfaceDim = Color(0xFFD2E1A1);
-  static const Color surfaceBright = Color(0xFFF3FFCA);
+  static const Color surface = Color(0xFFF7FBF8);
+  static const Color surfaceDim = Color(0xFFE4EFE8);
+  static const Color surfaceBright = Color(0xFFF7FBF8);
   static const Color surfaceContainerLowest = Color(0xFFFFFFFF);
-  static const Color surfaceContainerLow = Color(0xFFEBFBB8);
-  static const Color surfaceContainer = Color(0xFFE5F5B3);
-  static const Color surfaceContainerHigh = Color(0xFFE0EFAE);
-  static const Color surfaceContainerHighest = Color(0xFFDAE9A9);
-  static const Color onSurface = Color(0xFF161E00);
-  static const Color onSurfaceVariant = Color(0xFF3E4A3F);
-  static const Color inverseSurface = Color(0xFF293406);
-  static const Color inverseOnSurface = Color(0xFFE8F8B6);
-  static const Color outline = Color(0xFF6E7A6E);
-  static const Color outlineVariant = Color(0xFFBDCABC);
-  static const Color surfaceTint = Color(0xFF006D36);
+  static const Color surfaceContainerLow = Color(0xFFEEF6F0);
+  static const Color surfaceContainer = Color(0xFFE4F0E8);
+  static const Color surfaceContainerHigh = Color(0xFFD9E9DF);
+  static const Color surfaceContainerHighest = Color(0xFFCEE2D5);
+  static const Color onSurface = Color(0xFF17271F);
+  static const Color onSurfaceVariant = Color(0xFF52645A);
+  static const Color inverseSurface = deepForest;
+  static const Color inverseOnSurface = Color(0xFFE8F8EE);
+  static const Color outline = Color(0xFFB9CDC0);
+  static const Color outlineVariant = Color(0xFFD8E6DC);
+  static const Color surfaceTint = deepForest;
 
   // Primary Colors (Emerald)
-  static const Color primary = Color(0xFF006D36);
-  static const Color onPrimary = Color(0xFFFFFFFF);
-  static const Color primaryContainer = Color(0xFF50C878);
-  static const Color onPrimaryContainer = Color(0xFF005025);
+  static const Color primary = brightEmerald;
+  static const Color onPrimary = deepForestDark;
+  static const Color primaryContainer = brightEmerald;
+  static const Color onPrimaryContainer = deepForest;
   static const Color inversePrimary = Color(0xFF66DD8B);
   static const Color primaryFixed = Color(0xFF83FBA5);
   static const Color primaryFixedDim = Color(0xFF66DD8B);
@@ -34,7 +40,7 @@ class AppColors {
   static const Color onPrimaryFixedVariant = Color(0xFF005227);
 
   // Secondary Colors (Forest)
-  static const Color secondary = Color(0xFF3F6833);
+  static const Color secondary = deepForest;
   static const Color onSecondary = Color(0xFFFFFFFF);
   static const Color secondaryContainer = Color(0xFFBDEDAA);
   static const Color onSecondaryContainer = Color(0xFF436D37);
@@ -72,7 +78,7 @@ class AppColors {
   static const Color warning = tertiary;
   static const Color accent = primary;
   static const Color justiceGold = primary;
-  
+
   // Additional legacy colors for existing codebase compatibility
   static const Color primaryNavy = primary;
   static const Color trustBlue = secondary;
@@ -123,14 +129,14 @@ class AppColors {
   static const Gradient heroGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [surface, surfaceContainerLow, surfaceContainer],
+    colors: [deepForest, deepForestDark, Color(0xFF104B37)],
     stops: [0.0, 0.55, 1.0],
   );
 
   static const Gradient appBarGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [surface, surfaceContainerLow],
+    colors: [deepForest, deepForestDark],
   );
 
   static const Gradient goldGradient = LinearGradient(
@@ -208,7 +214,7 @@ class AppTheme {
   static const Color caseInProgress = AppColors.caseInProgress;
   static const Color caseResolved = AppColors.caseResolved;
   static const Color caseRejected = AppColors.caseRejected;
-  
+
   // Additional legacy colors for existing codebase compatibility
   static const Color primaryNavy = AppColors.primaryNavy;
   static const Color trustBlue = AppColors.trustBlue;
@@ -220,9 +226,9 @@ class AppTheme {
   static const Color amberDark = AppColors.amberDark;
 
   // Rounded corners (from design system)
-  static const double radiusS = 4;   // 0.25rem = 4px
-  static const double radiusM = 8;   // 0.5rem = 8px (DEFAULT)
-  static const double radiusL = 16;  // 1rem = 16px
+  static const double radiusS = 4; // 0.25rem = 4px
+  static const double radiusM = 8; // 0.5rem = 8px (DEFAULT)
+  static const double radiusL = 16; // 1rem = 16px
   static const double radiusXL = 24; // 1.5rem = 24px
 
   // Gradients
@@ -236,7 +242,8 @@ class AppTheme {
       end: Alignment.bottomRight,
       colors: [
         AppColors.surfaceContainerLowest,
-        Color.alphaBlend(accentColor.withValues(alpha: 0.08), AppColors.surfaceContainerLow),
+        Color.alphaBlend(
+            accentColor.withValues(alpha: 0.08), AppColors.surfaceContainerLow),
       ],
     );
   }
@@ -274,7 +281,7 @@ class AppTheme {
     final baseTextStyle = GoogleFonts.notoSans(
       color: AppColors.onSurface,
     );
-    
+
     final textTheme = TextTheme(
       displayLarge: baseTextStyle.copyWith(
         fontSize: 48,
@@ -390,7 +397,7 @@ class AppTheme {
         shadowColor: AppColors.shadow,
         margin: const EdgeInsets.symmetric(vertical: 8),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(radiusL),
+          borderRadius: BorderRadius.circular(radiusM),
           side: BorderSide.none,
         ),
       ),
@@ -433,7 +440,8 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(radiusM),
           ),
-          textStyle: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
+          textStyle:
+              textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -469,7 +477,8 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surfaceContainerLowest,
-        hintStyle: textTheme.bodyMedium?.copyWith(color: AppColors.onSurfaceVariant),
+        hintStyle:
+            textTheme.bodyMedium?.copyWith(color: AppColors.onSurfaceVariant),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(radiusM),
           borderSide: const BorderSide(color: AppColors.outline),
@@ -486,7 +495,8 @@ class AppTheme {
           borderRadius: BorderRadius.circular(radiusM),
           borderSide: const BorderSide(color: AppColors.error),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         labelStyle: textTheme.labelMedium?.copyWith(
           color: AppColors.onSurface,
           fontWeight: FontWeight.w600,

@@ -5,7 +5,7 @@ import '../models/problem_model.dart';
 import '../services/ai_service.dart';
 import '../core/exceptions/ai_exceptions.dart';
 import '../core/services/analytics_service.dart';
-import '../core/constants/app_strings.dart';
+import 'package:juslegal/core/core.dart';
 import '../models/chat_message_model.dart';
 import 'locale_provider.dart';
 

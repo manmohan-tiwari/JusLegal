@@ -1,74 +1,59 @@
-import 'dart:ui';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:juslegal/l10n/gen/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../core/config/theme_config.dart';
-import '../core/constants/app_config.dart';
+import 'package:juslegal/core/core.dart';
 import '../services/auth_handler.dart';
 import '../widgets/loading_widget.dart';
 
+enum AuthStep { initial, emailForm, phoneForm }
+
+const _background = Color(0xFFEAF8E6);
+const _forest = Color(0xFF1B4D3E);
+const _green = Color(0xFF2D6A4F);
+
 class LoginScreenNew extends ConsumerStatefulWidget {
   const LoginScreenNew({super.key});
-
   @override
   ConsumerState<LoginScreenNew> createState() => _LoginScreenNewState();
 }
 
 class _LoginScreenNewState extends ConsumerState<LoginScreenNew>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _entranceController;
-  late final Animation<double> _fadeAnimation;
-  late final Animation<Offset> _slideAnimation;
+  late final AnimationController _entrance;
   late final TextEditingController _phoneController;
-  late final TapGestureRecognizer _termsRecognizer;
-  late final TapGestureRecognizer _privacyRecognizer;
-  late final TapGestureRecognizer _legalDisclaimerRecognizer;
-  String? _localError;
-  bool _isPhoneTab = true;
+  late final TextEditingController _emailController;
+  late final TapGestureRecognizer _terms;
+  late final TapGestureRecognizer _privacy;
+  late final TapGestureRecognizer _legal;
+  AuthStep _step = AuthStep.initial;
+  String? _error;
 
   @override
   void initState() {
     super.initState();
     _phoneController = TextEditingController();
-    _termsRecognizer = TapGestureRecognizer()..onTap = _openTerms;
-    _privacyRecognizer = TapGestureRecognizer()..onTap = _openPrivacy;
-    _legalDisclaimerRecognizer = TapGestureRecognizer()..onTap = _openLegalDisclaimer;
-
-    _entranceController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 650),
-    );
-
-    _fadeAnimation = CurvedAnimation(
-      parent: _entranceController,
-      curve: Curves.easeOutCubic,
-    );
-
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.08),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _entranceController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    _entranceController.forward();
+    _emailController = TextEditingController();
+    _terms = TapGestureRecognizer()..onTap = _openTerms;
+    _privacy = TapGestureRecognizer()..onTap = _openPrivacy;
+    _legal = TapGestureRecognizer()..onTap = () => context.push('/legal-terms');
+    _entrance = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 650))
+      ..forward();
   }
 
   @override
   void dispose() {
-    _entranceController.dispose();
+    _entrance.dispose();
     _phoneController.dispose();
-    _termsRecognizer.dispose();
-    _privacyRecognizer.dispose();
-    _legalDisclaimerRecognizer.dispose();
+    _emailController.dispose();
+    _terms.dispose();
+    _privacy.dispose();
+    _legal.dispose();
     super.dispose();
   }
 
@@ -86,186 +71,136 @@ class _LoginScreenNewState extends ConsumerState<LoginScreenNew>
     }
   }
 
-  Future<void> _openLegalDisclaimer() async {
-    // Navigate to legal disclaimer screen
-    context.push('/legal-terms');
-  }
+  void _message(String value) => ScaffoldMessenger.of(context)
+    ..hideCurrentSnackBar()
+    ..showSnackBar(SnackBar(content: Text(value)));
 
-  void _showMessage(String message) {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
+  void _changeStep(AuthStep step) => setState(() {
+        _error = null;
+        _step = step;
+      });
 
-  Future<void> _handleGoogleSignIn() async {
+  Future<void> _google() async {
     try {
       await ref.read(authProvider.notifier).signInWithGoogle();
+      if (mounted) context.go('/home');
+    } catch (e) {
       if (!mounted) return;
-      context.go('/home');
-    } catch (error) {
-      if (!mounted) return;
-      final message = ref.read(authProvider).error ?? error.toString();
-      setState(() {
-        _localError = message;
-      });
-      _showMessage(message);
+      final message = ref.read(authProvider).error ?? e.toString();
+      setState(() => _error = message);
+      _message(message);
     }
   }
 
-  Future<void> _handleOtpFlow() async {
-    // final l10n = AppLocalizations.of(context);
-    final phoneText =
-        _phoneController.text.replaceAll(RegExp(r'\s+'), '').trim();
-    if (phoneText.length != 10 || !RegExp(r'^\d{10}$').hasMatch(phoneText)) {
-      setState(() {
-        _localError = 'Please enter a valid 10-digit phone number';
-      });
+  Future<void> _sendOtp() async {
+    final phone = _phoneController.text.replaceAll(RegExp(r'\s+'), '').trim();
+    if (!RegExp(r'^\d{10}$').hasMatch(phone)) {
+      setState(() => _error = 'Please enter a valid 10-digit phone number');
       return;
     }
-
-    setState(() {
-      _localError = null;
-    });
-
+    setState(() => _error = null);
     await ref.read(authProvider.notifier).verifyPhone(
-      '+91$phoneText',
-      (verificationId) {
-        if (context.mounted) {
-          _showMessage('OTP sent successfully');
-          context.push('/otp', extra: {
-            'verificationId': verificationId,
-            'phoneNumber': phoneText,
-          });
-        }
+      '+91$phone',
+      (id) {
+        if (!mounted) return;
+        _message('OTP sent successfully');
+        context
+            .push('/otp', extra: {'verificationId': id, 'phoneNumber': phone});
       },
       (error) {
         if (!mounted) return;
-        setState(() {
-          _localError = error;
-        });
-        _showMessage(error);
+        setState(() => _error = error);
+        _message(error);
       },
       (_) {
-        if (context.mounted) {
-          _showMessage('Phone number verified successfully');
-          context.go('/home');
-        }
+        if (!mounted) return;
+        _message('Phone number verified successfully');
+        context.go('/home');
       },
     );
+  }
+
+  void _continueEmail() {
+    if (!RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$')
+        .hasMatch(_emailController.text.trim())) {
+      setState(() => _error = 'Please enter a valid email address');
+      return;
+    }
+    setState(() => _error = null);
+    context.push('/email-auth');
   }
 
   @override
   Widget build(BuildContext context) {
-    // Temporarily disable localization to test rendering
-    // final l10n = AppLocalizations.of(context);
-    final authState = ref.watch(authProvider);
-    final isLoading = authState.isLoading;
-    final displayError = authState.error ?? _localError;
-    final viewInsets = MediaQuery.of(context).viewInsets.bottom;
-    final size = MediaQuery.of(context).size;
-
+    final auth = ref.watch(authProvider);
+    final animation =
+        CurvedAnimation(parent: _entrance, curve: Curves.easeOutCubic);
     return Scaffold(
+      backgroundColor: _background,
       resizeToAvoidBottomInset: true,
-      backgroundColor: AppColors.background,
-      body: Stack(
-        children: [
-          const Positioned.fill(child: _DottedPatternBackground()),
-          Positioned.fill(
-            child: SafeArea(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.fromLTRB(
-                  24,
-                  16,
-                  24,
-                  viewInsets + 24,
-                ),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: size.height - 32,
-                  ),
-                  child: FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: SlideTransition(
-                      position: _slideAnimation,
-                      child: Column(
-                        children: [
-                          _HeaderSection(),
-                          const SizedBox(height: 32),
-                          _LoginCard(
-                            isLoading: isLoading,
-                            phoneController: _phoneController,
-                            errorText: displayError,
-                            isPhoneTab: _isPhoneTab,
-                            onTabChange: (isPhone) {
-                              setState(() {
-                                _isPhoneTab = isPhone;
-                              });
-                            },
-                            onGoogleTap: _handleGoogleSignIn,
-                            onOtpTap: _handleOtpFlow,
-                            onEmailTap: () => context.push('/email-auth'),
-                          ),
-                          const Spacer(),
-                          _FooterSection(
-                            termsRecognizer: _termsRecognizer,
-                            privacyRecognizer: _privacyRecognizer,
-                            legalDisclaimerRecognizer: _legalDisclaimerRecognizer,
-                          ),
-                        ],
+      body: Stack(children: [
+        const Positioned.fill(child: _DottedBackground()),
+        SafeArea(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(
+                24, 16, 24, MediaQuery.viewInsetsOf(context).bottom + 24),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 520),
+                child: FadeTransition(
+                  opacity: animation,
+                  child: SlideTransition(
+                    position: Tween<Offset>(
+                            begin: const Offset(0, .08), end: Offset.zero)
+                        .animate(animation),
+                    child: Column(children: [
+                      const _Header(),
+                      const SizedBox(height: 32),
+                      _LoginCard(
+                        step: _step,
+                        isLoading: auth.isLoading,
+                        error: auth.error ?? _error,
+                        phoneController: _phoneController,
+                        emailController: _emailController,
+                        onStep: _changeStep,
+                        onGoogle: _google,
+                        onOtp: _sendOtp,
+                        onEmail: _continueEmail,
+                        onCreateAccount: () => context.push('/email-auth'),
                       ),
-                    ),
+                      const SizedBox(height: 32),
+                      _Footer(terms: _terms, privacy: _privacy, legal: _legal),
+                    ]),
                   ),
                 ),
               ),
             ),
           ),
-          if (isLoading)
-            Positioned.fill(
+        ),
+        if (auth.isLoading)
+          Positioned.fill(
               child: ColoredBox(
-                color: Colors.white.withValues(alpha: 0.72),
-                child: _LoadingMessage(message: 'Authenticating...'),
-              ),
-            ),
-        ],
-      ),
+                  color: Colors.white.withValues(alpha: .72),
+                  child: const _LoadingMessage())),
+      ]),
     );
   }
 }
 
-class _DottedPatternBackground extends StatelessWidget {
-  const _DottedPatternBackground();
-
+class _DottedBackground extends StatelessWidget {
+  const _DottedBackground();
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.background,
-      ),
-      child: CustomPaint(
-        painter: _DottedPatternPainter(),
-        size: Size.infinite,
-      ),
-    );
-  }
+  Widget build(BuildContext context) =>
+      CustomPaint(painter: _DottedPainter(), size: Size.infinite);
 }
 
-class _DottedPatternPainter extends CustomPainter {
+class _DottedPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final dotPaint = Paint()
-      ..color = AppColors.primary.withValues(alpha: 0.08)
-      ..style = PaintingStyle.fill;
-
-    final dotSpacing = 24.0;
-    final dotRadius = 1.5;
-
-    for (double x = 0; x < size.width; x += dotSpacing) {
-      for (double y = 0; y < size.height; y += dotSpacing) {
-        canvas.drawCircle(Offset(x, y), dotRadius, dotPaint);
+    final paint = Paint()..color = _green.withValues(alpha: .08);
+    for (var x = 0.0; x < size.width; x += 24) {
+      for (var y = 0.0; y < size.height; y += 24) {
+        canvas.drawCircle(Offset(x, y), 1.5, paint);
       }
     }
   }
@@ -274,693 +209,437 @@ class _DottedPatternPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-class _HeaderSection extends StatelessWidget {
+class _Header extends StatelessWidget {
+  const _Header();
   @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            'JusLegal',
-            style: GoogleFonts.notoSans(
-              color: AppColors.primary,
-              fontSize: 24,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: AppColors.outline,
-                width: 1.5,
-              ),
-            ),
-            child: const Icon(
-              Icons.help_outline_rounded,
-              color: AppColors.primary,
-              size: 20,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  Widget build(BuildContext context) =>
+      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+        Text('JusLegal', style: _style(_forest, 24, FontWeight.w700)),
+        const Tooltip(
+            message: 'Help',
+            child: Icon(Icons.help_outline_rounded, color: _forest)),
+      ]);
 }
 
 class _LoginCard extends StatelessWidget {
-  final bool isLoading;
-  final TextEditingController phoneController;
-  final String? errorText;
-  final bool isPhoneTab;
-  final Function(bool) onTabChange;
-  final Future<void> Function() onGoogleTap;
-  final Future<void> Function() onOtpTap;
-  final VoidCallback onEmailTap;
-
   const _LoginCard({
+    required this.step,
     required this.isLoading,
+    required this.error,
     required this.phoneController,
-    required this.errorText,
-    required this.isPhoneTab,
-    required this.onTabChange,
-    required this.onGoogleTap,
-    required this.onOtpTap,
-    required this.onEmailTap,
+    required this.emailController,
+    required this.onStep,
+    required this.onGoogle,
+    required this.onOtp,
+    required this.onEmail,
+    required this.onCreateAccount,
   });
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    
-    return Container(
-      constraints: const BoxConstraints(maxWidth: 420),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(AppTheme.radiusL),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadow,
-            blurRadius: 24,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(32),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // Logo/Brand
-          Text(
-            'JusLegal',
-            style: GoogleFonts.notoSans(
-              color: AppColors.primary,
-              fontSize: 32,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 8),
-          
-          // Heading
-          Text(
-            'Secure Access',
-            style: GoogleFonts.notoSans(
-              color: AppColors.onSurface,
-              fontSize: 28,
-              fontWeight: FontWeight.w700,
-              height: 1.2,
-            ),
-          ),
-          const SizedBox(height: 8),
-          
-          // Subtitle
-          Text(
-            'Sign in to continue your legal journey.',
-            style: GoogleFonts.notoSans(
-              color: AppColors.onSurfaceVariant,
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-          const SizedBox(height: 24),
-          
-          // Tabs
-          _TabSelector(
-            isPhoneTab: isPhoneTab,
-            onTabChange: onTabChange,
-          ),
-          const SizedBox(height: 24),
-          
-          if (isPhoneTab) ...[
-            // Phone input
-            _PhoneInputSection(
-              phoneController: phoneController,
-              isLoading: isLoading,
-              errorText: errorText,
-              onOtpTap: onOtpTap,
-            ),
-          ] else ...[
-            // Email input (placeholder for now)
-            _EmailInputSection(
-              onEmailTap: onEmailTap,
-            ),
-          ],
-          
-          const SizedBox(height: 24),
-          
-          // Separator
-          _Separator(),
-          const SizedBox(height: 24),
-          
-          // Google button
-          _GoogleButton(
-            onTap: isLoading ? null : onGoogleTap,
-          ),
-          const SizedBox(height: 24),
-          
-          // Create account link
-          _CreateAccountLink(),
-          const SizedBox(height: 16),
-          
-          // Disclaimer
-          _Disclaimer(),
-        ],
-      ),
-    );
-  }
-}
-
-class _TabSelector extends StatelessWidget {
-  final bool isPhoneTab;
-  final Function(bool) onTabChange;
-
-  const _TabSelector({
-    required this.isPhoneTab,
-    required this.onTabChange,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(AppTheme.radiusM),
-      ),
-      padding: const EdgeInsets.all(4),
-      child: Row(
-        children: [
-          Expanded(
-            child: GestureDetector(
-              onTap: () => onTabChange(true),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                decoration: BoxDecoration(
-                  color: isPhoneTab ? AppColors.surfaceContainerLowest : Colors.transparent,
-                  borderRadius: BorderRadius.circular(AppTheme.radiusM - 2),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                child: Text(
-                  'Phone',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.notoSans(
-                    color: isPhoneTab ? AppColors.primary : AppColors.onSurfaceVariant,
-                    fontSize: 14,
-                    fontWeight: isPhoneTab ? FontWeight.w600 : FontWeight.w400,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            child: GestureDetector(
-              onTap: () => onTabChange(false),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                decoration: BoxDecoration(
-                  color: !isPhoneTab ? AppColors.surfaceContainerLowest : Colors.transparent,
-                  borderRadius: BorderRadius.circular(AppTheme.radiusM - 2),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                child: Text(
-                  'Email',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.notoSans(
-                    color: !isPhoneTab ? AppColors.primary : AppColors.onSurfaceVariant,
-                    fontSize: 14,
-                    fontWeight: !isPhoneTab ? FontWeight.w600 : FontWeight.w400,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PhoneInputSection extends StatelessWidget {
-  final TextEditingController phoneController;
+  final AuthStep step;
   final bool isLoading;
-  final String? errorText;
-  final Future<void> Function() onOtpTap;
-
-  const _PhoneInputSection({
-    required this.phoneController,
-    required this.isLoading,
-    required this.errorText,
-    required this.onOtpTap,
-  });
+  final String? error;
+  final TextEditingController phoneController;
+  final TextEditingController emailController;
+  final ValueChanged<AuthStep> onStep;
+  final Future<void> Function() onGoogle;
+  final Future<void> Function() onOtp;
+  final VoidCallback onEmail;
+  final VoidCallback onCreateAccount;
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Mobile Number',
-          style: GoogleFonts.notoSans(
-            color: AppColors.onSurface,
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 8),
-        TextField(
-          controller: phoneController,
-          keyboardType: TextInputType.phone,
-          enabled: !isLoading,
-          maxLength: 10,
-          inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly,
-            LengthLimitingTextInputFormatter(10),
-          ],
-          style: GoogleFonts.notoSans(
-            color: AppColors.onSurface,
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
-          ),
-          decoration: InputDecoration(
-            counterText: '',
-            hintText: 'Enter 10-digit number',
-            hintStyle: GoogleFonts.notoSans(
-              color: AppColors.onSurfaceVariant,
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-            ),
-            prefixText: '+91 ',
-            prefixStyle: GoogleFonts.notoSans(
-              color: AppColors.onSurface,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-            filled: true,
-            fillColor: AppColors.surfaceContainerLow,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 16,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusM),
-              borderSide: const BorderSide(
-                color: AppColors.outline,
-                width: 1,
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusM),
-              borderSide: const BorderSide(
-                color: AppColors.primary,
-                width: 2,
-              ),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusM),
-              borderSide: const BorderSide(
-                color: AppColors.error,
-              ),
-            ),
-          ),
-        ),
-        if (errorText != null) ...[
+  Widget build(BuildContext context) => Container(
+        width: double.infinity,
+        constraints: const BoxConstraints(maxWidth: 420),
+        padding: const EdgeInsets.all(28),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(AppTheme.radiusL),
+            boxShadow: const [
+              BoxShadow(
+                  color: AppColors.shadow, blurRadius: 24, offset: Offset(0, 8))
+            ]),
+        child: Column(children: [
+          Text('Secure Access',
+              style: _style(AppColors.onSurface, 28, FontWeight.w700)),
           const SizedBox(height: 8),
-          Text(
-            errorText!,
-            style: GoogleFonts.notoSans(
-              color: AppColors.error,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
+          Text('Sign in to continue your legal journey.',
+              textAlign: TextAlign.center, style: _style(_green, 14)),
+          const SizedBox(height: 24),
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 250),
+            switchInCurve: Curves.easeOutCubic,
+            switchOutCurve: Curves.easeInCubic,
+            transitionBuilder: (child, animation) => FadeTransition(
+                opacity: animation,
+                child: SlideTransition(
+                    position: Tween<Offset>(
+                            begin: const Offset(.04, 0), end: Offset.zero)
+                        .animate(animation),
+                    child: child)),
+            child: _stepContent(),
           ),
-        ],
-        const SizedBox(height: 16),
-        SizedBox(
-          width: double.infinity,
-          height: 48,
-          child: ElevatedButton(
-            onPressed: isLoading ? null : onOtpTap,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryContainer,
-              foregroundColor: AppColors.onPrimary,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppTheme.radiusM),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Send OTP',
-                  style: GoogleFonts.notoSans(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                const Icon(
-                  Icons.arrow_forward,
-                  size: 18,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
+          const SizedBox(height: 20),
+          _CreateAccount(onTap: isLoading ? null : onCreateAccount),
+          const SizedBox(height: 12),
+          Text('Informational only, not an attorney substitute.',
+              textAlign: TextAlign.center,
+              style: _style(
+                  _green, 11, FontWeight.w400, 1.2, null, FontStyle.italic)),
+        ]),
+      );
+
+  Widget _stepContent() {
+    switch (step) {
+      case AuthStep.initial:
+        return _Options(
+            key: const ValueKey(AuthStep.initial),
+            isLoading: isLoading,
+            onEmail: () => onStep(AuthStep.emailForm),
+            onPhone: () => onStep(AuthStep.phoneForm),
+            onGoogle: onGoogle);
+      case AuthStep.emailForm:
+        return _EmailForm(
+            key: const ValueKey(AuthStep.emailForm),
+            controller: emailController,
+            isLoading: isLoading,
+            error: error,
+            onBack: () => onStep(AuthStep.initial),
+            onSubmit: onEmail);
+      case AuthStep.phoneForm:
+        return _PhoneForm(
+            key: const ValueKey(AuthStep.phoneForm),
+            controller: phoneController,
+            isLoading: isLoading,
+            error: error,
+            onBack: () => onStep(AuthStep.initial),
+            onSubmit: onOtp);
+    }
   }
 }
 
-class _EmailInputSection extends StatelessWidget {
-  final VoidCallback onEmailTap;
-
-  const _EmailInputSection({
-    required this.onEmailTap,
-  });
-
+class _Options extends StatelessWidget {
+  const _Options(
+      {super.key,
+      required this.isLoading,
+      required this.onEmail,
+      required this.onPhone,
+      required this.onGoogle});
+  final bool isLoading;
+  final VoidCallback onEmail;
+  final VoidCallback onPhone;
+  final Future<void> Function() onGoogle;
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Email Address',
-          style: GoogleFonts.notoSans(
-            color: AppColors.onSurface,
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
+  Widget build(BuildContext context) => Column(children: [
+        _PrimaryButton(
+            label: 'Continue with Email',
+            icon: Icons.email_outlined,
+            onPressed: isLoading ? null : onEmail),
+        const SizedBox(height: 12),
+        _SecondaryButton(
+            label: 'Continue with Mobile Number',
+            icon: Icons.phone_outlined,
+            onPressed: isLoading ? null : onPhone),
+        const SizedBox(height: 24),
+        const _Separator(),
+        const SizedBox(height: 24),
+        _SecondaryButton(
+            label: 'Continue with Google',
+            leading: Text('G', style: _style(_forest, 18, FontWeight.w700)),
+            onPressed: isLoading ? null : onGoogle),
+      ]);
+}
+
+class _EmailForm extends StatelessWidget {
+  const _EmailForm(
+      {super.key,
+      required this.controller,
+      required this.isLoading,
+      required this.error,
+      required this.onBack,
+      required this.onSubmit});
+  final TextEditingController controller;
+  final bool isLoading;
+  final String? error;
+  final VoidCallback onBack;
+  final VoidCallback onSubmit;
+  @override
+  Widget build(BuildContext context) => _FormShell(
+      title: 'Continue with email',
+      onBack: onBack,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const _Label('Email Address'),
         const SizedBox(height: 8),
         TextField(
-          enabled: false,
-          style: GoogleFonts.notoSans(
-            color: AppColors.onSurface,
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
-          ),
-          decoration: InputDecoration(
-            hintText: 'Enter your email',
-            hintStyle: GoogleFonts.notoSans(
-              color: AppColors.onSurfaceVariant,
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
-            ),
-            filled: true,
-            fillColor: AppColors.surfaceContainerLow,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 16,
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusM),
-              borderSide: const BorderSide(
-                color: AppColors.outline,
-                width: 1,
-              ),
-            ),
-            disabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppTheme.radiusM),
-              borderSide: const BorderSide(
-                color: AppColors.outline,
-                width: 1,
-              ),
-            ),
-          ),
-        ),
+            controller: controller,
+            enabled: !isLoading,
+            keyboardType: TextInputType.emailAddress,
+            autofillHints: const [AutofillHints.email],
+            onSubmitted: (_) => onSubmit(),
+            style: _style(AppColors.onSurface, 16),
+            decoration: _input('Enter your email', icon: Icons.email_outlined)),
+        _Error(error),
         const SizedBox(height: 16),
-        SizedBox(
-          width: double.infinity,
-          height: 48,
-          child: ElevatedButton(
-            onPressed: onEmailTap,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primaryContainer,
-              foregroundColor: AppColors.onPrimary,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppTheme.radiusM),
-              ),
-            ),
-            child: Text(
-              'Continue with Email',
-              style: GoogleFonts.notoSans(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+        _PrimaryButton(
+            label: 'Continue', onPressed: isLoading ? null : onSubmit),
+      ]));
+}
+
+class _PhoneForm extends StatelessWidget {
+  const _PhoneForm(
+      {super.key,
+      required this.controller,
+      required this.isLoading,
+      required this.error,
+      required this.onBack,
+      required this.onSubmit});
+  final TextEditingController controller;
+  final bool isLoading;
+  final String? error;
+  final VoidCallback onBack;
+  final Future<void> Function() onSubmit;
+  @override
+  Widget build(BuildContext context) => _FormShell(
+      title: 'Continue with mobile',
+      onBack: onBack,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const _Label('Phone Number'),
+        const SizedBox(height: 8),
+        TextField(
+            controller: controller,
+            enabled: !isLoading,
+            keyboardType: TextInputType.phone,
+            autofillHints: const [AutofillHints.telephoneNumber],
+            maxLength: 10,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(10)
+            ],
+            onSubmitted: (_) => onSubmit(),
+            style: _style(AppColors.onSurface, 16),
+            decoration: _input('Enter 10-digit number', prefix: '+91 ')
+                .copyWith(counterText: '')),
+        _Error(error),
+        const SizedBox(height: 16),
+        _PrimaryButton(
+            label: 'Send OTP',
+            icon: Icons.arrow_forward,
+            onPressed: isLoading ? null : onSubmit),
+      ]));
+}
+
+class _FormShell extends StatelessWidget {
+  const _FormShell(
+      {required this.title, required this.onBack, required this.child});
+  final String title;
+  final VoidCallback onBack;
+  final Widget child;
+  @override
+  Widget build(BuildContext context) =>
+      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        IconButton(
+            tooltip: 'Back to sign-in options',
+            onPressed: onBack,
+            icon: const Icon(Icons.arrow_back_rounded),
+            color: _forest,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 48, minHeight: 48)),
+        const SizedBox(height: 8),
+        Text(title, style: _style(_forest, 20, FontWeight.w700)),
+        const SizedBox(height: 20),
+        child,
+      ]);
+}
+
+class _Label extends StatelessWidget {
+  const _Label(this.value);
+  final String value;
+  @override
+  Widget build(BuildContext context) =>
+      Text(value, style: _style(AppColors.onSurface, 14, FontWeight.w600));
+}
+
+class _Error extends StatelessWidget {
+  const _Error(this.value);
+  final String? value;
+  @override
+  Widget build(BuildContext context) => value == null
+      ? const SizedBox.shrink()
+      : Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Text(value!,
+              style: _style(AppColors.error, 12, FontWeight.w500)));
+}
+
+class _PrimaryButton extends StatelessWidget {
+  const _PrimaryButton(
+      {required this.label, this.icon, required this.onPressed});
+  final String label;
+  final IconData? icon;
+  final VoidCallback? onPressed;
+  @override
+  Widget build(BuildContext context) => SizedBox(
+      width: double.infinity,
+      child: ElevatedButton.icon(
+        onPressed: onPressed,
+        icon: icon == null ? const SizedBox.shrink() : Icon(icon, size: 19),
+        label: Text(label,
+            textAlign: TextAlign.center,
+            style: _style(Colors.white, 16, FontWeight.w600)),
+        style: ElevatedButton.styleFrom(
+            backgroundColor: _forest,
+            foregroundColor: Colors.white,
+            disabledBackgroundColor: AppColors.surfaceContainerHigh,
+            minimumSize: const Size(48, 48),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppTheme.radiusM))),
+      ));
+}
+
+class _SecondaryButton extends StatelessWidget {
+  const _SecondaryButton(
+      {required this.label, this.icon, this.leading, required this.onPressed});
+  final String label;
+  final IconData? icon;
+  final Widget? leading;
+  final VoidCallback? onPressed;
+  @override
+  Widget build(BuildContext context) => SizedBox(
+      width: double.infinity,
+      child: OutlinedButton(
+        onPressed: onPressed,
+        style: OutlinedButton.styleFrom(
+            foregroundColor: _forest,
+            minimumSize: const Size(48, 48),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            side: const BorderSide(color: _green),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppTheme.radiusM))),
+        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          if (leading != null)
+            leading!
+          else if (icon != null)
+            Icon(icon, size: 19),
+          if (leading != null || icon != null) const SizedBox(width: 10),
+          Flexible(
+              child: Text(label,
+                  textAlign: TextAlign.center,
+                  style: _style(_forest, 16, FontWeight.w600))),
+        ]),
+      ));
 }
 
 class _Separator extends StatelessWidget {
+  const _Separator();
   @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        const Expanded(
-          child: Divider(
-            color: AppColors.outlineVariant,
-            thickness: 1,
-          ),
-        ),
+  Widget build(BuildContext context) => Row(children: [
+        const Expanded(child: Divider(color: AppColors.outlineVariant)),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Text(
-            'Or continue with',
-            style: GoogleFonts.notoSans(
-              color: AppColors.onSurfaceVariant,
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ),
-        const Expanded(
-          child: Divider(
-            color: AppColors.outlineVariant,
-            thickness: 1,
-          ),
-        ),
-      ],
-    );
-  }
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Text('Or continue with', style: _style(_green, 12))),
+        const Expanded(child: Divider(color: AppColors.outlineVariant))
+      ]);
 }
 
-class _GoogleButton extends StatelessWidget {
+class _CreateAccount extends StatelessWidget {
+  const _CreateAccount({required this.onTap});
   final VoidCallback? onTap;
-
-  const _GoogleButton({
-    required this.onTap,
-  });
-
   @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 48,
-      child: OutlinedButton(
-        onPressed: onTap,
-        style: OutlinedButton.styleFrom(
-          backgroundColor: AppColors.surfaceContainerLowest,
-          foregroundColor: AppColors.onSurface,
-          side: const BorderSide(
-            color: AppColors.outline,
-            width: 1,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppTheme.radiusM),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Google Logo
-            Container(
-              width: 20,
-              height: 20,
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: NetworkImage('https://www.google.com/favicon.ico'),
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Text(
-              'Continue with Google',
-              style: GoogleFonts.notoSans(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => TextButton(
+      onPressed: onTap,
+      style: TextButton.styleFrom(
+          minimumSize: const Size(48, 48),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12)),
+      child: RichText(
+          textAlign: TextAlign.center,
+          text: TextSpan(style: _style(_green, 14), children: [
+            const TextSpan(text: 'New to JusLegal? '),
+            TextSpan(
+                text: 'Create an account',
+                style: _style(_forest, 14, FontWeight.w700, 1.2,
+                    TextDecoration.underline))
+          ])));
 }
 
-class _CreateAccountLink extends StatelessWidget {
+class _Footer extends StatelessWidget {
+  const _Footer(
+      {required this.terms, required this.privacy, required this.legal});
+  final TapGestureRecognizer terms;
+  final TapGestureRecognizer privacy;
+  final TapGestureRecognizer legal;
   @override
-  Widget build(BuildContext context) {
-    return RichText(
-      textAlign: TextAlign.center,
-      text: TextSpan(
-        style: GoogleFonts.notoSans(
-          color: AppColors.onSurfaceVariant,
-          fontSize: 14,
-          fontWeight: FontWeight.w400,
-        ),
-        children: [
-          const TextSpan(text: 'New to JusLegal? '),
-          TextSpan(
-            text: 'Create an account',
-            style: GoogleFonts.notoSans(
-              color: AppColors.primary,
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Disclaimer extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      'Informational only, not an attorney substitute.',
-      textAlign: TextAlign.center,
-      style: GoogleFonts.notoSans(
-        color: AppColors.onSurfaceVariant,
-        fontSize: 11,
-        fontWeight: FontWeight.w400,
-        fontStyle: FontStyle.italic,
-      ),
-    );
-  }
-}
-
-class _FooterSection extends StatelessWidget {
-  final TapGestureRecognizer termsRecognizer;
-  final TapGestureRecognizer privacyRecognizer;
-  final TapGestureRecognizer legalDisclaimerRecognizer;
-
-  const _FooterSection({
-    required this.termsRecognizer,
-    required this.privacyRecognizer,
-    required this.legalDisclaimerRecognizer,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      child: Column(
-        children: [
-          const Divider(
-            color: AppColors.outlineVariant,
-            thickness: 1,
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget build(BuildContext context) => Column(children: [
+        const Divider(color: AppColors.outlineVariant),
+        const SizedBox(height: 16),
+        Text('© 2024 JusLegal. Justice for all, grounded in ethics.',
+            textAlign: TextAlign.center, style: _style(_green, 11)),
+        const SizedBox(height: 10),
+        Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 16,
+            runSpacing: 8,
             children: [
-              Expanded(
-                child: Text(
-                  'JusLegal © 2024 JusLegal. Justice for all, grounded in ethics.',
-                  style: GoogleFonts.notoSans(
-                    color: AppColors.primary,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Row(
-                children: [
-                  _FooterLink(
-                    text: 'Privacy Policy',
-                    recognizer: privacyRecognizer,
-                  ),
-                  const SizedBox(width: 16),
-                  _FooterLink(
-                    text: 'Terms of Service',
-                    recognizer: termsRecognizer,
-                  ),
-                  const SizedBox(width: 16),
-                  _FooterLink(
-                    text: 'Legal Disclaimer',
-                    recognizer: legalDisclaimerRecognizer,
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+              _FooterLink('Privacy Policy', privacy),
+              _FooterLink('Terms of Service', terms),
+              _FooterLink('Legal Disclaimer', legal)
+            ]),
+      ]);
 }
 
 class _FooterLink extends StatelessWidget {
+  const _FooterLink(this.text, this.recognizer);
   final String text;
   final TapGestureRecognizer recognizer;
-
-  const _FooterLink({
-    required this.text,
-    required this.recognizer,
-  });
-
   @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
+  Widget build(BuildContext context) => GestureDetector(
       onTap: recognizer.onTap,
-      child: Text(
-        text,
-        style: GoogleFonts.notoSans(
-          color: AppColors.primary,
-          fontSize: 11,
-          fontWeight: FontWeight.w500,
-          decoration: TextDecoration.underline,
-        ),
-      ),
-    );
-  }
+      child: Text(text,
+          style: _style(
+              _forest, 11, FontWeight.w600, 1.2, TextDecoration.underline)));
 }
 
 class _LoadingMessage extends StatelessWidget {
-  final String message;
-
-  const _LoadingMessage({required this.message});
-
+  const _LoadingMessage();
   @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const LoadingWidget(size: 40),
-          const SizedBox(height: 16),
-          Text(
-            message,
-            style: GoogleFonts.notoSans(
-              color: AppColors.textPrimary,
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  Widget build(BuildContext context) => Center(
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+        const LoadingWidget(size: 40),
+        const SizedBox(height: 16),
+        Text('Authenticating...',
+            style: _style(AppColors.textPrimary, 14, FontWeight.w600))
+      ]));
 }
+
+TextStyle _style(Color color, double size,
+        [FontWeight weight = FontWeight.w400,
+        double height = 1.2,
+        TextDecoration? decoration,
+        FontStyle? fontStyle]) =>
+    GoogleFonts.notoSans(
+        color: color,
+        fontSize: size,
+        fontWeight: weight,
+        height: height,
+        decoration: decoration,
+        fontStyle: fontStyle);
+
+InputDecoration _input(String hint, {IconData? icon, String? prefix}) =>
+    InputDecoration(
+      hintText: hint,
+      hintStyle: _style(AppColors.onSurfaceVariant, 16),
+      prefixIcon: icon == null ? null : Icon(icon, color: _green),
+      prefixText: prefix,
+      prefixStyle: _style(_forest, 16, FontWeight.w600),
+      filled: true,
+      fillColor: AppColors.surfaceContainerLow,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusM),
+          borderSide: const BorderSide(color: AppColors.outline)),
+      focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusM),
+          borderSide: const BorderSide(color: _green, width: 2)),
+      errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppTheme.radiusM),
+          borderSide: const BorderSide(color: AppColors.error)),
+    );

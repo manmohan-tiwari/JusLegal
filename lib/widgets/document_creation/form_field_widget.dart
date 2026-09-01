@@ -1,6 +1,6 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../core/config/theme_config.dart';
+import 'package:juslegal/core/core.dart';
 import '../../models/form_field_model.dart';
 
 class FormFieldWidget extends StatelessWidget {

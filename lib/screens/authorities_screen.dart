@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../core/constants/app_config.dart';
-import '../core/config/theme_config.dart';
+import 'package:juslegal/core/core.dart';
 import '../widgets/empty_state_widget.dart';
 
 class AuthoritiesScreen extends StatefulWidget {

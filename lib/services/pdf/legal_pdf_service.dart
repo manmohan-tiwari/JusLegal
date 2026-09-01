@@ -3,11 +3,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 import 'legal_pdf_models.dart';
-import 'pdf_templates/affidavit_template.dart';
-import 'pdf_templates/court_template.dart';
-import 'pdf_templates/letter_template.dart';
-import 'pdf_templates/notice_template.dart';
-import 'pdf_templates/rti_template.dart';
+import 'pdf_builder.dart';
 
 /// The sole public entry point for A4 legal document generation and sharing.
 class LegalPdfService {
@@ -31,20 +27,7 @@ class LegalPdfService {
 
   static Future<Uint8List> _buildPdf(LegalDocument doc, String locale) async {
     final pdf = pw.Document(theme: await _buildTheme(locale));
-    switch (doc.documentType) {
-      case 'court_complaint':
-        return CourtTemplate.build(pdf, doc as CourtComplaintDocument);
-      case 'letter':
-        return LetterTemplate.build(pdf, doc as FormalLetterDocument);
-      case 'rti':
-        return RtiTemplate.build(pdf, doc as RtiDocument);
-      case 'notice':
-        return NoticeTemplate.build(pdf, doc as LegalNoticeDocument);
-      case 'affidavit':
-        return AffidavitTemplate.build(pdf, doc as AffidavitDocument);
-    }
-    throw ArgumentError.value(
-        doc.documentType, 'documentType', 'Unsupported legal document type');
+    return PdfBuilder.build(pdf, doc);
   }
 
   static Future<pw.ThemeData> _buildTheme(String locale) async {

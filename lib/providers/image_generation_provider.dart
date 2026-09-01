@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../core/config/env_config.dart';
-import '../services/siliconflow_service.dart';
+import 'package:juslegal/core/core.dart';
+import '../services/ai_service.dart';
 
 final siliconFlowApiKeyProvider = Provider<String>((ref) {
   return EnvConfig.siliconflowApiKey;

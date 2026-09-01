@@ -1,7 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
-import '../core/config/theme_config.dart';
+import 'package:juslegal/core/core.dart';
 
 /// Entry point for reviewing a legal document or contract.
 ///

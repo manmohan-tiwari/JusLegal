@@ -1,5 +1,5 @@
-﻿import 'package:flutter/material.dart';
-import '../core/config/theme_config.dart';
+import 'package:flutter/material.dart';
+import 'package:juslegal/core/core.dart';
 
 class LoadingWidget extends StatefulWidget {
   final String? message;

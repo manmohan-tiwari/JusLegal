@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import '../core/constants/app_animations.dart';
-import '../core/config/theme_config.dart';
+import 'package:juslegal/core/core.dart';
 
 class CategoryCard extends StatelessWidget {
   final IconData icon;

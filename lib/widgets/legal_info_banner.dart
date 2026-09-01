@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../core/config/theme_config.dart';
+import 'package:juslegal/core/core.dart';
 
 class LegalInfoBanner extends StatelessWidget {
   final String message;

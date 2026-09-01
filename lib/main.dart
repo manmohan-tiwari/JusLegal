@@ -10,12 +10,10 @@ import 'package:flutter/foundation.dart' show kDebugMode, defaultTargetPlatform;
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:juslegal/l10n/gen/app_localizations.dart';
-import 'core/constants/app_config.dart';
+import 'package:juslegal/core/core.dart';
 import 'core/constants/firebase_options.dart';
-import 'core/config/env_config.dart';
 import 'core/router/app_router.dart';
 import 'core/services/analytics_service.dart';
-import 'core/config/theme_config.dart';
 import 'providers/locale_provider.dart';
 
 Future<void> main() async {

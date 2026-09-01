@@ -9,8 +9,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../core/config/theme_config.dart';
-import '../core/constants/app_config.dart';
+import 'package:juslegal/core/core.dart';
 import '../core/services/analytics_service.dart';
 import '../providers/locale_provider.dart';
 

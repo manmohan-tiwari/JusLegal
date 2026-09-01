@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../core/config/theme_config.dart';
+import 'package:juslegal/core/core.dart';
 import '../services/auth_handler.dart';
 
 class EmailAuthScreen extends ConsumerStatefulWidget {

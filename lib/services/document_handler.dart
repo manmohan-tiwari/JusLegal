@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/form_field_model.dart';
 import '../models/form_template_model.dart';
-import '../core/config/templates.dart';
+import 'package:juslegal/core/core.dart';
 import 'ai_service.dart';
 
 class DocumentCreationService {

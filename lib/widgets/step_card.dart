@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../core/config/theme_config.dart';
+import 'package:juslegal/core/core.dart';
 
 class StepCard extends StatelessWidget {
   final int index;
