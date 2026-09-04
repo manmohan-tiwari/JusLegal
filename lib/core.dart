@@ -22,6 +22,7 @@ export 'core/services/analytics_service.dart';
 
 // Utils
 export 'core/utils/logger.dart';
+export 'core/utils/password_validator.dart';
 export 'core/utils/rate_limiter.dart';
 export 'core/utils/text_utils.dart';
 

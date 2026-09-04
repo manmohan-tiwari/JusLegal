@@ -106,6 +106,8 @@
   "otpSentSuccessfully": "OTP sent successfully",
   "phoneNumberVerifiedSuccessfully": "Phone number verified successfully",
   "appleSignInSoon": "Apple sign-in will be available soon.",
+  "unableToOpenLink": "Unable to open this link. Please try again.",
+  "tooManyOtpRequests": "Too many attempts. Please wait before requesting another OTP.",
   "reachUsAt": "Reach us at {email}",
   "@reachUsAt": {
     "placeholders": {
@@ -247,5 +249,15 @@
 
   "serviceUnavailable": "Service unavailable",
   "signInFeaturesTemporarilyUnavailable": "Sign-in features are temporarily unavailable. Please try again later.",
-  "privacyPolicyBody": "This page explains how JusLegal handles your information when you use the app for legal guidance."
+  "privacyPolicyBody": "This page explains how JusLegal handles your information when you use the app for legal guidance.",
+  "appTagline": "Know Your Rights. Take Action.",
+  "onboardingDisclaimer": "JusLegal provides general legal guidance based on Indian law. It does not replace professional legal advice. For complex or criminal matters, always consult a practicing advocate.",
+  "resultDisclaimer": "General guidance only. Not legal advice.",
+  "documentDisclaimer": "This document was generated for reference purposes. Review carefully before sending.",
+  "problemSummaryEmpty": "Problem summary cannot be empty.",
+  "serviceTemporarilyUnavailable": "Service temporarily unavailable. Please try again in a few minutes.",
+  "noInternetConnection": "No internet connection. Please check your network and try again.",
+  "tooManyRequests": "Too many requests. Please wait a moment and try again.",
+  "configurationError": "Service configuration error. Please try again later.",
+  "unableToProcessResponse": "Unable to process AI response. Please try again."
 }

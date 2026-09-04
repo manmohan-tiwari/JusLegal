@@ -722,6 +722,18 @@ abstract class AppLocalizations {
   /// **'Apple sign-in will be available soon.'**
   String get appleSignInSoon;
 
+  /// No description provided for @unableToOpenLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to open this link. Please try again.'**
+  String get unableToOpenLink;
+
+  /// No description provided for @tooManyOtpRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many attempts. Please wait before requesting another OTP.'**
+  String get tooManyOtpRequests;
+
   /// No description provided for @reachUsAt.
   ///
   /// In en, this message translates to:
@@ -1279,6 +1291,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This page explains how JusLegal handles your information when you use the app for legal guidance.'**
   String get privacyPolicyBody;
+
+  /// No description provided for @appTagline.
+  ///
+  /// In en, this message translates to:
+  /// **'Know Your Rights. Take Action.'**
+  String get appTagline;
+
+  /// No description provided for @onboardingDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'JusLegal provides general legal guidance based on Indian law. It does not replace professional legal advice. For complex or criminal matters, always consult a practicing advocate.'**
+  String get onboardingDisclaimer;
+
+  /// No description provided for @resultDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'General guidance only. Not legal advice.'**
+  String get resultDisclaimer;
+
+  /// No description provided for @documentDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'This document was generated for reference purposes. Review carefully before sending.'**
+  String get documentDisclaimer;
+
+  /// No description provided for @problemSummaryEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Problem summary cannot be empty.'**
+  String get problemSummaryEmpty;
+
+  /// No description provided for @serviceTemporarilyUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Service temporarily unavailable. Please try again in a few minutes.'**
+  String get serviceTemporarilyUnavailable;
+
+  /// No description provided for @noInternetConnection.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet connection. Please check your network and try again.'**
+  String get noInternetConnection;
+
+  /// No description provided for @tooManyRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many requests. Please wait a moment and try again.'**
+  String get tooManyRequests;
+
+  /// No description provided for @configurationError.
+  ///
+  /// In en, this message translates to:
+  /// **'Service configuration error. Please try again later.'**
+  String get configurationError;
+
+  /// No description provided for @unableToProcessResponse.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to process AI response. Please try again.'**
+  String get unableToProcessResponse;
 }
 
 class _AppLocalizationsDelegate

@@ -1,9 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:juslegal/l10n/gen/app_localizations.dart';
 
 import '../../models/legal_result_model.dart';
+import '../../services/auth_handler.dart';
+import '../../services/firebase_token_service.dart';
 import '../../screens/authorities_screen.dart';
 import '../../screens/complaint_generator_screen.dart';
 import '../../screens/email_auth_screen.dart';
@@ -17,13 +18,19 @@ import '../../screens/legal_terms_screen.dart';
 import '../../screens/legal_writing_screen.dart';
 import '../../screens/login_screen_new.dart';
 import '../../screens/my_cases_screen.dart';
+import '../../screens/not_found_screen.dart';
 import '../../screens/otp_screen.dart';
 import '../../screens/privacy_policy_screen.dart';
 import '../../screens/problem_analyzer_screen.dart';
 import '../../screens/result_screen.dart';
 import '../../screens/settings_screen.dart';
+import 'otp_route_params.dart';
 
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
+
+class RouterRefreshNotifier extends ChangeNotifier {
+  void refresh() => notifyListeners();
+}
 
 class AppRouteNames {
   static const String login = 'login';
@@ -38,6 +45,7 @@ class AppRouteNames {
   static const String settings = 'settings';
   static const String privacyPolicy = 'privacyPolicy';
   static const String firebaseUnavailable = 'firebaseUnavailable';
+  static const String legalTermsRoot = 'legalTermsRoot';
 
   // Legal utilities
   static const String aiLawyerChat = 'aiLawyerChat';
@@ -51,22 +59,44 @@ class AppRouteNames {
   // static const String homeContractNegotiation = 'contractNegotiation';
 }
 
-GoRouter buildRouter({required bool firebaseAvailable}) {
+GoRouter buildRouter({
+  required bool firebaseAvailable,
+  required AuthState Function() getAuthState,
+  required Listenable refreshListenable,
+}) {
   return GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: '/',
-    redirect: (context, state) {
+    refreshListenable: refreshListenable,
+    errorBuilder: (context, state) => const NotFoundScreen(),
+    redirect: (context, state) async {
       final path = state.uri.path;
       if (!firebaseAvailable) {
-        if (path == '/privacy-policy' || path == '/firebase-unavailable') {
+        if (path == '/privacy-policy' ||
+          path == '/legal-terms' ||
+          path == '/firebase-unavailable') {
           return null;
         }
         return '/firebase-unavailable';
       }
-      final user = FirebaseAuth.instance.currentUser;
+        final user = getAuthState().user;
+        final isProtectedRoute = path == '/home' ||
+          path.startsWith('/home/') ||
+          path == '/analyze';
 
-      // If path starts with /home and user is not authenticated, redirect to login
-      if (path.startsWith('/home') && user == null) {
+      if (isProtectedRoute && user == null) {
+        return '/login';
+      }
+
+      if (isProtectedRoute &&
+          user != null &&
+          user.providerData.any((provider) =>
+              provider.providerId == 'password') &&
+          !user.emailVerified) {
+        return '/email-auth';
+      }
+
+      if (isProtectedRoute && await FirebaseTokenService().getIdToken() == null) {
         return '/login';
       }
 
@@ -88,6 +118,11 @@ GoRouter buildRouter({required bool firebaseAvailable}) {
         builder: (context, state) => const PrivacyPolicyScreen(),
       ),
       GoRoute(
+        path: '/legal-terms',
+        name: AppRouteNames.legalTermsRoot,
+        builder: (context, state) => const LegalTermsScreen(),
+      ),
+      GoRoute(
         path: '/firebase-unavailable',
         name: AppRouteNames.firebaseUnavailable,
         builder: (context, state) => const _FirebaseUnavailableScreen(),
@@ -106,11 +141,19 @@ GoRouter buildRouter({required bool firebaseAvailable}) {
         path: '/otp',
         name: AppRouteNames.otp,
         builder: (context, state) {
-          final extra = (state.extra as Map<String, dynamic>?) ?? {};
+          final params = OtpRouteParams.fromExtra(state.extra);
           return OtpScreen(
-            verificationId: extra['verificationId'] as String? ?? '',
-            phoneNumber: extra['phoneNumber'] as String? ?? '',
+            verificationId: params.verificationId,
+            phoneNumber: params.phoneNumber,
           );
+        },
+      ),
+      GoRoute(
+        path: '/analyze',
+        name: 'analyzeLegacy',
+        builder: (context, state) {
+          final category = state.uri.queryParameters['category'];
+          return ProblemAnalyzerScreen(initialCategory: category);
         },
       ),
       GoRoute(

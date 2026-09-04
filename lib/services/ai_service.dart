@@ -634,7 +634,7 @@ class _WorkerChatClient {
   })  : _tokenService = tokenService ?? FirebaseTokenService(),
         _dio = dio ??
             Dio(BaseOptions(
-              baseUrl: WORKER_BASE_URL,
+              baseUrl: EnvironmentState.workerBaseUrl,
               connectTimeout: ApiConstants.connectionTimeout,
               receiveTimeout: ApiConstants.receiveTimeout,
               headers: {

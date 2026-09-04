@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:juslegal/core/config/app_config.dart';
 
 /// A safe wrapper around Firebase Analytics that handles initialization
 /// failures gracefully and provides fallback behavior.
@@ -56,6 +57,9 @@ class SafeAnalytics {
       // Load user consent preferences
       final prefs = await SharedPreferences.getInstance();
       _analyticsEnabled = prefs.getBool(_analyticsConsentKey) ?? false;
+      if (!FeatureFlags.analyticsConsentEnabled) {
+        _analyticsEnabled = false;
+      }
       _crashlyticsEnabled = prefs.getBool(_crashlyticsConsentKey) ?? false;
 
       // Apply consent settings
@@ -101,6 +105,7 @@ class SafeAnalytics {
 
   /// Enable analytics collection
   static Future<void> enableAnalytics() async {
+    if (!FeatureFlags.analyticsConsentEnabled) return;
     _analyticsEnabled = true;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_analyticsConsentKey, true);

@@ -7,6 +7,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:juslegal/core/core.dart';
+import 'package:juslegal/core/router/otp_route_params.dart';
+import '../l10n/gen/app_localizations.dart';
 import '../services/auth_handler.dart';
 import '../widgets/loading_widget.dart';
 
@@ -30,6 +32,7 @@ class _LoginScreenNewState extends ConsumerState<LoginScreenNew>
   late final TapGestureRecognizer _terms;
   late final TapGestureRecognizer _privacy;
   late final TapGestureRecognizer _legal;
+  late final RateLimiter _otpLimiter;
   AuthStep _step = AuthStep.initial;
   String? _error;
 
@@ -40,7 +43,11 @@ class _LoginScreenNewState extends ConsumerState<LoginScreenNew>
     _emailController = TextEditingController();
     _terms = TapGestureRecognizer()..onTap = _openTerms;
     _privacy = TapGestureRecognizer()..onTap = _openPrivacy;
-    _legal = TapGestureRecognizer()..onTap = () => context.push('/legal-terms');
+    _legal = TapGestureRecognizer()..onTap = _openLegal;
+    _otpLimiter = RateLimiter(
+      minInterval: const Duration(seconds: 30),
+      maxCallsPerInterval: 1,
+    );
     _entrance = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 650))
       ..forward();
@@ -54,22 +61,32 @@ class _LoginScreenNewState extends ConsumerState<LoginScreenNew>
     _terms.dispose();
     _privacy.dispose();
     _legal.dispose();
+    _otpLimiter.dispose();
     super.dispose();
   }
 
-  Future<void> _openTerms() async {
-    final uri = Uri.parse(AppConfig.termsOfServiceUrl);
-    if (await canLaunchUrl(uri)) {
+  Future<void> _openLink(String url, String failureMessage) async {
+    final uri = Uri.parse(url);
+    if (!await canLaunchUrl(uri)) {
+      if (mounted) _message(failureMessage);
+      return;
+    }
+    try {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (_) {
+      if (mounted) _message(failureMessage);
     }
   }
 
-  Future<void> _openPrivacy() async {
-    final uri = Uri.parse(AppConfig.privacyPolicyUrl);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
-  }
+  Future<void> _openTerms() => _openLink(
+      AppConfig.termsOfServiceUrl, _l10n.unableToOpenLink);
+
+  Future<void> _openPrivacy() =>
+      _openLink(AppConfig.privacyPolicyUrl, _l10n.unableToOpenLink);
+
+  void _openLegal() => context.push('/legal-terms');
+
+  AppLocalizations get _l10n => AppLocalizations.of(context);
 
   void _message(String value) => ScaffoldMessenger.of(context)
     ..hideCurrentSnackBar()
@@ -85,49 +102,64 @@ class _LoginScreenNewState extends ConsumerState<LoginScreenNew>
       await ref.read(authProvider.notifier).signInWithGoogle();
       if (mounted) context.go('/home');
     } catch (e) {
-      if (!mounted) return;
-      final message = ref.read(authProvider).error ?? e.toString();
-      setState(() => _error = message);
-      _message(message);
+      if (e is AuthCancelledException) return;
+      _handleAuthError(e.toString());
     }
   }
 
   Future<void> _sendOtp() async {
     final phone = _phoneController.text.replaceAll(RegExp(r'\s+'), '').trim();
     if (!RegExp(r'^\d{10}$').hasMatch(phone)) {
-      setState(() => _error = 'Please enter a valid 10-digit phone number');
+      setState(() => _error = _l10n.validPhoneNumberError);
+      return;
+    }
+    if (!_otpLimiter.isCallAllowed()) {
+      _message(_l10n.tooManyOtpRequests);
       return;
     }
     setState(() => _error = null);
-    await ref.read(authProvider.notifier).verifyPhone(
-      '+91$phone',
-      (id) {
-        if (!mounted) return;
-        _message('OTP sent successfully');
-        context
-            .push('/otp', extra: {'verificationId': id, 'phoneNumber': phone});
-      },
-      (error) {
-        if (!mounted) return;
-        setState(() => _error = error);
-        _message(error);
-      },
-      (_) {
-        if (!mounted) return;
-        _message('Phone number verified successfully');
-        context.go('/home');
-      },
-    );
+    try {
+      await ref.read(authProvider.notifier).verifyPhone(
+        '${AppConfig.defaultCountryCode}$phone',
+        (id) {
+          if (!mounted) return;
+          _message(_l10n.otpSentSuccessfully);
+          context.push('/otp',
+              extra: OtpRouteParams(
+                verificationId: id,
+                phoneNumber: phone,
+              ));
+        },
+        (error) => _handleAuthError(error),
+        (_) {
+          if (!mounted) return;
+          _message(_l10n.phoneNumberVerifiedSuccessfully);
+          context.go('/home');
+        },
+      );
+    } catch (e) {
+      _handleAuthError(e.toString());
+    }
   }
 
-  void _continueEmail() {
-    if (!RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$')
-        .hasMatch(_emailController.text.trim())) {
-      setState(() => _error = 'Please enter a valid email address');
+  Future<void> _continueEmail() async {
+    final email = _emailController.text.trim();
+    if (!_isValidEmail(email)) {
+      setState(() => _error = _l10n.pleaseEnterValidEmail);
       return;
     }
     setState(() => _error = null);
-    context.push('/email-auth');
+    if (mounted) await context.push('/email-auth');
+  }
+
+  void _handleAuthError(String message) {
+    if (!mounted) return;
+    setState(() => _error = message);
+    _message(message);
+  }
+
+  static bool _isValidEmail(String email) {
+    return RegExp(r"^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$").hasMatch(email);
   }
 
   @override
@@ -159,7 +191,7 @@ class _LoginScreenNewState extends ConsumerState<LoginScreenNew>
                       _LoginCard(
                         step: _step,
                         isLoading: auth.isLoading,
-                        error: auth.error ?? _error,
+                        error: _error,
                         phoneController: _phoneController,
                         emailController: _emailController,
                         onStep: _changeStep,
@@ -343,7 +375,9 @@ class _Options extends StatelessWidget {
         const SizedBox(height: 24),
         _SecondaryButton(
             label: 'Continue with Google',
-            leading: Text('G', style: _style(_forest, 18, FontWeight.w700)),
+            leading: Semantics(
+                label: 'Google',
+                child: Text('G', style: _style(_forest, 18, FontWeight.w700))),
             onPressed: isLoading ? null : onGoogle),
       ]);
 }
@@ -371,6 +405,7 @@ class _EmailForm extends StatelessWidget {
         TextField(
             controller: controller,
             enabled: !isLoading,
+            autofocus: true,
             keyboardType: TextInputType.emailAddress,
             autofillHints: const [AutofillHints.email],
             onSubmitted: (_) => onSubmit(),
@@ -406,6 +441,7 @@ class _PhoneForm extends StatelessWidget {
         TextField(
             controller: controller,
             enabled: !isLoading,
+            autofocus: true,
             keyboardType: TextInputType.phone,
             autofillHints: const [AutofillHints.telephoneNumber],
             maxLength: 10,
@@ -415,7 +451,8 @@ class _PhoneForm extends StatelessWidget {
             ],
             onSubmitted: (_) => onSubmit(),
             style: _style(AppColors.onSurface, 16),
-            decoration: _input('Enter 10-digit number', prefix: '+91 ')
+            decoration: _input('Enter 10-digit number',
+                    prefix: '${AppConfig.defaultCountryCode} ')
                 .copyWith(counterText: '')),
         _Error(error),
         const SizedBox(height: 16),
@@ -591,11 +628,14 @@ class _FooterLink extends StatelessWidget {
   final String text;
   final TapGestureRecognizer recognizer;
   @override
-  Widget build(BuildContext context) => GestureDetector(
-      onTap: recognizer.onTap,
-      child: Text(text,
+  Widget build(BuildContext context) => Text.rich(
+        TextSpan(
+          text: text,
+          recognizer: recognizer,
           style: _style(
-              _forest, 11, FontWeight.w600, 1.2, TextDecoration.underline)));
+              _forest, 11, FontWeight.w600, 1.2, TextDecoration.underline),
+        ),
+      );
 }
 
 class _LoadingMessage extends StatelessWidget {

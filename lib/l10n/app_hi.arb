@@ -106,6 +106,8 @@
   "otpSentSuccessfully": "OTP सफलतापूर्वक भेजा गया",
   "phoneNumberVerifiedSuccessfully": "फोन नंबर सफलतापूर्वक सत्यापित हुआ",
   "appleSignInSoon": "Apple साइन-इन जल्द उपलब्ध होगा।",
+  "unableToOpenLink": "यह लिंक खोलने में असमर्थ। कृपया पुनः प्रयास करें।",
+  "tooManyOtpRequests": "बहुत अधिक प्रयास। कृपया दूसरा OTP अनुरोध करने से पहले प्रतीक्षा करें।",
   "reachUsAt": "हमसे संपर्क करें: {email}",
   "@reachUsAt": {
     "placeholders": {

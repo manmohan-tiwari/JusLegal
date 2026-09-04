@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:juslegal/core/config/app_config.dart';
 
 /// SecurityAudit: Manages dynamic Firebase ID tokens for proxy authentication.
 /// Replaces static PROXY_AUTH_TOKEN with short-lived, cryptographically signed tokens.
@@ -32,7 +33,8 @@ class FirebaseTokenService {
       // Use cached token if still valid (refresh 5 minutes before expiry)
       if (_cachedToken != null &&
           _tokenExpiry != null &&
-          DateTime.now().isBefore(_tokenExpiry!.subtract(const Duration(minutes: 5)))) {
+            DateTime.now().isBefore(
+              _tokenExpiry!.subtract(AuthConfig.tokenRefreshBeforeExpiry))) {
         if (kDebugMode) {
           debugPrint('[FirebaseTokenService] Using cached ID token');
         }
@@ -44,7 +46,7 @@ class FirebaseTokenService {
         debugPrint('[FirebaseTokenService] Fetching fresh ID token');
       }
 
-      final idTokenResult = await currentUser.getIdTokenResult(true);
+      final idTokenResult = await currentUser.getIdTokenResult(false);
       _cachedToken = idTokenResult.token;
       _tokenExpiry = idTokenResult.expirationTime;
 

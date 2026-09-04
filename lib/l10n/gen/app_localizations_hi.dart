@@ -346,6 +346,14 @@ class AppLocalizationsHi extends AppLocalizations {
   String get appleSignInSoon => 'Apple साइन-इन जल्द उपलब्ध होगा।';
 
   @override
+  String get unableToOpenLink =>
+      'यह लिंक खोलने में असमर्थ। कृपया पुनः प्रयास करें।';
+
+  @override
+  String get tooManyOtpRequests =>
+      'बहुत अधिक प्रयास। कृपया दूसरा OTP अनुरोध करने से पहले प्रतीक्षा करें।';
+
+  @override
   String reachUsAt(String email) {
     return 'हमसे संपर्क करें: $email';
   }
@@ -644,4 +652,41 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get privacyPolicyBody =>
       'यह पृष्ठ बताता है कि JusLegal ऐप का उपयोग करते समय आपकी जानकारी को कैसे संभालता है।';
+
+  @override
+  String get appTagline => 'Know Your Rights. Take Action.';
+
+  @override
+  String get onboardingDisclaimer =>
+      'JusLegal provides general legal guidance based on Indian law. It does not replace professional legal advice. For complex or criminal matters, always consult a practicing advocate.';
+
+  @override
+  String get resultDisclaimer => 'General guidance only. Not legal advice.';
+
+  @override
+  String get documentDisclaimer =>
+      'This document was generated for reference purposes. Review carefully before sending.';
+
+  @override
+  String get problemSummaryEmpty => 'Problem summary cannot be empty.';
+
+  @override
+  String get serviceTemporarilyUnavailable =>
+      'Service temporarily unavailable. Please try again in a few minutes.';
+
+  @override
+  String get noInternetConnection =>
+      'No internet connection. Please check your network and try again.';
+
+  @override
+  String get tooManyRequests =>
+      'Too many requests. Please wait a moment and try again.';
+
+  @override
+  String get configurationError =>
+      'Service configuration error. Please try again later.';
+
+  @override
+  String get unableToProcessResponse =>
+      'Unable to process AI response. Please try again.';
 }

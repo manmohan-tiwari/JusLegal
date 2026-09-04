@@ -29,24 +29,38 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   late final List<TextEditingController> _controllers;
 
   Timer? _timer;
+  Timer? _debounceTimer;
   int _secondsRemaining = 30;
   String? _localError;
   bool _isAutoSubmitted = false;
+  late String _currentVerificationId;
 
   @override
   void initState() {
     super.initState();
+    _currentVerificationId = widget.verificationId;
     _focusNodes = List.generate(6, (index) => FocusNode());
     _controllers = List.generate(6, (index) => TextEditingController());
     _startTimer();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _focusNodes[0].requestFocus();
+      }
+    });
   }
 
   void _startTimer() {
+    if (!mounted) return;
     setState(() {
       _secondsRemaining = 30;
     });
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
       if (_secondsRemaining > 0) {
         setState(() {
           _secondsRemaining--;
@@ -60,6 +74,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   @override
   void dispose() {
     _timer?.cancel();
+    _debounceTimer?.cancel();
     for (var node in _focusNodes) {
       node.dispose();
     }
@@ -73,11 +88,54 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     return _controllers.map((c) => c.text).join();
   }
 
+  void _clearFields({String? error}) {
+    _debounceTimer?.cancel();
+    _isAutoSubmitted = false;
+    for (var controller in _controllers) {
+      controller.clear();
+    }
+    if (mounted) {
+      setState(() {
+        _localError = error;
+      });
+      _focusNodes[0].requestFocus();
+    }
+  }
+
   void _checkAndSubmit() {
     final otpText = _otp;
     if (otpText.length == 6 && !_isAutoSubmitted) {
-      _isAutoSubmitted = true;
-      _verifyOtp();
+      _debounceTimer?.cancel();
+      _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+        if (!mounted) return;
+        if (_otp.length == 6 && !_isAutoSubmitted) {
+          _isAutoSubmitted = true;
+          _verifyOtp();
+        }
+      });
+    }
+  }
+
+  Future<void> _pasteFromClipboard() async {
+    final clipboardData = await Clipboard.getData(Clipboard.kTextPlain);
+    final text = clipboardData?.text;
+    if (text == null || text.trim().isEmpty) return;
+
+    final digits = text.replaceAll(RegExp(r'\D'), '');
+    if (digits.length >= 6) {
+      final code = digits.substring(0, 6);
+      for (var i = 0; i < 6; i++) {
+        _controllers[i].text = code[i];
+      }
+      _focusNodes[5].requestFocus();
+      _checkAndSubmit();
+    } else if (digits.isNotEmpty) {
+      for (var i = 0; i < digits.length && i < 6; i++) {
+        _controllers[i].text = digits[i];
+      }
+      if (digits.length < 6) {
+        _focusNodes[digits.length].requestFocus();
+      }
     }
   }
 
@@ -85,34 +143,29 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     final l10n = AppLocalizations.of(context);
     final otpText = _otp;
     if (otpText.length != 6) {
-      _isAutoSubmitted = false;
-      setState(() {
-        _localError = l10n.enterOtpDigits;
-      });
+      _clearFields(error: l10n.enterOtpDigits);
       return;
     }
-    setState(() {
-      _localError = null;
-    });
+    if (mounted) {
+      setState(() {
+        _localError = null;
+      });
+    }
 
-    final goRouter = GoRouter.of(context);
     try {
       await ref.read(authProvider.notifier).verifyOTP(
-            widget.verificationId,
+            _currentVerificationId,
             otpText,
           );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.phoneNumberVerifiedSuccessfully)),
       );
-      goRouter.go('/home');
+      context.go('/home');
     } catch (error) {
       if (!mounted) return;
       final message = ref.read(authProvider).error ?? error.toString();
-      setState(() {
-        _isAutoSubmitted = false;
-        _localError = message;
-      });
+      _clearFields(error: message);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(message)),
       );
@@ -122,10 +175,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   Future<void> _resendOtp() async {
     if (_secondsRemaining > 0) return;
 
-    setState(() {
-      _localError = null;
-      _isAutoSubmitted = false;
-    });
+    _clearFields();
 
     final fullPhoneNumber = widget.phoneNumber.startsWith('+')
         ? widget.phoneNumber
@@ -134,8 +184,10 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     await ref.read(authProvider.notifier).verifyPhone(
       fullPhoneNumber,
       (newVerificationId) {
-        // Verification ID refreshed
-        if (context.mounted) {
+        if (mounted) {
+          setState(() {
+            _currentVerificationId = newVerificationId;
+          });
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
                 content:
@@ -146,16 +198,14 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
       },
       (error) {
         if (mounted) {
-          setState(() {
-            _localError = error;
-          });
+          _clearFields(error: error);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(error)),
           );
         }
       },
       (_) {
-        if (context.mounted) {
+        if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Phone number verified successfully')),
           );
@@ -190,13 +240,24 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    l10n.verifyYourNumber,
-                    style: GoogleFonts.merriweather(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          l10n.verifyYourNumber,
+                          style: GoogleFonts.merriweather(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                      OtpPasteButton(
+                        onPaste: _pasteFromClipboard,
+                        enabled: !isLoading,
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -343,6 +404,30 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
               ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class OtpPasteButton extends StatelessWidget {
+  final VoidCallback onPaste;
+  final bool enabled;
+
+  const OtpPasteButton({
+    super.key,
+    required this.onPaste,
+    this.enabled = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton.icon(
+      onPressed: enabled ? onPaste : null,
+      icon: const Icon(Icons.content_paste_rounded, size: 18),
+      label: const Text('Paste'),
+      style: TextButton.styleFrom(
+        foregroundColor: AppColors.legalGold,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       ),
     );
   }

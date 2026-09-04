@@ -11,8 +11,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart' as dotenv;
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../l10n/gen/app_localizations.dart';
 import '../../models/document_category_model.dart';
 import '../../models/document_type_model.dart';
 import '../../models/form_field_model.dart';
@@ -21,6 +23,7 @@ import '../../models/form_template_model.dart';
 part 'app_config.templates.dart';
 part 'app_config.theme.dart';
 part 'app_config.animations.dart';
+part 'app_config.environment.dart';
 
 // ============================== API / WORKER =================================
 
@@ -101,9 +104,37 @@ class AiRuntimeConfig {
 class EnvConfig {
   EnvConfig._();
 
-  static Future<void> initialize() async {}
+  static ConfigurationException? configurationError;
 
-  static bool get isAiAvailable => true;
+  static Future<void> initialize() async {
+    configurationError = null;
+    try {
+      await dotenv.dotenv.load(
+        fileName: const String.fromEnvironment(
+          'JUSLEGAL_ENV_FILE',
+          defaultValue: 'assets/.env',
+        ),
+        isOptional: true,
+      );
+      _EnvironmentState.load(dotenv.dotenv.env);
+      if (!EnvironmentState.isValid) {
+        throw const ConfigurationException(
+          'Worker URL, website URL, and country code must be valid.',
+        );
+      }
+    } catch (error, stackTrace) {
+      _EnvironmentState.load(const <String, String>{});
+      configurationError = error is ConfigurationException
+          ? error
+          : ConfigurationException('Unable to load environment configuration: $error');
+      if (kDebugMode) {
+        debugPrint('[EnvConfig] Optional environment file was not loaded: $error');
+        debugPrintStack(stackTrace: stackTrace);
+      }
+    }
+  }
+
+  static bool get isAiAvailable => FeatureFlags.aiEnabled;
 
   /// Image generation has not yet been moved behind the Worker. Returning an
   /// empty value prevents a provider key from being embedded in the app.
@@ -112,8 +143,9 @@ class EnvConfig {
 
   static void printConfig() {
     if (kDebugMode) {
-      debugPrint(
-          '[EnvConfig] AI requests use the Cloudflare Worker proxy with Firebase auth.');
+      debugPrint('[EnvConfig] environment=${EnvironmentTypeConfig.current.name} '
+          'baseUrl=${EnvironmentState.workerBaseUrl} '
+          'firebaseProject=${EnvironmentState.firebaseProjectId}');
     }
   }
 }
@@ -133,9 +165,16 @@ class AppConfig {
   static String get supportEmail => 'support@juslegal.app';
 
   // URLs
-  static String get privacyPolicyUrl => 'https://juslegal-2196.web.app/privacy';
-  static String get termsOfServiceUrl => 'https://juslegal-2196.web.app/terms';
-  static String get websiteUrl => 'https://juslegal-2196.web.app';
+  static String get privacyPolicyUrl => '${EnvironmentState.websiteUrl}/privacy';
+  static String get termsOfServiceUrl => '${EnvironmentState.websiteUrl}/terms';
+  static String get websiteUrl => EnvironmentState.websiteUrl;
+
+  // Firebase identifiers are public configuration, but remain environment-aware.
+  static String get firebaseProjectId => EnvironmentState.firebaseProjectId;
+  static String get firebaseAuthDomain => EnvironmentState.firebaseAuthDomain;
+  static String get firebaseStorageBucket => EnvironmentState.firebaseStorageBucket;
+  static String get firebaseMessagingSenderId => EnvironmentState.firebaseMessagingSenderId;
+  static String get firebaseMeasurementId => EnvironmentState.firebaseMeasurementId;
 
   // Legal Disclaimers
   static String get appTagline => 'Know Your Rights. Take Action.';
@@ -155,6 +194,9 @@ class AppConfig {
   // Optional API Keys (for future use)
   static String? get apiKey => null;
   static String? get analyticsKey => null;
+
+  // Phone authentication
+  static String get defaultCountryCode => EnvironmentState.defaultCountryCode;
 
   // Validation
   static bool get isConfigured => true;
@@ -223,4 +265,24 @@ class AppStrings {
       'Unable to process AI response. Please try again.';
   static const String errGenericError =
       'Something went wrong. Please try again.';
+
+  static AppStringsLocalization localized(BuildContext context) =>
+      AppStringsLocalization(AppLocalizations.of(context));
+}
+
+class AppStringsLocalization {
+  const AppStringsLocalization(this._localizations);
+
+  final AppLocalizations _localizations;
+
+  String get appTagline => _localizations.appTagline;
+  String get onboardingDisclaimer => _localizations.onboardingDisclaimer;
+  String get resultDisclaimer => _localizations.resultDisclaimer;
+  String get documentDisclaimer => _localizations.documentDisclaimer;
+  String get errorProblemEmpty => _localizations.problemSummaryEmpty;
+  String get errServiceUnavailable => _localizations.serviceTemporarilyUnavailable;
+  String get errNoInternet => _localizations.noInternetConnection;
+  String get errTooManyRequests => _localizations.tooManyRequests;
+  String get errConfigError => _localizations.configurationError;
+  String get errParseError => _localizations.unableToProcessResponse;
 }

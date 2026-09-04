@@ -1,100 +1,114 @@
-import 'dart:async';
-
+import 'package:device_preview/device_preview.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart'
+  show defaultTargetPlatform, kDebugMode, kIsWeb;
+import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-
-import 'package:flutter/foundation.dart' show kDebugMode, defaultTargetPlatform;
-import 'package:device_preview/device_preview.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:juslegal/l10n/gen/app_localizations.dart';
 import 'package:juslegal/core/core.dart';
-import 'core/constants/firebase_options.dart';
-import 'core/router/app_router.dart';
-import 'core/services/analytics_service.dart';
+import 'package:juslegal/l10n/gen/app_localizations.dart';
+
 import 'providers/locale_provider.dart';
+import 'services/auth_handler.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await EnvConfig.initialize();
+  if (kIsWeb) usePathUrlStrategy();
 
-  // Print configuration for debugging
-  if (kDebugMode) EnvConfig.printConfig();
+  final logger = AppLogger();
 
-  // Initialize Firebase with error handling
+  try {
+    await EnvConfig.initialize();
+    if (kDebugMode) EnvConfig.printConfig();
+  } catch (e, stackTrace) {
+    logger.error('Failed to initialize EnvConfig', tag: 'Main', error: e, stackTrace: stackTrace);
+  }
+
   bool firebaseInitialized = false;
   try {
     final existingApps = Firebase.apps;
     final hasDefaultApp = existingApps.any((app) => app.name == defaultFirebaseAppName);
     if (hasDefaultApp) {
       firebaseInitialized = true;
-      if (kDebugMode) {
-        debugPrint('[Main] Firebase default app already initialized (via JS SDK on web)');
-        debugPrint(
-            '[Main] Firebase Apps: ${Firebase.apps.map((e) => e.name).toList()}');
-      }
+      logger.info('Firebase default app already initialized (via JS SDK on web)', tag: 'Main');
+      logger.debug('Firebase Apps: ${Firebase.apps.map((e) => e.name).toList()}', tag: 'Main');
     } else {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
       firebaseInitialized = true;
-      if (kDebugMode) {
-        debugPrint('[Main] Firebase initialized successfully');
-        debugPrint(
-            '[Main] Firebase Apps: ${Firebase.apps.map((e) => e.name).toList()}');
-      }
+      logger.info('Firebase initialized successfully', tag: 'Main');
+      logger.debug('Firebase Apps: ${Firebase.apps.map((e) => e.name).toList()}', tag: 'Main');
     }
   } catch (e, stackTrace) {
-    if (kDebugMode) {
-      debugPrint('[Main] Firebase initialization failed: $e');
-      debugPrintStack(stackTrace: stackTrace);
-      debugPrint(
-          '[Main] Continuing without Firebase (app will work with limited functionality)');
-      debugPrint('[Main] Firebase-dependent features are unavailable');
-    }
-  }
-
-  // Initialize SafeAnalytics (disabled by default, requires user consent)
-  if (firebaseInitialized) {
-    try {
-      await SafeAnalytics.initialize();
-      if (kDebugMode) {
-        debugPrint(
-            '[Main] Analytics initialized: ${SafeAnalytics.isAvailable}');
-        debugPrint('[Main] Analytics consent: ${SafeAnalytics.analyticsEnabled}');
-        debugPrint('[Main] Crashlytics consent: ${SafeAnalytics.crashlyticsEnabled}');
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('[Main] Analytics initialization failed: $e');
-      }
-    }
-  }
-
-  // Initialize local storage
-  await Hive.initFlutter();
-  await Hive.openBox('cases');
-  await Hive.openBox('settings');
-
-  // Initialize configuration
-  await AppConfig.initialize();
-
-  // Log app start (only if analytics is enabled)
-  if (SafeAnalytics.analyticsEnabled) {
-    await SafeAnalytics.logEvent(
-      name: 'app_started',
-      parameters: {
-        'firebase_initialized': firebaseInitialized,
-        'platform': defaultTargetPlatform.name,
-        'is_debug': kDebugMode,
-      },
+    logger.error(
+      'Firebase initialization failed. Continuing without Firebase (limited functionality)',
+      tag: 'Main',
+      error: e,
+      stackTrace: stackTrace,
     );
   }
 
-  runApp(ProviderScope(
-      child: JusLegalApp(firebaseAvailable: firebaseInitialized)));
+  if (firebaseInitialized) {
+    if (kIsWeb && AuthConfig.persistSession) {
+      try {
+        await FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
+      } catch (e, stackTrace) {
+        logger.warning('Firebase Auth persistence setup failed: $e', tag: 'Main');
+        if (kDebugMode) logger.debug('$stackTrace', tag: 'Main');
+      }
+    }
+    try {
+      await SafeAnalytics.initialize();
+      logger.info('Analytics initialized: ${SafeAnalytics.isAvailable}', tag: 'Main');
+      logger.debug('Analytics consent: ${SafeAnalytics.analyticsEnabled}', tag: 'Main');
+      logger.debug('Crashlytics consent: ${SafeAnalytics.crashlyticsEnabled}', tag: 'Main');
+    } catch (e, stackTrace) {
+      logger.error('Analytics initialization failed', tag: 'Main', error: e, stackTrace: stackTrace);
+    }
+  }
+
+  try {
+    await Hive.initFlutter();
+    await Hive.openBox('cases');
+    await Hive.openBox('settings');
+  } catch (e, stackTrace) {
+    logger.error('Failed to initialize Hive storage boxes', tag: 'Main', error: e, stackTrace: stackTrace);
+  }
+
+  try {
+    await AppConfig.initialize();
+  } catch (e, stackTrace) {
+    logger.error('Failed to initialize AppConfig', tag: 'Main', error: e, stackTrace: stackTrace);
+  }
+
+  if (SafeAnalytics.analyticsEnabled) {
+    try {
+      await SafeAnalytics.logEvent(
+        name: 'app_started',
+        parameters: {
+          'firebase_initialized': firebaseInitialized,
+          'platform': defaultTargetPlatform.name,
+          'is_debug': kDebugMode,
+        },
+      );
+    } catch (e) {
+      logger.warning('Failed to log app_started event: $e', tag: 'Main');
+    }
+  }
+
+  runApp(
+    DevicePreview(
+      enabled: kDebugMode,
+      builder: (context) => ProviderScope(
+        child: JusLegalApp(firebaseAvailable: firebaseInitialized),
+      ),
+    ),
+  );
 }
 
 class JusLegalApp extends ConsumerStatefulWidget {
@@ -108,15 +122,29 @@ class JusLegalApp extends ConsumerStatefulWidget {
 
 class _JusLegalAppState extends ConsumerState<JusLegalApp> {
   late final GoRouter _router;
+  late final RouterRefreshNotifier _routerRefresh;
 
   @override
   void initState() {
     super.initState();
-    _router = buildRouter(firebaseAvailable: widget.firebaseAvailable);
+    _routerRefresh = RouterRefreshNotifier();
+    _router = buildRouter(
+      firebaseAvailable: widget.firebaseAvailable,
+      getAuthState: () => ref.read(authProvider),
+      refreshListenable: _routerRefresh,
+    );
+  }
+
+  @override
+  void dispose() {
+    _routerRefresh.dispose();
+    _router.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<AuthState>(authProvider, (_, __) => _routerRefresh.refresh());
     final locale = ref.watch(localeProvider);
     return MaterialApp.router(
       title: 'JusLegal',

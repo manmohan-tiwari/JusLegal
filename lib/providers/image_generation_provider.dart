@@ -16,6 +16,9 @@ final siliconFlowProvider = Provider<SiliconFlowService>((ref) {
 /// Usage: ref.watch(generateImageProvider('your prompt'))
 final generateImageProvider =
     FutureProvider.family<String, String>((ref, prompt) async {
+  if (!FeatureFlags.imageGenerationEnabled) {
+    throw StateError('Image generation is disabled for this environment.');
+  }
   final service = ref.watch(siliconFlowProvider);
   return service.generateLegalDocumentImage(prompt: prompt);
 });
