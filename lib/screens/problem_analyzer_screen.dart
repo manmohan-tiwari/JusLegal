@@ -4,14 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 import 'package:juslegal/core/core.dart';
-import '../models/problem_model.dart';
-import '../widgets/empty_state_widget.dart';
 import '../providers/ai_provider.dart';
 import '../providers/problem_provider.dart';
-import '../widgets/category_card.dart';
-import '../widgets/shimmer_loader.dart';
+import '../services/file_upload_service.dart';
+import '../widgets/section_label.dart';
 
 class ProblemAnalyzerScreen extends ConsumerStatefulWidget {
   final String? initialCategory;
@@ -24,251 +23,224 @@ class ProblemAnalyzerScreen extends ConsumerStatefulWidget {
 }
 
 class _ProblemAnalyzerScreenState extends ConsumerState<ProblemAnalyzerScreen> {
-  final _formKey = GlobalKey<FormState>();
+  final _scrollController = ScrollController();
+  final _summaryController = TextEditingController();
+  final _amountController = TextEditingController();
+  final _opponentController = TextEditingController();
+  final _focusNode = FocusNode();
 
-  late final ScrollController _scrollController;
-  late final FocusNode _categoryFocusNode;
-  late final FocusNode _dateFocusNode;
-  late final FocusNode _amountFocusNode;
-  late final FocusNode _partyFocusNode;
-  late final FocusNode _refFocusNode;
-  late final FocusNode _summaryFocusNode;
+  late String _selectedCategory;
+  bool _isAnalyzing = false;
+  bool _showExtraDetails = false;
+  final List<PlatformFile> _attachedFiles = [];
 
-  int _currentStep = 0;
-  late final int _minStep;
-  final List<PlatformFile> _pickedFiles = [];
-
-  late final TextEditingController _summaryController;
-  late final TextEditingController _dateController;
-  late final TextEditingController _amountController;
-  late final TextEditingController _partyController;
-  late final TextEditingController _refController;
+  // Voice Speech-to-Text
+  final stt.SpeechToText _speech = stt.SpeechToText();
+  bool _isListening = false;
 
   final List<LegalCategory> _categories = AppCategories.categories;
 
-  late String _category;
-  bool _isAnalyzing = false;
-  final Map<String, String> _dynamicFieldValues = {};
-  final Map<String, TextEditingController> _dynamicFieldControllers = {};
+  static const List<Map<String, String>> _quickScenarios = [
+    {
+      'label': 'Deposit Withheld',
+      'category': 'Housing & Real Estate',
+      'text':
+          'My landlord is refusing to return my security deposit of ₹45,000 even after vacating the flat 30 days ago with all dues cleared.',
+    },
+    {
+      'label': 'Unpaid Salary',
+      'category': 'Employment',
+      'text':
+          'My employer has withheld my last 2 months salary (₹80,000) and full-and-final settlement after I completed my notice period.',
+    },
+    {
+      'label': 'Cheque Bounced',
+      'category': 'Banking & UPI Fraud',
+      'text':
+          'A business partner gave me a cheque of ₹1,50,000 against goods delivered, which got bounced due to insufficient funds in their account.',
+    },
+    {
+      'label': 'UPI / Bank Fraud',
+      'category': 'Banking & UPI Fraud',
+      'text':
+          'An unauthorized transaction of ₹25,000 was debited from my bank account via UPI fraud. Bank customer care has not resolved it.',
+    },
+    {
+      'label': 'Fake / Defective Item',
+      'category': 'E-commerce & Shopping',
+      'text':
+          'I received a damaged and counterfeit electronic product worth ₹18,000 from an online seller. The platform rejected my return request.',
+    },
+  ];
 
   @override
   void initState() {
     super.initState();
-
-    _scrollController = ScrollController();
-    _categoryFocusNode = FocusNode();
-    _dateFocusNode = FocusNode();
-    _amountFocusNode = FocusNode();
-    _partyFocusNode = FocusNode();
-    _refFocusNode = FocusNode();
-    _summaryFocusNode = FocusNode();
-
-    _summaryController = TextEditingController();
-    _dateController = TextEditingController();
-    _amountController = TextEditingController();
-    _partyController = TextEditingController();
-    _refController = TextEditingController();
-
-    final hasCategoryParam = widget.initialCategory != null &&
-        widget.initialCategory!.trim().isNotEmpty;
-    _minStep = hasCategoryParam ? 1 : 0;
-    _currentStep = _minStep;
-
-    _category =
-        hasCategoryParam ? _safeInitialCategory(widget.initialCategory) : '';
-
-    // Set initial category once state is ready.
-    if (hasCategoryParam) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.read(problemProvider.notifier).setCategory(_category);
-      });
-    }
+    _selectedCategory = _safeInitialCategory(widget.initialCategory);
   }
 
-  String _safeInitialCategory(String? initialCategory) {
-    final defaultCategory = _categories.first.name;
-    if (initialCategory == null || initialCategory.trim().isEmpty) {
-      return defaultCategory;
+  String _safeInitialCategory(String? initial) {
+    if (initial == null || initial.trim().isEmpty) {
+      return _categories.isNotEmpty ? _categories.first.name : 'General';
     }
-
-    const aliases = {
-      'Travel & Flights': 'Flights & Travel Issues',
-      'Flights & Travel': 'Flights & Travel Issues',
-      'Restaurants & Food': 'Restaurants & Food Billing',
-      'E-commerce': 'E-commerce & Shopping',
-      'Shopping': 'E-commerce & Shopping',
-      'Housing': 'Housing & Real Estate',
-      'Housing & Rent': 'Housing & Real Estate',
-    };
-
-    final normalized = aliases[initialCategory] ?? initialCategory;
-    final isValid = _categories.any((c) => c.name == normalized);
-    return isValid ? normalized : defaultCategory;
+    final match = _categories.firstWhere(
+      (c) => c.name.toLowerCase() == initial.toLowerCase(),
+      orElse: () => _categories.first,
+    );
+    return match.name;
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
-    _categoryFocusNode.dispose();
-    _dateFocusNode.dispose();
-    _amountFocusNode.dispose();
-    _partyFocusNode.dispose();
-    _refFocusNode.dispose();
-    _summaryFocusNode.dispose();
-
     _summaryController.dispose();
-    _dateController.dispose();
     _amountController.dispose();
-    _partyController.dispose();
-    _refController.dispose();
-
-    for (final controller in _dynamicFieldControllers.values) {
-      controller.dispose();
-    }
+    _opponentController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
-  void _scrollToFirstError() {
-    FocusNode? targetNode;
-    if (_currentStep == 1) {
-      targetNode = _categoryFocusNode;
-    } else if (_currentStep == 2) {
-      if (_dateController.text.trim().isEmpty) {
-        targetNode = _dateFocusNode;
-      } else if (_amountController.text.trim().isEmpty) {
-        targetNode = _amountFocusNode;
-      } else if (_partyController.text.trim().isEmpty) {
-        targetNode = _partyFocusNode;
-      } else if (_refController.text.trim().isEmpty) {
-        targetNode = _refFocusNode;
-      }
-    } else if (_currentStep == 3) {
-      final summary = _summaryController.text.trim();
-      if (summary.isEmpty || summary.length < 10) {
-        targetNode = _summaryFocusNode;
-      }
+  Future<void> _toggleVoiceInput() async {
+    if (_isListening) {
+      await _speech.stop();
+      setState(() => _isListening = false);
+      return;
     }
 
-    final targetContext = targetNode?.context;
-    if (targetNode != null && targetContext != null) {
-      targetNode.requestFocus();
-      _scrollController.position.ensureVisible(
-        targetContext.findRenderObject()!,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
+    final available = await _speech.initialize(
+      onError: (e) => setState(() => _isListening = false),
+      onStatus: (status) {
+        if (status == 'done' || status == 'notListening') {
+          setState(() => _isListening = false);
+        }
+      },
+    );
+
+    if (available) {
+      setState(() => _isListening = true);
+      HapticFeedback.lightImpact();
+      _speech.listen(
+        onResult: (result) {
+          setState(() {
+            _summaryController.text = result.recognizedWords;
+          });
+        },
+      );
+    } else {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Speech recognition is not available.')),
       );
     }
   }
 
-  void _onContinue() {
-    if (_currentStep == 0) return;
-    if (_formKey.currentState?.validate() ?? false) {
-      if (_currentStep < 3) {
-        setState(() => _currentStep++);
-      } else {
-        _analyze();
-      }
-    } else {
-      _scrollToFirstError();
-    }
-  }
+  Future<void> _pickFiles() async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        allowMultiple: true,
+        type: FileType.custom,
+        allowedExtensions: const [
+          'jpg',
+          'jpeg',
+          'png',
+          'pdf',
+          'doc',
+          'docx',
+          'txt'
+        ],
+      );
+      if (result == null || result.files.isEmpty) return;
 
-  /// Returns true when the device has at least one active network interface.
-  Future<bool> _checkConnectivity() async {
-    final result = await Connectivity().checkConnectivity();
-    // connectivity_plus ^4.x returns a single ConnectivityResult value.
-    final isOnline = result != ConnectivityResult.none;
-    if (!isOnline && mounted) {
-      ScaffoldMessenger.of(context)
-        ..clearSnackBars()
-        ..showSnackBar(
+      final validation = FileUploadService.validateFileBatch(result.files);
+      if (validation != null) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Row(
-              children: [
-                Icon(Icons.wifi_off_rounded, color: Colors.white, size: 20),
-                SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    'No internet connection. Please check your network and try again.',
-                    style: TextStyle(color: Colors.white, fontSize: 13),
-                  ),
-                ),
-              ],
-            ),
-            backgroundColor: const Color(0xFFDC2626),
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.all(16),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            duration: const Duration(seconds: 4),
+            content: Text(validation),
+            backgroundColor: Colors.red.shade700,
           ),
         );
+        return;
+      }
+
+      setState(() {
+        _attachedFiles.addAll(result.files);
+      });
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not attach files.')),
+      );
     }
-    return isOnline;
   }
 
   Future<void> _analyze() async {
-    if (_isAnalyzing) return;
+    final description = _summaryController.text.trim();
+    if (description.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please describe your issue first.')),
+      );
+      _focusNode.requestFocus();
+      return;
+    }
 
-    // Guard: warn and abort when there is no network connection.
-    final isOnline = await _checkConnectivity();
-    if (!isOnline) return;
+    if (description.length < 15) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content:
+                Text('Please provide a little more detail (at least 15 characters).')),
+      );
+      return;
+    }
 
-    final summaryText = _summaryController.text.trim();
+    final conn = await Connectivity().checkConnectivity();
+    if (conn == ConnectivityResult.none) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No internet connection. Please check your network.')),
+      );
+      return;
+    }
 
+    _focusNode.unfocus();
     setState(() => _isAnalyzing = true);
 
     try {
-      ref.read(problemProvider.notifier).setCategory(_category);
+      final amount = _amountController.text.trim().isNotEmpty
+          ? _amountController.text.trim()
+          : 'Not specified';
+      final opponent = _opponentController.text.trim().isNotEmpty
+          ? _opponentController.text.trim()
+          : 'Opposite Party';
 
-      String dynamicFieldsText = '';
-      if (AppCategories.categoryFields.containsKey(_category)) {
-        for (final field in AppCategories.categoryFields[_category]!) {
-          final value = _dynamicFieldValues[field.fieldKey] ?? 'Not provided';
-          dynamicFieldsText += '${field.label}: $value\n';
-        }
-      }
+      ref.read(problemProvider.notifier).setCategory(_selectedCategory);
+      ref.read(problemProvider.notifier).setDescription(description);
 
-      final fullDescription = '''
-$dynamicFieldsText
-Date: ${_dateController.text}
-Amount: ${_amountController.text}
-Involved Party: ${_partyController.text}
-Reference Number: ${_refController.text}
-Summary: $summaryText
-'''
-          .trim();
-
-      ref.read(problemProvider.notifier).setDescription(fullDescription);
-
-      final problem = ProblemModel(
-        category: _category,
-        dateOfIncident: _dateController.text.trim(),
-        disputedAmount: _amountController.text.trim(),
-        involvedParty: _partyController.text.trim(),
-        referenceNumber: _refController.text.trim(),
-        summary: summaryText,
-        attachedFiles: _pickedFiles,
-        dynamicFieldValues: _dynamicFieldValues,
+      final aiService = ref.read(aiServiceProvider);
+      final rawAnalysis = await aiService.analyzeProblem(
+        category: _selectedCategory,
+        dateOfIncident: 'Recent',
+        disputedAmount: amount,
+        involvedParty: opponent,
+        referenceNumber: 'REF-${DateTime.now().millisecondsSinceEpoch}',
+        summary: description,
+        attachedFiles: _attachedFiles,
       );
 
-      final legalResult =
-          await ref.read(analysisProvider.notifier).analyze(problem);
+      final normalizer = AnalysisPayloadNormalizer();
+      final normalized = normalizer.normalize(rawAnalysis);
+      final legalResult = normalizer.toLegalResultModel(normalized);
 
-      if (mounted) {
-        context.go('/home/result', extra: legalResult);
-      }
+      ref.read(lastResultProvider.notifier).set(legalResult);
+
+      if (!mounted) return;
+      context.push('/home/result', extra: legalResult);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Analysis failed: $e'),
-            backgroundColor: const Color(0xFFDC2626),
-            behavior: SnackBarBehavior.floating,
-            margin: const EdgeInsets.all(16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
+            content: Text('Analysis failed: ${e.toString()}'),
+            backgroundColor: Colors.red.shade700,
           ),
         );
       }
@@ -277,476 +249,299 @@ Summary: $summaryText
     }
   }
 
-  Widget _buildStepIndicator() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        LinearProgressIndicator(
-          value: _currentStep / 3,
-          backgroundColor: AppColors.surfaceBright,
-          color: AppColors.legalGold,
-          minHeight: 3,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStepContent(ThemeData theme) {
-    String stepLabel = '';
-    Widget content = const SizedBox.shrink();
-
-    if (_currentStep == 0) {
-      stepLabel = 'Step 0 - Choose Category';
-      content = _categories.isEmpty
-          ? const EmptyStateWidget(
-              icon: Icons.search_off_outlined,
-              title: 'No categories available',
-              subtitle: 'Please try again later.',
-            )
-          : LayoutBuilder(
-              builder: (context, constraints) {
-                final crossAxisCount = constraints.maxWidth > 900
-                    ? 4
-                    : (constraints.maxWidth > 600 ? 3 : 2);
-                final textScale = MediaQuery.textScalerOf(context).scale(1);
-                final cardHeight = (constraints.maxWidth > 900
-                        ? 190.0
-                        : (constraints.maxWidth > 600 ? 204.0 : 212.0)) *
-                    textScale.clamp(1.0, 1.35);
-
-                return GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: _categories.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: crossAxisCount,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    mainAxisExtent: cardHeight,
-                  ),
-                  itemBuilder: (context, index) {
-                    final category = _categories[index];
-                    return CategoryCard(
-                      icon: category.icon,
-                      title: category.name,
-                      subtitle: category.description,
-                      iconColor: AppColors.legalGold,
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        setState(() {
-                          _category = category.name;
-                          _currentStep = 1;
-                        });
-                        ref
-                            .read(problemProvider.notifier)
-                            .setCategory(category.name);
-                      },
-                    );
-                  },
-                );
-              },
-            );
-    } else if (_currentStep == 1) {
-      stepLabel = 'Step 1 of 3 - Issue Details';
-      content = Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          DropdownButtonFormField<String>(
-            initialValue: _category.isEmpty ? null : _category,
-            focusNode: _categoryFocusNode,
-            validator: (value) => (value == null || value.isEmpty)
-                ? 'Please select a category'
-                : null,
-            items: _categories
-                .map(
-                  (category) => DropdownMenuItem(
-                    value: category.name,
-                    child: Text(category.name),
-                  ),
-                )
-                .toList(),
-            onChanged: (value) {
-              if (value == null) return;
-              setState(() {
-                _category = value;
-                _dynamicFieldValues.clear();
-                for (final controller in _dynamicFieldControllers.values) {
-                  controller.dispose();
-                }
-                _dynamicFieldControllers.clear();
-              });
-              ref.read(problemProvider.notifier).setCategory(value);
-            },
-            hint: const Text('Select a category'),
-            decoration: const InputDecoration(labelText: 'Category'),
-          ),
-          if (_category.isNotEmpty &&
-              AppCategories.categoryFields.containsKey(_category)) ...[
-            const SizedBox(height: 16),
-            ...AppCategories.categoryFields[_category]!.map((field) {
-              if (!_dynamicFieldControllers.containsKey(field.fieldKey)) {
-                _dynamicFieldControllers[field.fieldKey] =
-                    TextEditingController();
-              }
-              final controller = _dynamicFieldControllers[field.fieldKey]!;
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: TextFormField(
-                  controller: controller,
-                  keyboardType: field.inputType,
-                  validator: field.required
-                      ? (value) => (value == null || value.trim().isEmpty)
-                          ? 'Please enter ${field.label}'
-                          : null
-                      : null,
-                  decoration: InputDecoration(
-                    labelText:
-                        field.required ? '${field.label} *' : field.label,
-                    hintText: field.hint,
-                  ),
-                  onChanged: (value) {
-                    _dynamicFieldValues[field.fieldKey] = value;
-                  },
-                ),
-              );
-            }),
-          ],
-        ],
-      );
-    } else if (_currentStep == 2) {
-      stepLabel = 'Step 2 of 3 - Additional Information';
-      content = Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: TextFormField(
-                  controller: _dateController,
-                  focusNode: _dateFocusNode,
-                  validator: (value) => (value == null || value.trim().isEmpty)
-                      ? 'Please enter the date'
-                      : null,
-                  decoration: const InputDecoration(
-                    labelText: 'Date',
-                    hintText: 'DD/MM/YYYY',
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: TextFormField(
-                  controller: _amountController,
-                  focusNode: _amountFocusNode,
-                  validator: (value) => (value == null || value.trim().isEmpty)
-                      ? 'Please enter the amount'
-                      : null,
-                  decoration: const InputDecoration(
-                    labelText: 'Amount',
-                    hintText: 'e.g. Rs.5000',
-                  ),
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _partyController,
-            focusNode: _partyFocusNode,
-            validator: (value) => (value == null || value.trim().isEmpty)
-                ? 'Please enter the involved party'
-                : null,
-            decoration: const InputDecoration(
-              labelText: 'Involved Party',
-              hintText: 'e.g. Vendor name, Bank name',
-            ),
-          ),
-          const SizedBox(height: 16),
-          TextFormField(
-            controller: _refController,
-            focusNode: _refFocusNode,
-            validator: (value) => (value == null || value.trim().isEmpty)
-                ? 'Please enter the reference number'
-                : null,
-            decoration: const InputDecoration(
-              labelText: 'Reference Number',
-              hintText: 'e.g. Order ID, Transaction ID',
-            ),
-          ),
-        ],
-      );
-    } else if (_currentStep == 3) {
-      stepLabel = 'Step 3 of 3 - Summary & Evidence';
-      content = Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TextFormField(
-            controller: _summaryController,
-            focusNode: _summaryFocusNode,
-            validator: (value) {
-              final v = value?.trim() ?? '';
-              if (v.isEmpty) return 'Please enter the summary';
-              if (v.length < 10) return 'Please enter at least 10 characters';
-              return null;
-            },
-            maxLines: 6,
-            maxLength: 600,
-            textInputAction: TextInputAction.newline,
-            onChanged: (_) => setState(() {}),
-            decoration: const InputDecoration(
-              labelText: 'Summary',
-              hintText: 'Describe what happened in detail...',
-            ),
-          ),
-          const SizedBox(height: 24),
-          const Text('Evidence',
-              style: TextStyle(
-                color: AppColors.textPrimary,
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-              )),
-          const SizedBox(height: 8),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: AppColors.border,
-                width: 1,
-              ),
-            ),
-            child: Column(
-              children: [
-                const Icon(Icons.cloud_upload_outlined,
-                    color: AppColors.legalGold, size: 32),
-                const SizedBox(height: 8),
-                TextButton(
-                  onPressed: () async {
-                    final result = await FilePicker.platform.pickFiles(
-                      allowMultiple: true,
-                      type: FileType.custom,
-                      allowedExtensions: const [
-                        'jpg',
-                        'jpeg',
-                        'png',
-                        'pdf',
-                        'doc',
-                        'docx'
-                      ],
-                    );
-                    if (result != null) {
-                      setState(() {
-                        _pickedFiles.addAll(result.files);
-                      });
-                    }
-                  },
-                  child: const Text('Attach files'),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.image_outlined,
-                        color: const Color(0xFF6B7280).withValues(alpha: 0.7),
-                        size: 24),
-                    const SizedBox(width: 16),
-                    Icon(Icons.picture_as_pdf_outlined,
-                        color: const Color(0xFF6B7280).withValues(alpha: 0.7),
-                        size: 24),
-                    const SizedBox(width: 16),
-                    Icon(Icons.description_outlined,
-                        color: const Color(0xFF6B7280).withValues(alpha: 0.7),
-                        size: 24),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          if (_pickedFiles.isNotEmpty) ...[
-            const SizedBox(height: 16),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _pickedFiles.length,
-              itemBuilder: (context, index) {
-                final file = _pickedFiles[index];
-                return Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            file.name,
-                            style: const TextStyle(
-                              color: Color(0xFF1F2937),
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          Text(
-                            '${(file.size / 1024).toStringAsFixed(1)} KB',
-                            style: const TextStyle(
-                              color: Color(0xFF6B7280),
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () {
-                        setState(() {
-                          _pickedFiles.removeAt(index);
-                        });
-                      },
-                    ),
-                  ],
-                );
-              },
-            ),
-          ],
-        ],
-      );
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Text(
-            stepLabel,
-            style: const TextStyle(
-              color: AppColors.textSecondary,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-        Card(
-          color: AppColors.surface,
-          elevation: 0,
-          margin: const EdgeInsets.symmetric(horizontal: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(color: AppColors.border),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: content,
-          ),
-        ),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
-
-    final bool isLastStep = _currentStep == 3;
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) return;
-        if (_isAnalyzing) return;
-
-        await showDialog<void>(
-          context: context,
-          builder: (dialogContext) {
-            return AlertDialog(
-              title: const Text('Discard Analysis?'),
-              content: const Text('Your entered data will be lost.'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(dialogContext).pop(),
-                  child: const Text('Keep Editing'),
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        title: const Text('Solve Legal Issue'),
+        leading: BackButton(onPressed: () => Navigator.of(context).pop()),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 1. Category Selector (Horizontal Pills)
+              SectionLabel('1. SELECT TOPIC'),
+              const SizedBox(height: 10),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: _categories.map((cat) {
+                    final isSelected = cat.name == _selectedCategory;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: InkWell(
+                        onTap: () => setState(() => _selectedCategory = cat.name),
+                        borderRadius: BorderRadius.circular(20),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? AppColors.deepForest
+                                : AppColors.surface,
+                            border: Border.all(
+                              color: isSelected
+                                  ? AppColors.deepForest
+                                  : AppColors.border,
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            cat.name,
+                            style: TextStyle(
+                              color: isSelected ? Colors.white : AppColors.onSurface,
+                              fontSize: 12.5,
+                              fontWeight:
+                                  isSelected ? FontWeight.w700 : FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    HapticFeedback.lightImpact();
-                    Navigator.of(dialogContext).pop();
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('Discard'),
+              ),
+
+              const SizedBox(height: 20),
+
+              // 2. Quick Scenario Chips (1-tap to populate)
+              SectionLabel('2. COMMON SCENARIOS (1-TAP TO FILL)'),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: _quickScenarios.map((qs) {
+                  return ActionChip(
+                    label: Text(qs['label']!),
+                    avatar: const Icon(Icons.bolt, size: 16, color: AppColors.brightEmerald),
+                    backgroundColor: AppColors.surface,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: const BorderSide(color: AppColors.border),
+                    ),
+                    onPressed: () {
+                      HapticFeedback.lightImpact();
+                      setState(() {
+                        _selectedCategory = qs['category']!;
+                        _summaryController.text = qs['text']!;
+                      });
+                    },
+                  );
+                }).toList(),
+              ),
+
+              const SizedBox(height: 20),
+
+              // 3. Problem Description & Voice Input
+              SectionLabel('3. DESCRIBE YOUR ISSUE'),
+              const SizedBox(height: 8),
+              Container(
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  border: Border.all(color: AppColors.border),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.03),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: _summaryController,
+                      focusNode: _focusNode,
+                      maxLines: 5,
+                      maxLength: 2000,
+                      textInputAction: TextInputAction.newline,
+                      decoration: const InputDecoration(
+                        hintText:
+                            'Explain what happened in plain Hindi or English...\n\nE.g. My landlord is not returning my ₹45,000 security deposit after 30 days of vacating with all electricity dues paid.',
+                        hintStyle: TextStyle(
+                          color: AppColors.textSecondary,
+                          fontSize: 13,
+                          height: 1.5,
+                        ),
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.all(16),
+                      ),
+                    ),
+                    const Divider(height: 1, color: AppColors.border),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      child: Row(
+                        children: [
+                          IconButton(
+                            onPressed: _toggleVoiceInput,
+                            icon: Icon(
+                              _isListening ? Icons.mic : Icons.mic_none_rounded,
+                              color: _isListening ? Colors.red : AppColors.deepForest,
+                            ),
+                            tooltip: 'Voice Input',
+                          ),
+                          Text(
+                            _isListening ? 'Listening...' : 'Tap mic to speak',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: _isListening ? Colors.red : AppColors.textSecondary,
+                              fontWeight: _isListening ? FontWeight.w700 : FontWeight.w500,
+                            ),
+                          ),
+                          const Spacer(),
+                          if (_summaryController.text.isNotEmpty)
+                            TextButton(
+                              onPressed: () => setState(() => _summaryController.clear()),
+                              child: const Text('Clear'),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 14),
+
+              // 4. Optional Details Accordion
+              InkWell(
+                onTap: () => setState(() => _showExtraDetails = !_showExtraDetails),
+                borderRadius: BorderRadius.circular(12),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+                  child: Row(
+                    children: [
+                      Icon(
+                        _showExtraDetails ? Icons.expand_less : Icons.add_circle_outline,
+                        size: 18,
+                        color: AppColors.deepForest,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        _showExtraDetails
+                            ? 'Hide Additional Details'
+                            : 'Add Amount / Opponent / Evidence (Optional)',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.deepForest,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              if (_showExtraDetails) ...[
+                const SizedBox(height: 10),
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  child: Column(
+                    children: [
+                      TextField(
+                        controller: _amountController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: 'Disputed Amount (₹)',
+                          hintText: 'E.g. 45000',
+                          prefixText: '₹ ',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: _opponentController,
+                        decoration: const InputDecoration(
+                          labelText: 'Opposite Party / Company Name',
+                          hintText: 'E.g. Landlord Name / Bank / Company',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      OutlinedButton.icon(
+                        onPressed: _pickFiles,
+                        icon: const Icon(Icons.attach_file_rounded),
+                        label: Text(_attachedFiles.isEmpty
+                            ? 'Attach Photos / PDF Evidence'
+                            : '${_attachedFiles.length} file(s) attached'),
+                      ),
+                    ],
+                  ),
                 ),
               ],
-            );
-          },
-        );
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('New Analysis'),
-          leading: IconButton(
-            onPressed: () {
-              if (_currentStep > _minStep) {
-                setState(() => _currentStep--);
-                return;
-              }
-              context.pop();
-            },
-            icon: const Icon(Icons.arrow_back_rounded),
-          ),
-          bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(2),
-            child: _buildStepIndicator(),
-          ),
-        ),
-        body: SafeArea(
-          child: Column(
-            children: [
-              Expanded(
-                child: Form(
-                  key: _formKey,
-                  child: SingleChildScrollView(
-                    controller: _scrollController,
-                    padding: EdgeInsets.only(bottom: bottomInset > 0 ? 16 : 32),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 8),
-                        _buildStepContent(Theme.of(context)),
-                        if (_isAnalyzing) ...[
-                          const SizedBox(height: 24),
-                          const ShimmerLoader(),
-                        ],
-                      ],
+
+              const SizedBox(height: 24),
+
+              // 5. Big 1-Tap Solution Action Button
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: ElevatedButton.icon(
+                  onPressed: _isAnalyzing ? null : _analyze,
+                  icon: _isAnalyzing
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            color: AppColors.onPrimary,
+                          ),
+                        )
+                      : const Icon(Icons.gavel_rounded),
+                  label: Text(
+                    _isAnalyzing
+                        ? 'Analyzing Legal Rights & Sections...'
+                        : 'Get Legal Solution & Action Plan',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: AppColors.onPrimary,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
                     ),
                   ),
                 ),
               ),
-              if (_currentStep != 0)
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-                  decoration: BoxDecoration(
-                    color: AppTheme.background,
-                    border: Border(top: BorderSide(color: AppTheme.border)),
-                  ),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _isAnalyzing
-                          ? null
-                          : () {
-                              HapticFeedback.lightImpact();
-                              _onContinue();
-                            },
+
+              const SizedBox(height: 16),
+
+              // Trust badge
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.08),
+                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.shield_outlined, color: AppColors.deepForest, size: 20),
+                    SizedBox(width: 10),
+                    Expanded(
                       child: Text(
-                        _isAnalyzing
-                            ? 'Analyzing...'
-                            : (isLastStep ? 'Analyze My Problem' : 'Continue'),
+                        'AI analyzes Indian Acts (Consumer Protection, NI Act, BNS/IPC, RERA, Labor Laws) to provide exact legal sections and step-by-step remedies.',
+                        style: TextStyle(fontSize: 11.5, height: 1.4, color: AppColors.deepForest),
                       ),
                     ),
-                  ),
+                  ],
                 ),
+              ),
             ],
           ),
         ),
