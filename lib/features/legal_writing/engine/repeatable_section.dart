@@ -142,8 +142,9 @@ class RepeatableSectionRenderer extends StatelessWidget {
             ),
             formValues: const {},
             errors: errors,
-            onFieldChanged: (_, __) {},
-            onRepeatableItemChanged: (_, __, ___, ____) {},
+            onFieldChanged: (fieldId, value) =>
+                onItemChanged(section.id, index, fieldId, value),
+            onRepeatableItemChanged: onItemChanged,
             repeatableItemValues: item,
             repeatableItemIndex: index,
           ),

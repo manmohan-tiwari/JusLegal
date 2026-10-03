@@ -222,6 +222,7 @@ const _partyFields = [
       label: 'Party type',
       required: true,
       type: FormFieldType.dropdown,
+      defaultValue: 'individual',
       options: [
         FieldOption(value: 'individual', label: 'Individual'),
         FieldOption(value: 'organization', label: 'Organization')
@@ -232,6 +233,7 @@ const _partyFields = [
       label: 'ID type',
       required: true,
       type: FormFieldType.dropdown,
+      defaultValue: 'aadhaar',
       options: [
         FieldOption(value: 'aadhaar', label: 'Aadhaar'),
         FieldOption(value: 'pan', label: 'PAN'),

@@ -96,10 +96,6 @@ class _FieldRendererState extends State<FieldRenderer> {
 
   @override
   Widget build(BuildContext context) {
-    if (!widget.field.isVisible({})) {
-      return const SizedBox.shrink();
-    }
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -178,10 +174,14 @@ class _FieldRendererState extends State<FieldRenderer> {
           readOnly: widget.field.isReadOnly,
         );
       case FormFieldType.dropdown:
+        final options = widget.field.options ?? [];
+        final val = widget.value?.toString();
+        final selectedValue =
+            options.any((opt) => opt.value == val) ? val : null;
         return DropdownButtonFormField<String>(
-          initialValue: widget.value?.toString(),
+          initialValue: selectedValue,
           onChanged: (v) => widget.onChanged(v),
-          items: (widget.field.options ?? []).map((opt) {
+          items: options.map((opt) {
             return DropdownMenuItem<String>(
               value: opt.value,
               child: Text(opt.label),
@@ -192,19 +192,20 @@ class _FieldRendererState extends State<FieldRenderer> {
       case FormFieldType.radio:
         final options = widget.field.options ?? [];
         final groupValue = widget.value?.toString();
-        return RadioGroup<String>(
-          groupValue: groupValue,
-          onChanged: (v) => widget.onChanged(v),
-          child: Column(
-            children: options.map((opt) {
-              return RadioListTile<String>(
-                title: Text(opt.label),
-                value: opt.value,
-                dense: true,
-                contentPadding: EdgeInsets.zero,
-              );
-            }).toList(),
-          ),
+        return Column(
+          children: options.map((opt) {
+            // ignore: deprecated_member_use
+            return RadioListTile<String>(
+              title: Text(opt.label),
+              value: opt.value,
+              // ignore: deprecated_member_use
+              groupValue: groupValue,
+              // ignore: deprecated_member_use
+              onChanged: (v) => widget.onChanged(v),
+              dense: true,
+              contentPadding: EdgeInsets.zero,
+            );
+          }).toList(),
         );
       case FormFieldType.multiSelect:
         final options = widget.field.options ?? [];

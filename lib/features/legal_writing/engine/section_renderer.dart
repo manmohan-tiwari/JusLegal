@@ -79,6 +79,9 @@ class SectionRenderer extends StatelessWidget {
 
   Widget _buildField(FormFieldDefinition field) {
     final effectiveValues = repeatableItemValues ?? formValues;
+    if (!field.isVisible(effectiveValues)) {
+      return const SizedBox.shrink();
+    }
     return FieldRenderer(
       field: field,
       value: effectiveValues[field.id],

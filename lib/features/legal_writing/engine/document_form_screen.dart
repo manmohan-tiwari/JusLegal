@@ -80,11 +80,17 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
     for (final section in widget.definition.sections) {
       if (section is RepeatableSectionDefinition) {
         if (section.minItems > 0) {
+          final defaultItem = <String, dynamic>{};
+          for (final field in section.fields) {
+            if (field.defaultValue != null) {
+              defaultItem[field.id] = field.defaultValue;
+            }
+          }
           _formData = _formData.setValue(
             section.id,
             List.generate(
               section.minItems,
-              (_) => <String, dynamic>{},
+              (_) => Map<String, dynamic>.from(defaultItem),
             ),
           );
         }
@@ -122,8 +128,17 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
   void _addRepeatableItem() {
     final section = widget.definition.sections[_currentStep];
     if (section is RepeatableSectionDefinition) {
+      final defaultItem = <String, dynamic>{};
+      for (final field in section.fields) {
+        if (field.defaultValue != null) {
+          defaultItem[field.id] = field.defaultValue;
+        }
+      }
+      final current = _formData.getRepeatable(section.id);
+      final list = List<Map<String, dynamic>>.from(current);
+      list.add(Map<String, dynamic>.from(defaultItem));
       setState(() {
-        _formData = _formData.addRepeatableItem(section.id);
+        _formData = _formData.setValue(section.id, list);
       });
     }
   }
@@ -137,6 +152,7 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
   void _setStep(int step) {
     setState(() {
       _currentStep = step;
+      _errors = const {};
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
