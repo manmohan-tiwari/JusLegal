@@ -230,33 +230,30 @@ class _HomeContent extends StatelessWidget {
 
   static const popularCategories = <_PopularLegalCategory>[
     _PopularLegalCategory(
-      title: 'Consumer Protection',
-      description: 'Purchases, refunds and unfair practices',
-      icon: Icons.receipt_long_outlined,
-      categoryId: 'E-commerce & Shopping',
-    ),
-    _PopularLegalCategory(
-      title: 'Property Law',
-      description: 'Housing, builders and ownership disputes',
+      title: 'Property & Rent',
+      description: 'Rent agreements, eviction & security deposit theft',
       icon: Icons.home_work_outlined,
       categoryId: 'Housing & Real Estate',
     ),
     _PopularLegalCategory(
-      title: 'Labor Rights',
-      description: 'Pay, workplace rights and PF matters',
+      title: 'Employment & Salary',
+      description: 'Withheld salary, termination & workplace rights',
       icon: Icons.work_outline_rounded,
       categoryId: 'Employment',
     ),
     _PopularLegalCategory(
-      title: 'Cyber Law',
-      description: 'Digital fraud and online safety',
+      title: 'Money Recovery & Cheque',
+      description: 'Cheque bounce (Sec 138) & debt recovery notices',
+      icon: Icons.account_balance_wallet_outlined,
+      categoryId: 'Banking & UPI Fraud',
+    ),
+    _PopularLegalCategory(
+      title: 'Cyber Crime & Bank Fraud',
+      description: 'Account freeze, 1930 portal & online financial fraud',
       icon: Icons.shield_outlined,
       categoryId: 'Banking & UPI Fraud',
     ),
   ];
-
-  static const double _categorySectionTopSpacingDesktop = 48;
-  static const double _categorySectionTopSpacingMobile = 48;
 
   const _HomeContent({
     required this.categories,
@@ -311,14 +308,22 @@ class _HomeContent extends StatelessWidget {
         route: '/home/document-review',
         category: 'documents',
       ),
-      // TODO: complete before enabling
-      // _AiFeatureTool(
-      //   title: l10n.toolContractNegotiationTitle,
-      //   description: l10n.toolContractNegotiationDesc,
-      //   icon: Icons.handshake_outlined,
-      //   route: '/home/contract-negotiation',
-      //   category: 'documents',
-      // ),
+      _AiFeatureTool(
+        title: 'Formal Notice & Complaint',
+        description:
+            'Draft formal legal notices with statutory consumer sections',
+        icon: Icons.gavel_rounded,
+        route: '/home/complaint',
+        category: 'documents',
+      ),
+      _AiFeatureTool(
+        title: l10n.authorities,
+        description:
+            'Direct access to Cybercrime, Consumer Helpline & RBI CMS',
+        icon: Icons.account_balance_outlined,
+        route: '/home/authorities',
+        category: 'documents',
+      ),
     ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -327,13 +332,29 @@ class _HomeContent extends StatelessWidget {
           _HeroSection(isDesktop: isDesktop),
           duration: const Duration(milliseconds: 520),
         ),
-        SizedBox(
-          height: isDesktop
-              ? _categorySectionTopSpacingDesktop
-              : _categorySectionTopSpacingMobile,
-        ),
+        const SizedBox(height: 24),
 
-        // -- Legal Categories ------------------------------
+        // -- 3 Action Power Hubs ---------------------------
+        _SectionLabel('CORE LEGAL HUBS'),
+        const SizedBox(height: 4),
+        Padding(
+          padding: const EdgeInsets.only(left: 11),
+          child: Text(
+            'Draft court documents, audit agreements, or resolve legal disputes with AI.',
+            style: const TextStyle(
+              color: Color(0xFF6B7280),
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
+            ).copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ),
+        const SizedBox(height: 14),
+        _ThreeActionHubs(isDesktop: isDesktop),
+        const SizedBox(height: 28),
+
+        // -- High-Impact Legal Categories ------------------
         _SectionLabel(l10n.exploreLegalCategories),
         const SizedBox(height: 16),
         if (categories.isEmpty)
@@ -1406,4 +1427,230 @@ class _BottomNavItem {
   final IconData selectedIcon;
 
   const _BottomNavItem(this.label, this.icon, this.selectedIcon);
+}
+
+// ---------------------------------------------
+// 3 Core Action Power Hubs
+// ---------------------------------------------
+
+class _ThreeActionHubs extends StatelessWidget {
+  final bool isDesktop;
+
+  const _ThreeActionHubs({required this.isDesktop});
+
+  @override
+  Widget build(BuildContext context) {
+    final hubs = [
+      _HubData(
+        tag: '30+ COURT TEMPLATES',
+        title: 'Draft Legal Documents',
+        subtitle:
+            'Rent Agreements, 15-Day Legal Demand Notices, Cheque Bounce, Affidavits & RTIs with instant PDF download.',
+        icon: Icons.edit_document,
+        buttonText: 'Create Document',
+        gradient: const LinearGradient(
+          colors: [Color(0xFF0B3D2E), Color(0xFF062B20)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        badgeColor: AppColors.brightEmerald,
+        onTap: () => context.push('/home/legal-writing'),
+      ),
+      _HubData(
+        tag: 'AI CONTRACT AUDITOR',
+        title: 'Audit & Review Contracts',
+        subtitle:
+            'Scan leases, offer letters & NDAs before signing. Detect one-sided clauses, lock-in penalties & get a Safety Score.',
+        icon: Icons.fact_check_outlined,
+        buttonText: 'Audit Document',
+        gradient: const LinearGradient(
+          colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        badgeColor: const Color(0xFF38BDF8),
+        onTap: () => context.push('/home/document-review'),
+      ),
+      _HubData(
+        tag: 'INSTANT LEGAL RESOLUTION',
+        title: 'Resolve Legal Disputes',
+        subtitle:
+            'Withheld salary, security deposit theft, money recovery, or cyber fraud — get exact Indian laws & action plans.',
+        icon: Icons.gavel_rounded,
+        buttonText: 'Solve Dispute',
+        gradient: const LinearGradient(
+          colors: [Color(0xFF312E81), Color(0xFF1E1B4B)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        badgeColor: const Color(0xFFA5B4FC),
+        onTap: () => context.go('/home/analyzer'),
+      ),
+    ];
+
+    if (isDesktop) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: hubs
+            .map((hub) => Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    child: _HubCard(data: hub),
+                  ),
+                ))
+            .toList(),
+      );
+    }
+
+    return Column(
+      children: hubs
+          .map((hub) => Padding(
+                padding: const EdgeInsets.only(bottom: 14),
+                child: _HubCard(data: hub),
+              ))
+          .toList(),
+    );
+  }
+}
+
+class _HubData {
+  final String tag;
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final String buttonText;
+  final Gradient gradient;
+  final Color badgeColor;
+  final VoidCallback onTap;
+
+  const _HubData({
+    required this.tag,
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.buttonText,
+    required this.gradient,
+    required this.badgeColor,
+    required this.onTap,
+  });
+}
+
+class _HubCard extends StatelessWidget {
+  final _HubData data;
+
+  const _HubCard({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: data.gradient,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.12),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: data.onTap,
+          borderRadius: BorderRadius.circular(20),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Top row: Tag & Icon
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: data.badgeColor.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: data.badgeColor.withValues(alpha: 0.4),
+                        ),
+                      ),
+                      child: Text(
+                        data.tag,
+                        style: TextStyle(
+                          color: data.badgeColor,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        data.icon,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+
+                // Title
+                Text(
+                  data.title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 6),
+
+                // Subtitle
+                Text(
+                  data.subtitle,
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.82),
+                    fontSize: 12.5,
+                    height: 1.45,
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Action pill
+                Row(
+                  children: [
+                    Text(
+                      data.buttonText,
+                      style: TextStyle(
+                        color: data.badgeColor,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.arrow_forward_rounded,
+                      size: 15,
+                      color: data.badgeColor,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

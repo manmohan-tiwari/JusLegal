@@ -56,8 +56,6 @@ class AppRouteNames {
   static const String homeLegalTerms = 'legalTerms';
   static const String homeLegalWriting = 'legalWriting';
   static const String homeDocumentReview = 'documentReview';
-  // TODO: complete before enabling
-  // static const String homeContractNegotiation = 'contractNegotiation';
 }
 
 GoRouter buildRouter({
@@ -255,13 +253,6 @@ GoRouter buildRouter({
             name: AppRouteNames.homeDocumentReview,
             builder: (context, state) => const DocumentReviewScreen(),
           ),
-          // TODO: complete before enabling
-          // GoRoute(
-          //   path: 'contract-negotiation',
-          //   name: AppRouteNames.homeContractNegotiation,
-          //   // Contract review is handled by the document-review workflow.
-          //   builder: (context, state) => const DocumentReviewScreen(),
-          // ),
         ],
       ),
     ],

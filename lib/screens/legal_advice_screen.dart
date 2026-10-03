@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:juslegal/core/core.dart';
 import '../services/ai_service.dart';
 import '../widgets/legal_disclaimer_banner.dart';
-import '../widgets/siliconflow_image_widget.dart';
 
 class _QTemplate {
   final String display;
@@ -253,17 +252,7 @@ class _LegalAdviceScreenState extends ConsumerState<LegalAdviceScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 20),
-                Center(
-                  child: SiliconFlowImageWidget(
-                    prompt:
-                        'Professional Indian legal illustration for: ${selected.display}',
-                    width: double.infinity,
-                    height: 180,
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
                 _SectionLabel('YOUR DETAILS'),
                 const SizedBox(height: 10),
                 TextField(

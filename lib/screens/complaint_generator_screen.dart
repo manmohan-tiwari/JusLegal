@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:juslegal/core/core.dart';
 import '../providers/ai_provider.dart';
@@ -261,53 +262,90 @@ class _ComplaintGeneratorScreenState
       ),
       body: _lastErrorMessage != null
           ? Center(
-              child: Card(
-                color: Color(0xFFF5F7FF),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: const BorderSide(color: Color(0xFFE5E7EB)),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.error_outline,
-                        color: Color(0xFFDC2626),
-                        size: 48,
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Something went wrong',
-                        style: const TextStyle(
-                            color: Color(0xFF1F2937),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        _lastErrorMessage ?? '',
-                        style: const TextStyle(
-                            color: Color(0xFF6B7280),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w400),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: _isGenerating
-                            ? null
-                            : () {
-                                HapticFeedback.lightImpact();
-                                setState(() => _lastErrorMessage = null);
-                                _generate();
-                              },
-                        child: const Text('Try Again'),
-                      ),
-                    ],
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Card(
+                  color: AppColors.surface,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    side: const BorderSide(color: AppColors.border),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.15),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.assignment_late_outlined,
+                            color: AppColors.deepForest,
+                            size: 40,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          _lastErrorMessage == 'Please analyze your problem first.'
+                              ? 'No Active Case Found'
+                              : 'Notice Generation Issue',
+                          style: const TextStyle(
+                              color: AppColors.deepForest,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _lastErrorMessage == 'Please analyze your problem first.'
+                              ? 'To automatically draft a legal notice or complaint with exact laws and sections, analyze your issue first or use our Legal Writing template engine.'
+                              : (_lastErrorMessage ?? ''),
+                          style: const TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 13,
+                              height: 1.4),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 24),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: () => context.go('/home/analyzer'),
+                            icon: const Icon(Icons.analytics_outlined),
+                            label: const Text('Analyze Problem First'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              foregroundColor: AppColors.onPrimary,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton.icon(
+                            onPressed: () => context.push('/home/legal-writing'),
+                            icon: const Icon(Icons.edit_note_rounded),
+                            label: const Text('Draft Legal Notice Directly'),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: AppColors.deepForest,
+                              side: const BorderSide(color: AppColors.border),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
