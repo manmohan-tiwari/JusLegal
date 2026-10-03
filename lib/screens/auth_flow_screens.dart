@@ -293,7 +293,22 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                       ),
                     ),
                   ),
-                  const SizedBox(height: 22),
+                  const SizedBox(height: 16),
+                  Center(
+                    child: TextButton.icon(
+                      onPressed: () => context.go('/home'),
+                      icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+                      label: const Text(
+                        'Explore App as Guest',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF558B2F),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
                   Center(
                       child: Wrap(alignment: WrapAlignment.center, children: [
                     const Text('Already have an account? ',
@@ -665,7 +680,25 @@ class _EmailVerificationScreenState
                         : 'Resend Email')),
             TextButton(
                 onPressed: _loading ? null : _changeEmail,
-                child: const Text('Change Email'))
+                child: const Text('Change Email')),
+            TextButton.icon(
+              onPressed: () => context.go('/home'),
+              icon: const Icon(Icons.arrow_forward_rounded, size: 16),
+              label: const Text(
+                'Explore App as Guest / Skip for now',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF558B2F),
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
+                if (context.mounted) context.go('/');
+              },
+              child: const Text('Sign Out', style: TextStyle(color: Colors.red)),
+            ),
           ])));
 }
 
@@ -778,6 +811,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             TextButton(
                 onPressed: () => context.push('/mobile-login'),
                 child: const Text('Login with Mobile')),
+            TextButton.icon(
+              onPressed: () => context.go('/home'),
+              icon: const Icon(Icons.arrow_forward_rounded, size: 16),
+              label: const Text(
+                'Explore App as Guest',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF558B2F),
+                ),
+              ),
+            ),
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               const Text("Don't have an account?"),
               TextButton(

@@ -6,14 +6,10 @@ import 'package:juslegal/l10n/gen/app_localizations.dart';
 import '../../models/legal_result_model.dart';
 import '../../services/auth_handler.dart';
 import '../../services/firebase_token_service.dart';
-import '../../screens/authorities_screen.dart';
-import '../../screens/complaint_generator_screen.dart';
 import '../../screens/auth_flow_screens.dart';
 import '../../screens/home_screen.dart';
 import '../../screens/ai_legal_chat_screen.dart';
-import '../../screens/case_analysis_screen.dart';
 import '../../screens/document_review_screen.dart';
-import '../../screens/legal_advice_screen.dart';
 import '../../screens/legal_terms_screen.dart';
 import '../../screens/legal_writing_screen.dart';
 import '../../screens/my_cases_screen.dart';
@@ -22,7 +18,6 @@ import '../../screens/otp_screen.dart';
 import '../../screens/privacy_policy_screen.dart';
 import '../../screens/problem_analyzer_screen.dart';
 import '../../screens/result_screen.dart';
-import '../../screens/consent_management_screen.dart';
 import '../../screens/settings_screen.dart';
 import 'otp_route_params.dart';
 
@@ -40,19 +35,14 @@ class AppRouteNames {
   static const String home = 'home';
   static const String analyzer = 'analyzer';
   static const String result = 'result';
-  static const String complaint = 'complaint';
   static const String cases = 'cases';
-  static const String authorities = 'authorities';
   static const String settings = 'settings';
-  static const String consentManagement = 'consentManagement';
   static const String privacyPolicy = 'privacyPolicy';
   static const String firebaseUnavailable = 'firebaseUnavailable';
   static const String legalTermsRoot = 'legalTermsRoot';
 
   // Legal utilities
   static const String aiLawyerChat = 'aiLawyerChat';
-  static const String homeLegalAdvice = 'legalAdvice';
-  static const String homeCaseAnalysis = 'caseAnalysis';
   static const String homeLegalTerms = 'legalTerms';
   static const String homeLegalWriting = 'legalWriting';
   static const String homeDocumentReview = 'documentReview';
@@ -79,31 +69,10 @@ GoRouter buildRouter({
         return '/firebase-unavailable';
       }
       final user = getAuthState().user;
-      final isProtectedRoute =
-          path == '/home' || path.startsWith('/home/') || path == '/analyze';
-
-      if (isProtectedRoute && user == null) {
-        return '/';
-      }
-
-      if (isProtectedRoute &&
-          user != null &&
-          user.providerData
-              .any((provider) => provider.providerId == 'password') &&
-          !user.emailVerified) {
-        return '/email-verification';
-      }
-
-      if (isProtectedRoute &&
-          await FirebaseTokenService().getIdToken() == null) {
-        return '/';
-      }
 
       // Handle root path redirect
       if (path == '/') {
-        if (user == null) {
-          return '/';
-        } else {
+        if (user != null) {
           return '/home';
         }
       }
@@ -195,29 +164,14 @@ GoRouter buildRouter({
             },
           ),
           GoRoute(
-            path: 'complaint',
-            name: AppRouteNames.complaint,
-            builder: (context, state) => const ComplaintGeneratorScreen(),
-          ),
-          GoRoute(
             path: 'cases',
             name: AppRouteNames.cases,
             builder: (context, state) => const MyCasesScreen(),
           ),
           GoRoute(
-            path: 'authorities',
-            name: AppRouteNames.authorities,
-            builder: (context, state) => const AuthoritiesScreen(),
-          ),
-          GoRoute(
             path: 'settings',
             name: AppRouteNames.settings,
             builder: (context, state) => const SettingsScreen(),
-          ),
-          GoRoute(
-            path: 'privacy-consent',
-            name: AppRouteNames.consentManagement,
-            builder: (context, state) => const ConsentManagementScreen(),
           ),
 
           // Legal utility routes
@@ -227,16 +181,6 @@ GoRouter buildRouter({
             builder: (context, state) => const AILegalChatScreen(
               userName: 'there',
             ),
-          ),
-          GoRoute(
-            path: 'legal-advice',
-            name: AppRouteNames.homeLegalAdvice,
-            builder: (context, state) => const LegalAdviceScreen(),
-          ),
-          GoRoute(
-            path: 'case-analysis',
-            name: AppRouteNames.homeCaseAnalysis,
-            builder: (context, state) => const CaseAnalysisScreen(),
           ),
           GoRoute(
             path: 'legal-terms',
