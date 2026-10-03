@@ -453,46 +453,6 @@ class _HomeContent extends StatelessWidget {
           delay: const Duration(milliseconds: 180),
         ),
 
-        // -- Why Choose JusLegal ---------------------------
-        SizedBox(height: isDesktop ? 28 : 24),
-        _SectionLabel(l10n.whyChooseJuslegal),
-        const SizedBox(height: 16),
-        const _BenefitItem(
-          icon: Icons.verified_outlined,
-          title: 'AI-Powered Analysis',
-          description: 'Get instant legal analysis based on your situation',
-        ),
-        const SizedBox(height: 14),
-        const _BenefitItem(
-          icon: Icons.diamond_outlined,
-          title: '10+ Legal Categories',
-          description: 'Covers all major consumer issues',
-          isGold: true,
-        ),
-        const SizedBox(height: 14),
-        const _BenefitItem(
-          icon: Icons.account_balance_rounded,
-          title: 'Expert Authorities',
-          description: 'Direct access to official regulatory bodies',
-        ),
-        const SizedBox(height: 14),
-        const _BenefitItem(
-          icon: Icons.description_outlined,
-          title: 'Document Generation',
-          description: 'Professional complaint letters and notices',
-          isGold: true,
-        ),
-        const SizedBox(height: 24),
-        _DisclaimerBanner(
-          onTap: () async {
-            final uri = Uri.parse(AppConfig.privacyPolicyUrl);
-            if (await canLaunchUrl(uri)) {
-              await launchUrl(uri);
-            }
-          },
-          text: l10n.aiGuidanceOnlyNotLegalAdvice,
-          moreText: l10n.learnMore,
-        ),
       ],
     );
   }
