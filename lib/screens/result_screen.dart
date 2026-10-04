@@ -14,6 +14,7 @@ import '../providers/ai_provider.dart';
 import '../providers/cases_provider.dart';
 import '../providers/problem_provider.dart';
 import '../widgets/authority_card.dart';
+import '../widgets/case_header_image_widget.dart';
 import '../widgets/shimmer_loader.dart';
 import '../widgets/step_card.dart';
 import '../widgets/legal_disclaimer_banner.dart';

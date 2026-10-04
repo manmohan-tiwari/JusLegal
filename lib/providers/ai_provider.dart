@@ -23,7 +23,7 @@ import 'locale_provider.dart';
 const int MIN_CONFIDENCE_SCORE = 1;
 const int MAX_CONFIDENCE_SCORE = 10;
 const int CHAT_HISTORY_LIMIT = 100;
-const int API_CONTEXT_WINDOW = 10;
+const int API_CONTEXT_WINDOW = 6;
 const Duration CHAT_DEBOUNCE_DELAY = Duration(milliseconds: 500);
 const String kChatHistoryBox = 'chat_history';
 
@@ -43,25 +43,32 @@ class RequestToken {
 // ---------------------------------------------------------------------------
 // Chat state
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// Chat state
+// ---------------------------------------------------------------------------
 class ChatState {
   final List<ChatMessage> conversationHistory;
+  final CaseState caseState;
   final bool isSending;
   final String? error;
 
   const ChatState({
     this.conversationHistory = const [],
+    this.caseState = const CaseState(),
     this.isSending = false,
     this.error,
   });
 
   ChatState copyWith({
     List<ChatMessage>? conversationHistory,
+    CaseState? caseState,
     bool? isSending,
     String? error,
     bool clearError = false,
   }) =>
       ChatState(
         conversationHistory: conversationHistory ?? this.conversationHistory,
+        caseState: caseState ?? this.caseState,
         isSending: isSending ?? this.isSending,
         error: clearError ? null : error ?? this.error,
       );
@@ -120,8 +127,19 @@ class ChatNotifier extends Notifier<ChatState> {
           .map((map) => ChatMessage.fromMap(Map<dynamic, dynamic>.from(map)))
           .toList();
       if (messages.isEmpty || state.conversationHistory.isNotEmpty) return;
+
+      // Extract last case state if available
+      CaseState restoredCaseState = const CaseState();
+      for (final msg in messages.reversed) {
+        if (msg.caseState != null) {
+          restoredCaseState = msg.caseState!;
+          break;
+        }
+      }
+
       state = state.copyWith(
         conversationHistory: List.unmodifiable(messages),
+        caseState: restoredCaseState,
       );
       AppLogger.debug('ChatNotifier',
           'Restored ${messages.length} persisted chat messages');
@@ -144,24 +162,38 @@ class ChatNotifier extends Notifier<ChatState> {
     }
   }
 
+  void addMessageObject(ChatMessage message) {
+    final updated = List<ChatMessage>.from(state.conversationHistory)..add(message);
+    final limited = updated.length > CHAT_HISTORY_LIMIT
+        ? updated.sublist(updated.length - CHAT_HISTORY_LIMIT)
+        : updated;
+
+    final updatedCaseState = message.caseState ?? state.caseState;
+
+    state = state.copyWith(
+      conversationHistory: List.unmodifiable(limited),
+      caseState: updatedCaseState,
+      clearError: true,
+    );
+    _persistHistory(limited);
+  }
+
   /// Adds a message and trims history to [CHAT_HISTORY_LIMIT] entries.
   void addMessage(String role, String content) {
     final trimmedContent = content.trim();
     if (trimmedContent.isEmpty) return;
-    final updated = List<ChatMessage>.from(state.conversationHistory)
-      ..add(ChatMessage(
-        role: role,
-        content: trimmedContent,
-        timestamp: DateTime.now(),
-      ));
-    final limited = updated.length > CHAT_HISTORY_LIMIT
-      ? updated.sublist(updated.length - CHAT_HISTORY_LIMIT)
-        : updated;
-    state = state.copyWith(
-      conversationHistory: List.unmodifiable(limited),
-      clearError: true,
-    );
-    _persistHistory(limited);
+    final message = role == 'assistant'
+        ? ChatMessage.fromAiResponse(
+            trimmedContent,
+            timestamp: DateTime.now(),
+            currentCaseState: state.caseState,
+          )
+        : ChatMessage(
+            role: role,
+            content: trimmedContent,
+            timestamp: DateTime.now(),
+          );
+    addMessageObject(message);
   }
 
   /// Debounced send: restarts a [CHAT_DEBOUNCE_DELAY] timer on each call so
@@ -216,6 +248,7 @@ class ChatNotifier extends Notifier<ChatState> {
             trimmedMessage,
             messagesForApi,
             languageCode: ref.read(localeProvider).languageCode,
+            caseState: state.caseState,
           );
       _activeRequest = null;
       if (token.isCancelled) {
@@ -223,7 +256,12 @@ class ChatNotifier extends Notifier<ChatState> {
             'Request completed after cancellation; discarding response');
         return;
       }
-      addMessage('assistant', response);
+      final assistantMessage = ChatMessage.fromAiResponse(
+        response,
+        timestamp: DateTime.now(),
+        currentCaseState: state.caseState,
+      );
+      addMessageObject(assistantMessage);
       state = state.copyWith(isSending: false, clearError: true);
       SafeAnalytics.logEvent(name: 'token_usage', parameters: {
         'context': 'chat',

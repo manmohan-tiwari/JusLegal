@@ -148,13 +148,13 @@ class AppColors {
   static const Gradient userBubbleGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [surfaceContainerLow, surface],
+    colors: [deepForest, deepForestDark],
   );
 
   static const Gradient botBubbleGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [surface, surfaceContainerLow],
+    colors: [surfaceContainerLowest, surfaceContainerLow],
   );
 
   static const Gradient cardBlueGradient = LinearGradient(

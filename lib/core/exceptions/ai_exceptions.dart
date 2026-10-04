@@ -66,6 +66,15 @@ class NetworkException implements Exception {
   String toString() => 'NetworkException: $message';
 }
 
+class AuthRequiredException implements Exception {
+  final String message;
+
+  AuthRequiredException([this.message = 'Authentication required. Please sign in to use AI legal services.']);
+
+  @override
+  String toString() => 'AuthRequiredException: $message';
+}
+
 /// SecurityAudit: Helper methods for error sanitization and handling.
 /// Removes PII and sensitive information from error messages before logging.
 class ErrorSanitizer {
@@ -96,6 +105,14 @@ class ErrorSanitizer {
   static UserFacingException toUserFacing(Object error) {
     if (error is UserFacingException) {
       return error;
+    }
+
+    if (error is AuthRequiredException) {
+      return UserFacingException(
+        error.message,
+        category: 'auth_required',
+        isRetryable: false,
+      );
     }
 
     if (error is RateLimitException) {

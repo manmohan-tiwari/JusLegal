@@ -5,7 +5,6 @@ import 'package:juslegal/l10n/gen/app_localizations.dart';
 
 import '../../models/legal_result_model.dart';
 import '../../services/auth_handler.dart';
-import '../../services/firebase_token_service.dart';
 import '../../screens/auth_flow_screens.dart';
 import '../../screens/home_screen.dart';
 import '../../screens/ai_legal_chat_screen.dart';

@@ -15,7 +15,7 @@ class AIService {
 
   /// Currently preferred provider. Chat/analysis requests try this provider
   /// first and fall back to the other worker-routed provider on failure.
-  AiProvider _preferredProvider = AiProvider.openrouter;
+  AiProvider _preferredProvider = AiProvider.groq;
   AiProvider get preferredProvider => _preferredProvider;
 
   /// Switch the preferred provider at runtime (groq, openrouter).
@@ -104,12 +104,13 @@ class AIService {
   /// Uses preferredProvider first and falls back to secondary provider.
   Future<String> sendMessage(
       String userMessage, List<Map<String, String>> conversationHistory,
-      {String languageCode = 'en'}) async {
+      {String languageCode = 'en', CaseState? caseState}) async {
     return await _executeWithFallback(
       (client) => client.sendMessage(
         userMessage,
         conversationHistory,
         languageCode: languageCode,
+        caseState: caseState,
       ),
       operationLabel: 'chat message',
     );
@@ -626,8 +627,8 @@ class WorkerChatClient {
   /// Sends a conversational request with JusLegal's chat context.
   Future<String> sendMessage(
           String userMessage, List<Map<String, String>> conversationHistory,
-          {String languageCode = 'en'}) =>
-      _sendChatRequest(userMessage, conversationHistory, languageCode);
+          {String languageCode = 'en', CaseState? caseState}) =>
+      _sendChatRequest(userMessage, conversationHistory, languageCode, caseState: caseState);
 
   /// Performs the Dio POST with automatic 401 token-refresh retry: when the
   /// Worker rejects an expired Firebase ID token, the token is force-refreshed
@@ -652,23 +653,31 @@ class WorkerChatClient {
   Future<String> _sendChatRequest(
     String userMessage,
     List<Map<String, String>> conversationHistory,
-    String languageCode,
-  ) async {
+    String languageCode, {
+    CaseState? caseState,
+  }) async {
     try {
       if (kDebugMode) {
         debugPrint('[$_label] Calling Worker $_endpoint for chat');
       }
+
+      final systemPrompt = StringBuffer(chatSystemPromptForLanguage(languageCode));
+      if (caseState != null) {
+        systemPrompt.write('\n\nCURRENT CASE STATE:\n${caseState.toPromptSummary()}');
+      }
+
       final response = await _postWithAuthRetry(
         _endpoint,
         _requestPayload(
           _boundedMessages([
             {
               'role': 'system',
-              'content': chatSystemPromptForLanguage(languageCode),
+              'content': systemPrompt.toString(),
             },
             ..._historyWithCurrentMessage(userMessage, conversationHistory),
           ]),
-          maxTokens: ApiConstants.maxTokens,
+          maxTokens: 800,
+          jsonResponse: true,
         ),
       );
       return _contentFrom(response.data);
@@ -831,10 +840,17 @@ class WorkerChatClient {
         error.type == DioExceptionType.receiveTimeout) {
       throw NetworkException('$_label request timed out');
     }
+
     final statusCode = error.response?.statusCode;
+    if (statusCode == 401) {
+      throw AuthRequiredException(
+        'Authentication required. Please sign in to use AI legal features.',
+      );
+    }
     if (statusCode == 429) {
       throw RateLimitException('$_label rate limit exceeded', _label);
     }
+
     if (statusCode != null) {
       if (kDebugMode) {
         debugPrint('[$_label] Worker returned HTTP $statusCode');
@@ -886,9 +902,9 @@ class GroqService {
 
   Future<String> sendMessage(
           String userMessage, List<Map<String, String>> conversationHistory,
-          {String languageCode = 'en'}) =>
+          {String languageCode = 'en', CaseState? caseState}) =>
       _client.sendMessage(userMessage, conversationHistory,
-          languageCode: languageCode);
+          languageCode: languageCode, caseState: caseState);
 }
 
 /// Compatibility alias. OpenRouter is now routed through the unified worker
@@ -916,7 +932,7 @@ class OpenRouterService {
 
   Future<String> sendMessage(
           String userMessage, List<Map<String, String>> conversationHistory,
-          {String languageCode = 'en'}) =>
+          {String languageCode = 'en', CaseState? caseState}) =>
       _client.sendMessage(userMessage, conversationHistory,
-          languageCode: languageCode);
+          languageCode: languageCode, caseState: caseState);
 }

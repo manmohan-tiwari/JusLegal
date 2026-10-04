@@ -309,6 +309,22 @@ export function sanitizeUpstreamPayload(raw: unknown, expectedModel: string): Pa
 	return { payload: output, reason: null };
 }
 
+async function getOpenRouterFreeModels(apiKey: string): Promise<string[]> {
+	try {
+		const res = await fetch("https://openrouter.ai/api/v1/models", {
+			headers: { Authorization: `Bearer ${apiKey}` },
+		});
+		if (!res.ok) return [];
+		const data = (await res.json()) as { data?: Array<{ id?: string }> };
+		if (!Array.isArray(data.data)) return [];
+		return data.data
+			.map((m) => m.id)
+			.filter((id): id is string => typeof id === "string" && id.endsWith(":free"));
+	} catch {
+		return [];
+	}
+}
+
 export default {
 	async fetch(request, env): Promise<Response> {
 		const cors = corsHeaders(request, env);
@@ -328,15 +344,28 @@ export default {
 		}
 
 		const { pathname } = new URL(request.url);
-		
-		// ✅ FIXED: Use correct free models
-		const expectedModel = pathname === "/callGroq"
-			? "llama-3.3-70b-versatile"
-			: pathname === "/callOpenRouter"
-				? "meta-llama/llama-3.3-70b-instruct:free"
-				: null;
-		
-		if (!expectedModel) return jsonResponse({ error: "Not found" }, 404, cors);
+
+		let candidateModels: string[] | null = null;
+		if (pathname === "/callGroq") {
+			candidateModels = [
+				"llama-3.1-8b-instant",
+				"llama-3.3-70b-specdec",
+				"mixtral-8x7b-32768",
+				"gemma2-9b-it",
+			];
+		} else if (pathname === "/callOpenRouter") {
+			const dynamicFree = await getOpenRouterFreeModels(env.OPENROUTER_API_KEY);
+			candidateModels = [
+				"google/gemini-2.0-flash-exp:free",
+				"meta-llama/llama-3.1-8b-instruct:free",
+				"deepseek/deepseek-r1:free",
+				...dynamicFree,
+			];
+			// Deduplicate candidate model list
+			candidateModels = Array.from(new Set(candidateModels));
+		}
+
+		if (!candidateModels) return jsonResponse({ error: "Not found" }, 404, cors);
 
 		if (!(await hasValidBearerToken(request, env))) {
 			return jsonResponse({ error: "Unauthorized" }, 401, cors);
@@ -346,11 +375,8 @@ export default {
 			const body = await readRequestBody(request);
 			if (body === null) return jsonResponse({ error: "Request body too large" }, 413, cors);
 
-			// JWT segments are base64url-encoded, but HTTP JSON bodies are plain
-			// JSON. Using the JWT decoder here made every normal Flutter request
-			// parse as null and therefore return HTTP 400.
 			const raw = parseRequestJson(new TextDecoder().decode(body));
-			const validation = sanitizeUpstreamPayload(raw, expectedModel);
+			const validation = sanitizeUpstreamPayload(raw, candidateModels[0]);
 
 			if (!validation.payload) {
 				return jsonResponse(
@@ -362,30 +388,43 @@ export default {
 					cors,
 				);
 			}
-			const upstreamResponse = await fetch(
-				pathname === "/callGroq"
-					? "https://api.groq.com/openai/v1/chat/completions"
-					: "https://openrouter.ai/api/v1/chat/completions",
-				{
-					method: "POST",
-					headers: {
-						Authorization: `Bearer ${pathname === "/callGroq" ? env.GROQ_API_KEY : env.OPENROUTER_API_KEY}`,
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify(validation.payload),
-				},
-			);
 
-			if (!upstreamResponse.ok) {
-				const detail = await upstreamResponse.text();
-				return jsonResponse({ error: "AI provider request failed", upstreamStatus: upstreamResponse.status, detail }, 502, cors);
+			let lastErrorDetail = "";
+			let lastStatus = 502;
+
+			for (const modelName of candidateModels) {
+				const payload = { ...validation.payload, model: modelName };
+				const upstreamResponse = await fetch(
+					pathname === "/callGroq"
+						? "https://api.groq.com/openai/v1/chat/completions"
+						: "https://openrouter.ai/api/v1/chat/completions",
+					{
+						method: "POST",
+						headers: {
+							Authorization: `Bearer ${pathname === "/callGroq" ? env.GROQ_API_KEY : env.OPENROUTER_API_KEY}`,
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify(payload),
+					},
+				);
+
+				if (upstreamResponse.ok) {
+					const headers = new Headers(cors);
+					headers.set("Content-Type", "application/json; charset=utf-8");
+					headers.set("Cache-Control", "no-store");
+					headers.set("X-Content-Type-Options", "nosniff");
+					return new Response(upstreamResponse.body, { status: upstreamResponse.status, headers });
+				}
+
+				lastStatus = upstreamResponse.status;
+				lastErrorDetail = await upstreamResponse.text();
 			}
 
-			const headers = new Headers(cors);
-			headers.set("Content-Type", "application/json; charset=utf-8");
-			headers.set("Cache-Control", "no-store");
-			headers.set("X-Content-Type-Options", "nosniff");
-			return new Response(upstreamResponse.body, { status: upstreamResponse.status, headers });
+			return jsonResponse(
+				{ error: "AI provider request failed", upstreamStatus: lastStatus, detail: lastErrorDetail },
+				502,
+				cors,
+			);
 		} catch {
 			return jsonResponse({ error: "Internal error" }, 500, cors);
 		}

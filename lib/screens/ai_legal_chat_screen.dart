@@ -140,7 +140,7 @@ class _AILegalChatScreenState extends ConsumerState<AILegalChatScreen>
         child: Container(
           decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
           child: Column(children: [
-            Expanded(child: _messageList(chat.conversationHistory)),
+            Expanded(child: _messageList(chat.conversationHistory, isSendUnavailable)),
             if (chat.isSending) _TypingIndicator(spinnerAnimation: _spinnerController, dotsAnimation: _dotsController),
             // Fix 2: viewInsets lifts the composer; its scroll view prevents
             // a multi-line composer/banner from being obscured by the keyboard.
@@ -156,15 +156,24 @@ class _AILegalChatScreenState extends ConsumerState<AILegalChatScreen>
     );
   }
 
-  Widget _messageList(List<ChatMessage> messages) => ListView.builder(
+  Widget _messageList(List<ChatMessage> messages, bool isSendUnavailable) => ListView.builder(
     controller: _scrollController,
     padding: const EdgeInsets.fromLTRB(16, 20, 16, 8),
     itemCount: messages.length,
-    itemBuilder: (context, index) => AppAnimations.fadeSlideIn(
-      _MessageBubble(message: messages[index]),
-      duration: const Duration(milliseconds: 280),
-      beginOffset: const Offset(0, .04),
-    ),
+    itemBuilder: (context, index) {
+      final message = messages[index];
+      final isLatestAssistant = !isSendUnavailable &&
+          message.role == 'assistant' &&
+          index == messages.length - 1;
+      return AppAnimations.fadeSlideIn(
+        _MessageBubble(
+          message: message,
+          onOptionSelected: isLatestAssistant ? (opt) => _sendMessage(opt) : null,
+        ),
+        duration: const Duration(milliseconds: 280),
+        beginOffset: const Offset(0, .04),
+      );
+    },
   );
 
   Widget _inputArea(ChatState chat, bool isSendUnavailable) {
@@ -247,42 +256,316 @@ class _AILegalChatScreenState extends ConsumerState<AILegalChatScreen>
 
 class _MessageBubble extends StatelessWidget {
   final ChatMessage message;
-  const _MessageBubble({required this.message});
+  final ValueChanged<String>? onOptionSelected;
+
+  const _MessageBubble({
+    required this.message,
+    this.onOptionSelected,
+  });
+
+  String _formatTime(DateTime dt) {
+    final hour = dt.hour == 0 ? 12 : (dt.hour > 12 ? dt.hour - 12 : dt.hour);
+    final minute = dt.minute.toString().padLeft(2, '0');
+    final period = dt.hour >= 12 ? 'PM' : 'AM';
+    return '$hour:$minute $period';
+  }
 
   @override
   Widget build(BuildContext context) {
     final isUser = message.role == 'user';
-    final maxWidth = math.min(MediaQuery.sizeOf(context).width * .80, 560.0);
-    return Align(
-      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-      child: ConstrainedBox(
-        // Fix 1: every markdown descendant now receives a finite max width.
-        constraints: BoxConstraints(maxWidth: maxWidth),
-        child: Container(
-          width: double.infinity,
-          margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            gradient: isUser ? AppColors.userBubbleGradient : AppColors.botBubbleGradient,
-            borderRadius: BorderRadius.only(
-              topLeft: const Radius.circular(24), topRight: const Radius.circular(24),
-              bottomLeft: Radius.circular(isUser ? 24 : 8), bottomRight: Radius.circular(isUser ? 8 : 24),
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final maxBubbleWidth = math.min(screenWidth * 0.78, 560.0);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (!isUser) ...[
+            Container(
+              margin: const EdgeInsets.only(top: 2, right: 8),
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: AppColors.appBarGradient,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.deepForest.withValues(alpha: 0.25),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.gavel_rounded,
+                color: AppColors.legalGold,
+                size: 16,
+              ),
             ),
-            border: Border.all(color: isUser ? AppColors.white.withValues(alpha: .35) : AppColors.white.withValues(alpha: .9)),
-          ),
-          child: isUser
-              ? Text(message.content, softWrap: true, overflow: TextOverflow.clip, style: const TextStyle(color: Colors.white, fontSize: 16, height: 1.45, fontWeight: FontWeight.w600))
-              : MarkdownBody(
-                  // Fix 6: API content is untrusted, so HTML is encoded first.
-                  data: _escapeHtml(message.content),
-                  selectable: true,
-                  // flutter_markdown 0.7.x does not expose MarkdownBody.softWrap;
-                  // RichText soft-wraps by default. softLineBreak preserves this.
-                  softLineBreak: true,
-                  onTapLink: (text, href, title) => _openLink(context, href),
-                  styleSheet: _markdownStyle(context),
+          ],
+          ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: maxBubbleWidth),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
+              decoration: BoxDecoration(
+                gradient: isUser
+                    ? AppColors.userBubbleGradient
+                    : AppColors.botBubbleGradient,
+                borderRadius: BorderRadius.only(
+                  topLeft: const Radius.circular(20),
+                  topRight: const Radius.circular(20),
+                  bottomLeft: Radius.circular(isUser ? 20 : 4),
+                  bottomRight: Radius.circular(isUser ? 4 : 20),
                 ),
-        ),
+                border: Border.all(
+                  color: isUser
+                      ? AppColors.brightEmerald.withValues(alpha: 0.4)
+                      : AppColors.outlineVariant,
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: isUser
+                        ? AppColors.deepForest.withValues(alpha: 0.2)
+                        : AppColors.shadowBlack.withValues(alpha: 0.06),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment:
+                    isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (isUser)
+                    Text(
+                      message.content,
+                      softWrap: true,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        height: 1.45,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    )
+                  else ...[
+                    if (message.content.isNotEmpty)
+                      MarkdownBody(
+                        data: _escapeHtml(message.content),
+                        selectable: true,
+                        softLineBreak: true,
+                        onTapLink: (text, href, title) => _openLink(context, href),
+                        styleSheet: _markdownStyle(context),
+                      ),
+                    if (message.action != null && message.action!.items.isNotEmpty) ...[
+                      const SizedBox(height: 10),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceBright,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                              color: AppColors.legalGold.withValues(alpha: 0.5),
+                              width: 1.2),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.shadowBlack.withValues(alpha: 0.04),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.flash_on_rounded,
+                                    color: AppColors.legalGold, size: 18),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    message.action!.title,
+                                    style: const TextStyle(
+                                      color: AppColors.deepForest,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            ...message.action!.items.map(
+                              (item) => Padding(
+                                padding: const EdgeInsets.only(bottom: 4),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text('• ',
+                                        style: TextStyle(
+                                            color: AppColors.legalGold,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 14)),
+                                    Expanded(
+                                      child: Text(
+                                        item,
+                                        style: const TextStyle(
+                                            color: AppColors.onSurface,
+                                            fontSize: 13.5,
+                                            height: 1.35),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                    if (message.question != null &&
+                        message.question!.isNotEmpty) ...[
+                      const SizedBox(height: 10),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.deepForest.withValues(alpha: 0.05),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                              color: AppColors.deepForest.withValues(alpha: 0.25)),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Icon(Icons.help_outline_rounded,
+                                color: AppColors.deepForest, size: 18),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                message.question!,
+                                style: const TextStyle(
+                                  color: AppColors.deepForest,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.35,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                    if (message.legalContext != null &&
+                        message.legalContext!.isNotEmpty) ...[
+                      const SizedBox(height: 10),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceContainerLow,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                              color: AppColors.brightEmerald.withValues(alpha: 0.3)),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Icon(Icons.gavel_rounded,
+                                color: AppColors.deepForest, size: 14),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                message.legalContext!,
+                                style: const TextStyle(
+                                  color: AppColors.onSurface,
+                                  fontSize: 12,
+                                  fontStyle: FontStyle.italic,
+                                  height: 1.35,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                    if (message.nextStep != null &&
+                        message.nextStep!.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          const Icon(Icons.arrow_forward_rounded,
+                              color: AppColors.legalGold, size: 14),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              'Next: ${message.nextStep}',
+                              style: const TextStyle(
+                                color: AppColors.textSecondary,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                    if (message.options != null &&
+                        message.options!.isNotEmpty) ...[
+                      const SizedBox(height: 12),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: message.options!.map((option) {
+                          return _QuickOptionChip(
+                            label: option.label,
+                            onTap: onOptionSelected != null
+                                ? () => onOptionSelected!(option.label)
+                                : null,
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ],
+                  const SizedBox(height: 4),
+                  Text(
+                    _formatTime(message.timestamp),
+                    style: TextStyle(
+                      color: isUser ? Colors.white70 : AppColors.onSurfaceVariant,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (isUser) ...[
+            Container(
+              margin: const EdgeInsets.only(top: 2, left: 8),
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.deepForest,
+                border: Border.all(color: AppColors.legalGold.withValues(alpha: 0.6), width: 1),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.shadowBlack.withValues(alpha: 0.1),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.person_rounded,
+                color: Colors.white,
+                size: 16,
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -291,7 +574,6 @@ class _MessageBubble extends StatelessWidget {
 
   static Future<void> _openLink(BuildContext context, String? href) async {
     final uri = href == null ? null : Uri.tryParse(href.trim());
-    // Fix 3: only absolute HTTP(S) URLs are safe to hand to url_launcher.
     final isSafeWebUri = uri != null && uri.hasAuthority &&
         (uri.scheme.toLowerCase() == 'https' || uri.scheme.toLowerCase() == 'http');
     if (!isSafeWebUri || !await launchUrl(uri, mode: LaunchMode.externalApplication)) {
@@ -300,18 +582,46 @@ class _MessageBubble extends StatelessWidget {
   }
 
   static MarkdownStyleSheet _markdownStyle(BuildContext context) {
-    final base = Theme.of(context).textTheme.bodyLarge?.copyWith(color: AppColors.textPrimary, fontSize: 16, height: 1.5);
+    final base = Theme.of(context).textTheme.bodyLarge?.copyWith(
+          color: AppColors.onSurface,
+          fontSize: 15,
+          height: 1.5,
+        );
     return MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
       p: base,
-      h3: base?.copyWith(color: AppColors.legalGold, fontSize: 18, fontWeight: FontWeight.w700, height: 1.3),
-      h3Padding: const EdgeInsets.only(top: 12, bottom: 4),
-      strong: base?.copyWith(color: AppColors.legalGold, fontWeight: FontWeight.w700),
-      a: base?.copyWith(color: AppColors.legalGold, decoration: TextDecoration.underline, decorationColor: AppColors.legalGold, fontWeight: FontWeight.w600),
-      listBullet: base?.copyWith(color: AppColors.legalGold, fontSize: 16),
-      listIndent: 24, listBulletPadding: const EdgeInsets.only(right: 8),
-      code: const TextStyle(color: AppColors.textPrimary, backgroundColor: AppColors.grey100, fontFamily: 'monospace', fontSize: 14),
-      codeblockDecoration: BoxDecoration(color: AppColors.grey100, borderRadius: BorderRadius.circular(4)),
-      codeblockPadding: const EdgeInsets.all(4), blockSpacing: 8,
+      h3: base?.copyWith(
+        color: AppColors.deepForest,
+        fontSize: 17,
+        fontWeight: FontWeight.w700,
+        height: 1.3,
+      ),
+      h3Padding: const EdgeInsets.only(top: 10, bottom: 4),
+      strong: base?.copyWith(
+        color: AppColors.deepForest,
+        fontWeight: FontWeight.w700,
+      ),
+      a: base?.copyWith(
+        color: AppColors.deepForest,
+        decoration: TextDecoration.underline,
+        decorationColor: AppColors.deepForest,
+        fontWeight: FontWeight.w600,
+      ),
+      listBullet: base?.copyWith(color: AppColors.deepForest, fontSize: 15),
+      listIndent: 20,
+      listBulletPadding: const EdgeInsets.only(right: 6),
+      code: const TextStyle(
+        color: AppColors.onSurface,
+        backgroundColor: AppColors.surfaceContainerLow,
+        fontFamily: 'monospace',
+        fontSize: 13,
+      ),
+      codeblockDecoration: BoxDecoration(
+        color: AppColors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: AppColors.outlineVariant),
+      ),
+      codeblockPadding: const EdgeInsets.all(8),
+      blockSpacing: 8,
     );
   }
 }
@@ -416,4 +726,57 @@ class _SuggestionChip extends StatelessWidget {
       ),
     ),
   );
+}
+
+class _QuickOptionChip extends StatelessWidget {
+  final String label;
+  final VoidCallback? onTap;
+
+  const _QuickOptionChip({
+    required this.label,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final enabled = onTap != null;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        splashColor: AppColors.brightEmerald.withValues(alpha: 0.2),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: enabled
+                ? AppColors.surfaceContainerLowest
+                : AppColors.surfaceContainerLow,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: enabled ? AppColors.deepForest : AppColors.outlineVariant,
+              width: 1.2,
+            ),
+            boxShadow: enabled
+                ? [
+                    BoxShadow(
+                      color: AppColors.deepForest.withValues(alpha: 0.08),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    )
+                  ]
+                : null,
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: enabled ? AppColors.deepForest : AppColors.onSurfaceVariant,
+              fontSize: 13.5,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
