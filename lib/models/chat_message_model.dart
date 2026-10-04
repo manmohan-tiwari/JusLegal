@@ -17,8 +17,10 @@ class ChatOption {
 
   factory ChatOption.fromMap(dynamic map) {
     if (map is Map) {
-      final label = (map['label'] ?? map['text'] ?? map['value'] ?? '').toString().trim();
-      final value = (map['value'] ?? map['label'] ?? map['text'] ?? '').toString().trim();
+      final label =
+          (map['label'] ?? map['text'] ?? map['value'] ?? '').toString().trim();
+      final value =
+          (map['value'] ?? map['label'] ?? map['text'] ?? '').toString().trim();
       return ChatOption(
         label: label.isNotEmpty ? label : 'Select',
         value: value.isNotEmpty ? value : label,
@@ -59,8 +61,12 @@ class ChatAction {
 
   factory ChatAction.fromMap(dynamic map) {
     if (map is Map) {
-      final title = (map['title'] ?? map['name'] ?? map['heading'] ?? 'Do this now').toString().trim();
-      final rawItems = map['items'] ?? map['actions'] ?? map['checklist'] ?? map['steps'];
+      final title =
+          (map['title'] ?? map['name'] ?? map['heading'] ?? 'Do this now')
+              .toString()
+              .trim();
+      final rawItems =
+          map['items'] ?? map['actions'] ?? map['checklist'] ?? map['steps'];
       final items = rawItems is List
           ? rawItems
               .map((e) => e.toString().trim())
@@ -105,7 +111,8 @@ class CaseState {
     return CaseState(
       caseType: caseType ?? this.caseType,
       knownFacts: knownFacts ?? this.knownFacts,
-      missingImportantFacts: missingImportantFacts ?? this.missingImportantFacts,
+      missingImportantFacts:
+          missingImportantFacts ?? this.missingImportantFacts,
       currentStage: currentStage ?? this.currentStage,
       previousActions: previousActions ?? this.previousActions,
       escalationStatus: escalationStatus ?? this.escalationStatus,
@@ -136,7 +143,10 @@ class CaseState {
 
     List<String> parseList(dynamic val) {
       if (val is List) {
-        return val.map((e) => e.toString().trim()).where((e) => e.isNotEmpty).toList();
+        return val
+            .map((e) => e.toString().trim())
+            .where((e) => e.isNotEmpty)
+            .toList();
       }
       return [];
     }
@@ -155,8 +165,9 @@ class CaseState {
     final factsStr = knownFacts.isEmpty
         ? 'None yet'
         : knownFacts.entries.map((e) => '${e.key}: ${e.value}').join(', ');
-    final missingStr =
-        missingImportantFacts.isEmpty ? 'None' : missingImportantFacts.join(', ');
+    final missingStr = missingImportantFacts.isEmpty
+        ? 'None'
+        : missingImportantFacts.join(', ');
     final prevActionsStr =
         previousActions.isEmpty ? 'None' : previousActions.join(', ');
 
@@ -164,6 +175,51 @@ class CaseState {
         'Known Facts: $factsStr\n'
         'Missing Facts: $missingStr\n'
         'Previous Actions: $prevActionsStr';
+  }
+
+  /// Applies only facts learned in the latest chat turn. Existing facts remain
+  /// intact unless the model explicitly supplies a non-null replacement.
+  CaseState withChatUpdates(Map<String, dynamic> updates) {
+    final facts = Map<String, String>.from(knownFacts);
+    String caseType = this.caseType;
+    String currentStage = this.currentStage;
+    String escalationStatus = this.escalationStatus;
+    List<String> missingFacts = missingImportantFacts;
+    List<String> previous = previousActions;
+
+    updates.forEach((key, value) {
+      if (value == null) return;
+      if (key == 'caseType' || key == 'category') {
+        final text = value.toString().trim();
+        if (text.isNotEmpty) caseType = text;
+      } else if (key == 'currentStage') {
+        final text = value.toString().trim();
+        if (text.isNotEmpty) currentStage = text;
+      } else if (key == 'escalationStatus') {
+        final text = value.toString().trim();
+        if (text.isNotEmpty) escalationStatus = text;
+      } else if (key == 'missingFacts' && value is List) {
+        missingFacts = value
+            .map((e) => e.toString().trim())
+            .where((e) => e.isNotEmpty)
+            .toList();
+      } else if (key == 'previousActions' && value is List) {
+        previous = value
+            .map((e) => e.toString().trim())
+            .where((e) => e.isNotEmpty)
+            .toList();
+      } else if (value is String && value.trim().isNotEmpty) {
+        facts[key] = value.trim();
+      }
+    });
+    return copyWith(
+      caseType: caseType,
+      knownFacts: facts,
+      missingImportantFacts: missingFacts,
+      currentStage: currentStage,
+      previousActions: previous,
+      escalationStatus: escalationStatus,
+    );
   }
 }
 
@@ -306,7 +362,7 @@ class ChatMessage {
     }
 
     // Safe fallback when AI returns unparseable or non-JSON response
-    return _buildFallbackMessage(rawContent, timestamp, currentCaseState);
+    return _buildFallbackMessage(timestamp, currentCaseState);
   }
 
   static ChatMessage _validateAndBuildFromMap(
@@ -314,25 +370,39 @@ class ChatMessage {
     DateTime timestamp,
     CaseState? currentCaseState,
   ) {
-    // 1. Validate response type
-    final validTypes = {'message', 'question', 'action', 'escalation', 'resolution'};
-    String rawType = (parsed['type'] as String?)?.toLowerCase().trim() ?? '';
-    if (!validTypes.contains(rawType)) {
-      if (parsed['question'] != null && parsed['question'].toString().trim().isNotEmpty) {
-        rawType = 'question';
-      } else if (parsed['action'] != null) {
-        rawType = 'action';
-      } else {
-        rawType = 'message';
-      }
+    const allowedKeys = {
+      'type',
+      'message',
+      'question',
+      'options',
+      'steps',
+      'legalContext',
+      'nextAction',
+      'caseUpdates'
+    };
+    const validTypes = {
+      'question',
+      'information',
+      'action',
+      'warning',
+      'final'
+    };
+    if (parsed.length != allowedKeys.length ||
+        !allowedKeys.every(parsed.containsKey) ||
+        parsed.keys.any((key) => !allowedKeys.contains(key)) ||
+        parsed['type'] is! String ||
+        !validTypes.contains((parsed['type'] as String).toLowerCase().trim()) ||
+        parsed['message'] is! String ||
+        (parsed['legalContext'] != null && parsed['legalContext'] is! String) ||
+        (parsed['nextAction'] != null && parsed['nextAction'] is! String)) {
+      return _buildFallbackMessage(timestamp, currentCaseState);
     }
-
-    // 2. Extract & sanitize message text
-    String msgText = (parsed['message'] as String?) ??
-        (parsed['content'] as String?) ??
-        (parsed['guidance'] as String?) ??
-        '';
+    final rawType = (parsed['type'] as String).toLowerCase().trim();
+    String msgText = parsed['message'] as String;
     msgText = _sanitizeMessageText(msgText);
+    if (msgText.isEmpty) {
+      return _buildFallbackMessage(timestamp, currentCaseState);
+    }
 
     // 3. Extract question
     String? questionText = (parsed['question'] as String?)?.trim();
@@ -340,58 +410,58 @@ class ChatMessage {
       questionText = null;
     }
 
-    // 4. Extract action
+    if ((rawType == 'question') != (questionText != null)) {
+      return _buildFallbackMessage(timestamp, currentCaseState);
+    }
+
+    // 4. Extract optional short steps for the existing action-card renderer.
     ChatAction? action;
-    if (parsed['action'] != null) {
-      action = ChatAction.fromMap(parsed['action']);
-      if (action.items.isEmpty) action = null;
-    } else {
-      final rawList = parsed['actionChecklist'] ?? parsed['checklist'] ?? parsed['actions'];
-      if (rawList is List) {
-        final items = rawList
-            .map((e) => e.toString().trim())
-            .where((e) => e.isNotEmpty)
-            .toList();
-        if (items.isNotEmpty) {
-          action = ChatAction(title: 'Do this now', items: items);
-        }
-      }
+    if (parsed['steps'] is! List ||
+        (parsed['steps'] as List).length > 4 ||
+        (parsed['steps'] as List).any((step) => step is! String)) {
+      return _buildFallbackMessage(timestamp, currentCaseState);
+    }
+    final steps = (parsed['steps'] as List)
+        .whereType<String>()
+        .map((step) => step.trim())
+        .where((step) => step.isNotEmpty)
+        .toList();
+    if (steps.isNotEmpty) {
+      action = ChatAction(title: 'Next steps', items: steps);
     }
 
     // 5. Extract options
     List<ChatOption>? options;
+    if (parsed['options'] is! List ||
+        (parsed['options'] as List).length > 4 ||
+        (parsed['options'] as List).any((option) => option is! String)) {
+      return _buildFallbackMessage(timestamp, currentCaseState);
+    }
     if (parsed['options'] is List) {
       options = (parsed['options'] as List)
+          .whereType<String>()
           .map((e) => ChatOption.fromMap(e))
           .where((o) => o.label.isNotEmpty)
           .toList();
+    }
+    if (rawType == 'question' && (options == null || options.length < 2)) {
+      return _buildFallbackMessage(timestamp, currentCaseState);
     }
 
     // 6. Extract legal context & next step
     String? legalCtx = (parsed['legalContext'] as String?)?.trim();
     if (legalCtx != null && legalCtx.isEmpty) legalCtx = null;
 
-    String? nextStepText = (parsed['nextStep'] as String?)?.trim();
+    String? nextStepText = (parsed['nextAction'] as String?)?.trim();
     if (nextStepText != null && nextStepText.isEmpty) nextStepText = null;
 
-    // 7. Extract updated case state
-    CaseState? updatedCaseState;
-    if (parsed['caseState'] != null) {
-      updatedCaseState = CaseState.fromMap(parsed['caseState']);
-    } else if (currentCaseState != null) {
-      updatedCaseState = currentCaseState;
+    // 7. Merge only latest-message facts into the existing source of truth.
+    if (parsed['caseUpdates'] is! Map) {
+      return _buildFallbackMessage(timestamp, currentCaseState);
     }
-
-    // If message body is empty but we have question/action, populate default message
-    if (msgText.isEmpty) {
-      if (questionText != null) {
-        msgText = 'Here is the next step for your case:';
-      } else if (action != null) {
-        msgText = 'Please review the recommended actions:';
-      } else {
-        msgText = 'Thank you for providing the details.';
-      }
-    }
+    final updates = Map<String, dynamic>.from(parsed['caseUpdates'] as Map);
+    final updatedCaseState =
+        (currentCaseState ?? const CaseState()).withChatUpdates(updates);
 
     return ChatMessage(
       role: 'assistant',
@@ -409,26 +479,15 @@ class ChatMessage {
   }
 
   static ChatMessage _buildFallbackMessage(
-    String rawContent,
     DateTime timestamp,
     CaseState? currentCaseState,
   ) {
-    final sanitizedText = _sanitizeMessageText(rawContent);
-    final content = sanitizedText.isNotEmpty
-        ? sanitizedText
-        : "I've received your request. Could you please share a few more details about your issue?";
-
     return ChatMessage(
       role: 'assistant',
-      content: content,
+      content:
+          "I couldn't process that response correctly. Please tell me a little more about what happened.",
       timestamp: timestamp,
-      type: 'message',
-      options: const [
-        ChatOption(label: 'Banking Fraud', value: 'banking_fraud'),
-        ChatOption(label: 'Damaged Order', value: 'damaged_order'),
-        ChatOption(label: 'Refund Issue', value: 'refund_issue'),
-        ChatOption(label: 'Other Issue', value: 'other_issue'),
-      ],
+      type: 'information',
       caseState: currentCaseState,
     );
   }
@@ -437,18 +496,22 @@ class ChatMessage {
   static String _sanitizeMessageText(String text) {
     String cleaned = text;
     cleaned = cleaned.replaceAll(
-        RegExp(r'Quick Options Presented:.*$', multiLine: true, caseSensitive: false), '');
+        RegExp(r'Quick Options Presented:.*$',
+            multiLine: true, caseSensitive: false),
+        '');
     cleaned = cleaned.replaceAll(
         RegExp(r'UI buttons?:.*$', multiLine: true, caseSensitive: false), '');
     cleaned = cleaned.replaceAll(
-        RegExp(r'Quick options?:.*$', multiLine: true, caseSensitive: false), '');
+        RegExp(r'Quick options?:.*$', multiLine: true, caseSensitive: false),
+        '');
     cleaned = cleaned.replaceAll(
-        RegExp(r'Action Checklist:.*$', multiLine: true, caseSensitive: false), '');
+        RegExp(r'Action Checklist:.*$', multiLine: true, caseSensitive: false),
+        '');
     cleaned = cleaned.replaceAll(
-        RegExp(r'Legal Context:.*$', multiLine: true, caseSensitive: false), '');
+        RegExp(r'Legal Context:.*$', multiLine: true, caseSensitive: false),
+        '');
     cleaned = cleaned.replaceAll(
         RegExp(r'Question:.*$', multiLine: true, caseSensitive: false), '');
     return cleaned.trim();
   }
 }
-

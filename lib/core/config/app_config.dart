@@ -37,6 +37,10 @@ class ApiConstants {
   // Shared Settings
   static const double temperature = 0.2;
   static const int maxTokens = 1200;
+
+  /// Normal chat is intentionally concise; analysis and document flows retain
+  /// their existing limits.
+  static const int chatMaxTokens = 400;
   static const int letterMaxTokens = 2400;
   static const int maxRetries = 2;
   static const int retryDelayMs = 1000;
@@ -62,47 +66,29 @@ class WorkerAiRequestLimits {
 }
 
 const String jusLegalChatSystemPrompt =
-    '''You are JusLegal, a progressive AI legal assistant specializing in Indian consumer protection law.
+    '''You are JusLegal, a progressive Indian legal assistant. This is NORMAL CHAT, not a legal-analysis or document-writing task.
 
-CONVERSATIONAL BEHAVIOR:
-1. PROGRESSIVE STEP-BY-STEP GUIDANCE: Provide ONLY immediate relevant action or information (1-2 sentences in "message" or "action"), ONE important question (in "question"), and available options (in "options"). Then wait for the user's answer.
-2. DO NOT DUMP ALL INFORMATION: Never dump full legal explanations or complete multi-step workflows in one turn.
-3. REMEMBER FACTS & DO NOT REPEAT QUESTIONS: Use the compact Case State provided. Never ask a question the user has already answered.
-4. DYNAMIC FOR ALL CONSUMER ISSUES: Works dynamically for banking/UPI fraud, account takeover, damaged orders, refund refusals, defective products, landlord disputes, service issues, etc.
-5. NEVER CONTROL UI FORMATTING WITH MARKDOWN HEADINGS OR SPECIAL TEXT:
-   - NEVER put button labels, option text, or headers like "Quick Options Presented:", "Question:", "Action Checklist:", "Legal Context:" inside the "message" text body.
-   - All interactive UI elements must be output ONLY as dedicated JSON fields.
+For each user message, read CURRENT CASE STATE, identify the next useful action, and respond progressively. Ask at most one high-value question when a material fact is missing; otherwise give the next practical action. Do not ask facts already in the case state. Do not give a full legal report, complete procedure, or unrelated legal detail unless the user asks for it. Keep law concise and relevant to the current stage; never invent laws, sections, authorities, deadlines, outcomes, or facts.
 
-RESPONSE SCHEMA (STRICT JSON ONLY):
-Respond strictly with a JSON object containing these exact fields:
+Return ONLY one JSON object. It must have exactly these keys and no others:
 {
-  "type": "message" | "question" | "action" | "escalation" | "resolution",
-  "message": "Short empathetic guidance text (1-3 sentences max). Do NOT include questions or headers here.",
-  "question": "ONE single important follow-up question (or null if resolution/no question needed).",
-  "action": {
-    "title": "Short title for immediate action (e.g. 'Do this now') or null if no action card required.",
-    "items": ["Immediate step 1", "Immediate step 2"]
-  },
-  "options": [
-    {"label": "Option Button Label", "value": "option_value_code_or_text"}
-  ],
-  "legalContext": "Short 1-sentence legal protection or circular reference note (or null if not applicable to current step).",
-  "nextStep": "Short 1-sentence description of what happens next (or null).",
-  "caseState": {
-    "caseType": "banking_fraud | damaged_order | refund | defective_product | landlord_dispute | general",
-    "knownFacts": {"fact_key": "fact_value"},
-    "missingImportantFacts": ["missing_fact_1"],
-    "currentStage": "triage | immediate_securing | reporting | evidence_gathering | escalation | resolved",
-    "previousActions": ["action_1"],
-    "escalationStatus": "none | bank_helpline | ombudsman | cyber_crime | consumer_court"
-  }
-}''';
+  "type": "question|information|action|warning|final",
+  "message": "1-3 short user-facing sentences; no markdown, headings, numbered prefixes, or option labels",
+  "question": null,
+  "options": [],
+  "steps": [],
+  "legalContext": null,
+  "nextAction": null,
+  "caseUpdates": {}
+}
+
+type and message are required. Use question only when type is question, with one question and normally 2-4 short, mutually clear string options. Keep options as strings, never write them in message. Use steps only when useful (1-4 short strings). Use legalContext only when relevant. nextAction is optional. caseUpdates must contain only facts learned from this latest user message; never invent facts, repeat old facts, or overwrite known facts with null unless explicitly corrected. Flutter controls all UI formatting.''';
 
 String chatSystemPromptForLanguage(String languageCode) {
   final base = jusLegalChatSystemPrompt;
   if (languageCode.toLowerCase() == 'hi') {
     return '$base\n'
-        'Output valid JSON. Write message, question, action title/items, options labels, and legalContext strings in Hindi (Devanagari script). '
+        'Output valid JSON. Write message, question, steps, options, and legalContext strings naturally in Hindi (Devanagari script). '
         'Keep legal terms like RBI, RTI, FIR, IPC, NCH, and Act names in English script/acronyms where appropriate.';
   }
   return '$base\nRespond in English.';
@@ -150,9 +136,11 @@ class EnvConfig {
       _EnvironmentState.load(const <String, String>{});
       configurationError = error is ConfigurationException
           ? error
-          : ConfigurationException('Unable to load environment configuration: $error');
+          : ConfigurationException(
+              'Unable to load environment configuration: $error');
       if (kDebugMode) {
-        debugPrint('[EnvConfig] Optional environment file was not loaded: $error');
+        debugPrint(
+            '[EnvConfig] Optional environment file was not loaded: $error');
         debugPrintStack(stackTrace: stackTrace);
       }
     }
@@ -162,7 +150,8 @@ class EnvConfig {
 
   static void printConfig() {
     if (kDebugMode) {
-      debugPrint('[EnvConfig] environment=${EnvironmentTypeConfig.current.name} '
+      debugPrint(
+          '[EnvConfig] environment=${EnvironmentTypeConfig.current.name} '
           'baseUrl=${EnvironmentState.workerBaseUrl} '
           'firebaseProject=${EnvironmentState.firebaseProjectId}');
     }
@@ -184,16 +173,20 @@ class AppConfig {
   static String get supportEmail => 'support@juslegal.app';
 
   // URLs
-  static String get privacyPolicyUrl => '${EnvironmentState.websiteUrl}/privacy';
+  static String get privacyPolicyUrl =>
+      '${EnvironmentState.websiteUrl}/privacy';
   static String get termsOfServiceUrl => '${EnvironmentState.websiteUrl}/terms';
   static String get websiteUrl => EnvironmentState.websiteUrl;
 
   // Firebase identifiers are public configuration, but remain environment-aware.
   static String get firebaseProjectId => EnvironmentState.firebaseProjectId;
   static String get firebaseAuthDomain => EnvironmentState.firebaseAuthDomain;
-  static String get firebaseStorageBucket => EnvironmentState.firebaseStorageBucket;
-  static String get firebaseMessagingSenderId => EnvironmentState.firebaseMessagingSenderId;
-  static String get firebaseMeasurementId => EnvironmentState.firebaseMeasurementId;
+  static String get firebaseStorageBucket =>
+      EnvironmentState.firebaseStorageBucket;
+  static String get firebaseMessagingSenderId =>
+      EnvironmentState.firebaseMessagingSenderId;
+  static String get firebaseMeasurementId =>
+      EnvironmentState.firebaseMeasurementId;
 
   // Legal Disclaimers
   static String get appTagline => 'Know Your Rights. Take Action.';
@@ -260,7 +253,8 @@ class AppStrings {
   static const String authMedicalCouncil = 'Medical Council of India';
   static const String authDistrictConsumer = 'District Consumer Commission';
   static const String authTrafficPolice = 'Traffic Police (Local)';
-  static const String authEducationRegulatory = 'Education Regulatory Authority';
+  static const String authEducationRegulatory =
+      'Education Regulatory Authority';
   static const String authAirlineGrievance = 'Airline Grievance Officer';
   static const String authConsumerCommission = 'Consumer Commission';
 
@@ -278,8 +272,10 @@ class AppStrings {
       'hi': 'AI सेवाएँ उपलब्ध नहीं हैं। कृपया थोड़ी देर बाद पुनः प्रयास करें।',
     },
     'network': {
-      'en': 'Could not reach the AI service. Check your connection and try again.',
-      'hi': 'AI सेवा से संपर्क नहीं हो सका। अपना कनेक्शन जाँचें और फिर प्रयास करें।',
+      'en':
+          'Could not reach the AI service. Check your connection and try again.',
+      'hi':
+          'AI सेवा से संपर्क नहीं हो सका। अपना कनेक्शन जाँचें और फिर प्रयास करें।',
     },
     'generic': {
       'en': 'Could not get an AI response. Please try again.',
@@ -325,7 +321,8 @@ class AppStringsLocalization {
   String get resultDisclaimer => _localizations.resultDisclaimer;
   String get documentDisclaimer => _localizations.documentDisclaimer;
   String get errorProblemEmpty => _localizations.problemSummaryEmpty;
-  String get errServiceUnavailable => _localizations.serviceTemporarilyUnavailable;
+  String get errServiceUnavailable =>
+      _localizations.serviceTemporarilyUnavailable;
   String get errNoInternet => _localizations.noInternetConnection;
   String get errTooManyRequests => _localizations.tooManyRequests;
   String get errConfigError => _localizations.configurationError;

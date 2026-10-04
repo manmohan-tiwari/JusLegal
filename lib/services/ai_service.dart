@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:juslegal/constants/document_prompts_complete.dart';
 import 'package:juslegal/core/core.dart';
+import 'package:juslegal/models/chat_message_model.dart';
 import 'firebase_token_service.dart';
 
 /// SecurityAudit: AI service with structured exception handling and PII sanitization.
@@ -76,7 +77,8 @@ class AIService {
     String primaryError = 'Unknown error';
     try {
       if (kDebugMode) {
-        debugPrint('[AIService] Executing $operationLabel with $primaryName...');
+        debugPrint(
+            '[AIService] Executing $operationLabel with $primaryName...');
       }
       return await action(primaryClient);
     } catch (e) {
@@ -178,8 +180,7 @@ Provide: 1) Legal rights under Indian consumer law, 2) Step-by-step action plan,
         '$fullPrompt\n${_languageInstruction(languageCode)}';
     const legalContext =
         'Consumer protection laws and regulations applicable to the case.';
-    final systemPrompt =
-        _buildStrictSystemPrompt(legalContext, languageCode);
+    final systemPrompt = _buildStrictSystemPrompt(legalContext, languageCode);
 
     return await _executeWithFallback(
       (client) => _tryWithRetry(
@@ -628,7 +629,8 @@ class WorkerChatClient {
   Future<String> sendMessage(
           String userMessage, List<Map<String, String>> conversationHistory,
           {String languageCode = 'en', CaseState? caseState}) =>
-      _sendChatRequest(userMessage, conversationHistory, languageCode, caseState: caseState);
+      _sendChatRequest(userMessage, conversationHistory, languageCode,
+          caseState: caseState);
 
   /// Performs the Dio POST with automatic 401 token-refresh retry: when the
   /// Worker rejects an expired Firebase ID token, the token is force-refreshed
@@ -661,9 +663,11 @@ class WorkerChatClient {
         debugPrint('[$_label] Calling Worker $_endpoint for chat');
       }
 
-      final systemPrompt = StringBuffer(chatSystemPromptForLanguage(languageCode));
+      final systemPrompt =
+          StringBuffer(chatSystemPromptForLanguage(languageCode));
       if (caseState != null) {
-        systemPrompt.write('\n\nCURRENT CASE STATE:\n${caseState.toPromptSummary()}');
+        systemPrompt
+            .write('\n\nCURRENT CASE STATE:\n${caseState.toPromptSummary()}');
       }
 
       final response = await _postWithAuthRetry(
@@ -676,7 +680,7 @@ class WorkerChatClient {
             },
             ..._historyWithCurrentMessage(userMessage, conversationHistory),
           ]),
-          maxTokens: 800,
+          maxTokens: ApiConstants.chatMaxTokens,
           jsonResponse: true,
         ),
       );
@@ -882,7 +886,8 @@ class WorkerChatClient {
 class GroqService {
   final WorkerChatClient _client;
 
-  GroqService({WorkerChatClient? client, Dio? dio, FirebaseTokenService? tokenService})
+  GroqService(
+      {WorkerChatClient? client, Dio? dio, FirebaseTokenService? tokenService})
       : _client = client ??
             WorkerChatClient(
               provider: AiProvider.groq,
@@ -912,7 +917,8 @@ class GroqService {
 class OpenRouterService {
   final WorkerChatClient _client;
 
-  OpenRouterService({WorkerChatClient? client, Dio? dio, FirebaseTokenService? tokenService})
+  OpenRouterService(
+      {WorkerChatClient? client, Dio? dio, FirebaseTokenService? tokenService})
       : _client = client ??
             WorkerChatClient(
               provider: AiProvider.openrouter,

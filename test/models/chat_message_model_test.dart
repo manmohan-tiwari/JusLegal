@@ -2,112 +2,108 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:juslegal/models/chat_message_model.dart';
 
 void main() {
-  group('ChatMessage structured-response architecture tests', () {
+  group('ChatMessage ChatResponse tests', () {
     final now = DateTime.now();
 
-    test('Parses valid structured JSON response with options, action, question, legalContext', () {
+    test('parses ChatResponse and merges only latest case updates', () {
       const rawJson = '''{
         "type": "question",
-        "message": "Account takeover can be serious. Let's secure your account first.",
-        "action": {
-          "title": "Do this now",
-          "items": [
-            "Contact your bank's fraud helpline immediately."
-          ]
-        },
-        "question": "Have you already reported this to your bank?",
-        "options": [
-          {"label": "Yes, reported", "value": "reported"},
-          {"label": "No, not yet", "value": "not_reported"},
-          {"label": "Bank refused", "value": "bank_refused"}
-        ],
-        "legalContext": "Under RBI circulars, reporting unauthorized transactions within 3 days limits liability.",
-        "nextStep": "Obtain bank acknowledgement reference number.",
-        "caseState": {
-          "caseType": "banking_fraud",
-          "knownFacts": {"issue": "account_takeover"},
-          "missingImportantFacts": ["report_date"],
-          "currentStage": "securing_account",
-          "previousActions": [],
-          "escalationStatus": "none"
-        }
+        "message": "Keep photos of the damage and packaging.",
+        "question": "Have you contacted the seller or platform?",
+        "options": ["Yes", "No"],
+        "steps": ["Save photos and the order record"],
+        "legalContext": "The product condition and your complaint record can matter.",
+        "nextAction": "Contact the seller through the order channel.",
+        "caseUpdates": {"category": "damaged_order", "evidenceAvailable": "photos"}
       }''';
 
-      final msg = ChatMessage.fromAiResponse(rawJson, timestamp: now);
-
-      expect(msg.role, equals('assistant'));
-      expect(msg.type, equals('question'));
-      expect(msg.content, equals("Account takeover can be serious. Let's secure your account first."));
-      expect(msg.question, equals("Have you already reported this to your bank?"));
-      expect(msg.action, isNotNull);
-      expect(msg.action!.title, equals("Do this now"));
-      expect(msg.action!.items, equals(["Contact your bank's fraud helpline immediately."]));
-      expect(msg.options, isNotNull);
-      expect(msg.options!.length, equals(3));
-      expect(msg.options![0], equals(const ChatOption(label: 'Yes, reported', value: 'reported')));
-      expect(msg.options![1], equals(const ChatOption(label: 'No, not yet', value: 'not_reported')));
-      expect(msg.options![2], equals(const ChatOption(label: 'Bank refused', value: 'bank_refused')));
-      expect(msg.legalContext, equals("Under RBI circulars, reporting unauthorized transactions within 3 days limits liability."));
-      expect(msg.nextStep, equals("Obtain bank acknowledgement reference number."));
-      expect(msg.caseState, isNotNull);
-      expect(msg.caseState!.caseType, equals('banking_fraud'));
-      expect(msg.caseState!.knownFacts['issue'], equals('account_takeover'));
-    });
-
-    test('Sanitizes text and removes plain-text leaked headers', () {
-      const rawJson = '''{
-        "type": "message",
-        "message": "Here is your guidance.\\nQuick Options Presented: Yes, No\\nUI buttons: Select one\\nQuestion: Have you reported it?",
-        "options": [{"label": "Yes", "value": "yes"}, {"label": "No", "value": "no"}]
-      }''';
-
-      final msg = ChatMessage.fromAiResponse(rawJson, timestamp: now);
-
-      expect(msg.content, equals("Here is your guidance."));
-      expect(msg.content.contains("Quick Options Presented:"), isFalse);
-      expect(msg.content.contains("UI buttons:"), isFalse);
-      expect(msg.content.contains("Question:"), isFalse);
-    });
-
-    test('Falls back safely on malformed/invalid AI non-JSON text without crashing', () {
-      const malformedText = "This is a broken non-JSON text response from the AI model.";
-
-      final msg = ChatMessage.fromAiResponse(malformedText, timestamp: now);
-
-      expect(msg.role, equals('assistant'));
-      expect(msg.type, equals('message'));
-      expect(msg.content, equals("This is a broken non-JSON text response from the AI model."));
-      expect(msg.options, isNotNull);
-      expect(msg.options!.isNotEmpty, isTrue);
-    });
-
-    test('Serializes toMap and deserializes fromMap with full backward compatibility', () {
-      final original = ChatMessage(
-        role: 'assistant',
-        content: 'Check your account status.',
+      final msg = ChatMessage.fromAiResponse(
+        rawJson,
         timestamp: now,
-        type: 'action',
-        action: const ChatAction(title: 'Do this now', items: ['Block debit card']),
-        options: const [ChatOption(label: 'Done', value: 'done')],
-        question: 'Is your card blocked?',
-        legalContext: 'RBI rules apply.',
-        nextStep: 'File FIR',
-        caseState: const CaseState(caseType: 'banking_fraud', currentStage: 'reporting'),
+        currentCaseState:
+            const CaseState(knownFacts: {'sellerContacted': 'no'}),
       );
 
-      final map = original.toMap();
-      final reconstructed = ChatMessage.fromMap(map);
+      expect(msg.type, 'question');
+      expect(msg.question, 'Have you contacted the seller or platform?');
+      expect(msg.options, const [
+        ChatOption(label: 'Yes', value: 'Yes'),
+        ChatOption(label: 'No', value: 'No')
+      ]);
+      expect(msg.action!.items, ['Save photos and the order record']);
+      expect(msg.caseState!.caseType, 'damaged_order');
+      expect(msg.caseState!.knownFacts, {
+        'sellerContacted': 'no',
+        'evidenceAvailable': 'photos',
+      });
+    });
 
-      expect(reconstructed.role, equals(original.role));
-      expect(reconstructed.type, equals(original.type));
-      expect(reconstructed.content, equals(original.content));
-      expect(reconstructed.question, equals(original.question));
-      expect(reconstructed.action!.title, equals('Do this now'));
-      expect(reconstructed.action!.items, equals(['Block debit card']));
-      expect(reconstructed.options!.first.label, equals('Done'));
-      expect(reconstructed.legalContext, equals('RBI rules apply.'));
-      expect(reconstructed.nextStep, equals('File FIR'));
-      expect(reconstructed.caseState!.caseType, equals('banking_fraud'));
+    test('rejects unknown keys and returns deterministic fallback', () {
+      const invalidJson = '''{
+        "type": "information", "message": "Hello", "question": null,
+        "options": [], "steps": [], "legalContext": null,
+        "nextAction": null, "caseUpdates": {}, "unexpected": true
+      }''';
+
+      final msg = ChatMessage.fromAiResponse(invalidJson, timestamp: now);
+      expect(msg.type, 'information');
+      expect(msg.content,
+          "I couldn't process that response correctly. Please tell me a little more about what happened.");
+      expect(msg.options, isNull);
+    });
+
+    test('does not overwrite known facts with null case updates', () {
+      const response = '''{
+        "type": "information", "message": "Please keep the order record.",
+        "question": null, "options": [], "steps": [], "legalContext": null,
+        "nextAction": null,
+        "caseUpdates": {"sellerContacted": null, "orderNumber": "ORD-42"}
+      }''';
+
+      final msg = ChatMessage.fromAiResponse(
+        response,
+        timestamp: now,
+        currentCaseState: const CaseState(
+          knownFacts: {'sellerContacted': 'yes', 'sellerResponse': 'denied'},
+        ),
+      );
+
+      expect(msg.caseState!.knownFacts, {
+        'sellerContacted': 'yes',
+        'sellerResponse': 'denied',
+        'orderNumber': 'ORD-42',
+      });
+    });
+
+    test('returns deterministic fallback for malformed AI JSON', () {
+      final msg = ChatMessage.fromAiResponse('not JSON', timestamp: now);
+      expect(msg.type, 'information');
+      expect(msg.content,
+          "I couldn't process that response correctly. Please tell me a little more about what happened.");
+    });
+
+    test('loads legacy Hive messages', () {
+      final legacy = <dynamic, dynamic>{
+        'role': 'assistant',
+        'content': 'Check your account status.',
+        'timestamp': now.millisecondsSinceEpoch,
+        'type': 'action',
+        'actionChecklist': ['Block debit card'],
+        'options': [
+          {'label': 'Done', 'value': 'done'}
+        ],
+        'caseState': {
+          'caseType': 'banking_fraud',
+          'knownFacts': {'reported': 'yes'},
+          'currentStage': 'reporting',
+        },
+      };
+
+      final message = ChatMessage.fromMap(legacy);
+      expect(message.action!.items, ['Block debit card']);
+      expect(message.options!.first,
+          const ChatOption(label: 'Done', value: 'done'));
+      expect(message.caseState!.knownFacts['reported'], 'yes');
     });
   });
 }
