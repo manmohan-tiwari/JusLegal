@@ -70,39 +70,29 @@ class _LoadingWidgetState extends State<LoadingWidget>
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        AnimatedBuilder(
-          animation: _rotationController,
-          builder: (context, child) {
-            return Transform.rotate(
-              angle: _rotationAnimation.value * 2 * 3.14159,
-              child: AnimatedBuilder(
-                animation: _scaleAnimation,
-                builder: (context, child) {
-                  return Transform.scale(
-                    scale: _scaleAnimation.value,
-                    child: Container(
-                      width: widget.size,
-                      height: widget.size,
-                      decoration: BoxDecoration(
-                        gradient: AppTheme.heroGradient,
-                        borderRadius: BorderRadius.circular(widget.size / 3),
-                      ),
-                      child: Center(
-                        child: Container(
-                          width: widget.size * 0.7,
-                          height: widget.size * 0.7,
-                          decoration: BoxDecoration(
-                            color: AppTheme.surface,
-                            borderRadius: BorderRadius.circular(widget.size / 4),
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
+        RotationTransition(
+          turns: _rotationAnimation,
+          child: ScaleTransition(
+            scale: _scaleAnimation,
+            child: Container(
+              width: widget.size,
+              height: widget.size,
+              decoration: BoxDecoration(
+                gradient: AppTheme.heroGradient,
+                borderRadius: BorderRadius.circular(widget.size / 3),
               ),
-            );
-          },
+              child: Center(
+                child: Container(
+                  width: widget.size * 0.7,
+                  height: widget.size * 0.7,
+                  decoration: BoxDecoration(
+                    color: AppTheme.surface,
+                    borderRadius: BorderRadius.circular(widget.size / 4),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
         if (widget.message != null) ...[
           const SizedBox(height: 16),

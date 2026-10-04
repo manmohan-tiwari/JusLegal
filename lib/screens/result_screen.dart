@@ -17,7 +17,6 @@ import '../widgets/authority_card.dart';
 import '../widgets/shimmer_loader.dart';
 import '../widgets/step_card.dart';
 import '../widgets/legal_disclaimer_banner.dart';
-import '../widgets/siliconflow_image_widget.dart';
 
 class ResultScreen extends ConsumerStatefulWidget {
   final LegalResultModel? initialResult;

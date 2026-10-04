@@ -130,11 +130,6 @@ class EnvConfig {
 
   static bool get isAiAvailable => FeatureFlags.aiEnabled;
 
-  /// Image generation has not yet been moved behind the Worker. Returning an
-  /// empty value prevents a provider key from being embedded in the app.
-  @Deprecated('Move SiliconFlow calls behind the Worker before enabling them.')
-  static String get siliconflowApiKey => '';
-
   static void printConfig() {
     if (kDebugMode) {
       debugPrint('[EnvConfig] environment=${EnvironmentTypeConfig.current.name} '

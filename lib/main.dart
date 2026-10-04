@@ -1,4 +1,3 @@
-import 'package:device_preview/device_preview.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart'
@@ -105,11 +104,8 @@ Future<void> main() async {
   }
 
   runApp(
-    DevicePreview(
-      enabled: kDebugMode,
-      builder: (context) => ProviderScope(
-        child: JusLegalApp(firebaseAvailable: firebaseInitialized),
-      ),
+    ProviderScope(
+      child: JusLegalApp(firebaseAvailable: firebaseInitialized),
     ),
   );
 }
@@ -154,7 +150,7 @@ class _JusLegalAppState extends ConsumerState<JusLegalApp> {
       theme: AppTheme.lightTheme,
       routerConfig: _router,
       debugShowCheckedModeBanner: false,
-      locale: kDebugMode ? DevicePreview.locale(context) ?? locale : locale,
+      locale: locale,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -162,7 +158,6 @@ class _JusLegalAppState extends ConsumerState<JusLegalApp> {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: AppLocalizations.supportedLocales,
-      builder: kDebugMode ? DevicePreview.appBuilder : null,
     );
   }
 }

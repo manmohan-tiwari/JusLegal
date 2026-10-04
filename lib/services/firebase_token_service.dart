@@ -22,13 +22,22 @@ class FirebaseTokenService {
   /// Tokens are automatically refreshed if expired.
   Future<String?> getIdToken() async {
     try {
-      final currentUser = _firebaseAuth.currentUser;
+      var currentUser = _firebaseAuth.currentUser;
       if (currentUser == null) {
         if (kDebugMode) {
-          debugPrint('[FirebaseTokenService] No authenticated user');
+          debugPrint('[FirebaseTokenService] No authenticated user - attempting anonymous sign in');
         }
-        return null;
+        try {
+          final userCredential = await _firebaseAuth.signInAnonymously();
+          currentUser = userCredential.user;
+        } catch (e) {
+          if (kDebugMode) {
+            debugPrint('[FirebaseTokenService] Anonymous sign-in fallback failed: $e');
+          }
+          return null;
+        }
       }
+      if (currentUser == null) return null;
 
       // Use cached token if still valid (refresh 5 minutes before expiry)
       if (_cachedToken != null &&
@@ -68,8 +77,10 @@ class FirebaseTokenService {
   /// responds with 401 so the request can be retried once with a fresh token.
   Future<String?> forceRefreshToken() async {
     try {
-      final currentUser = _firebaseAuth.currentUser;
-      if (currentUser == null) return null;
+      var currentUser = _firebaseAuth.currentUser;
+      if (currentUser == null) {
+        return await getIdToken();
+      }
       if (kDebugMode) {
         debugPrint('[FirebaseTokenService] Forcing ID token refresh');
       }

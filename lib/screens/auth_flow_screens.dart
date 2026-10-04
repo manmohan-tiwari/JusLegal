@@ -139,8 +139,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
       );
 
   Widget _visualPanel() => Container(
-        constraints: const BoxConstraints(minHeight: 640),
-        padding: const EdgeInsets.all(48),
+        padding: const EdgeInsets.all(24),
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -157,51 +156,54 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
               child: child,
             ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Spacer(),
-              Center(
-                child: AnimatedBuilder(
-                  animation: _scales,
-                  builder: (context, _) => CustomPaint(
-                    size: const Size(270, 220),
-                    painter: _ScalesPainter(_scales.value),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Spacer(),
+                        Center(
+                          child: Image.asset(
+                            'assets/images/logo.png',
+                            height: constraints.maxHeight < 300 ? 70 : 100,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text('Expert Legal Guidance',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500)),
+                        const SizedBox(height: 16),
+                        ...[
+                          'Instant Legal Answers',
+                          'Case References & Laws',
+                          '100% Private & Secure',
+                        ].map((item) => Padding(
+                              padding: const EdgeInsets.only(bottom: 10),
+                              child: Row(children: [
+                                const Icon(Icons.check_circle_rounded,
+                                    color: Colors.white, size: 18),
+                                const SizedBox(width: 8),
+                                Text(item,
+                                    style: TextStyle(
+                                        color: Colors.white.withValues(alpha: .92),
+                                        fontSize: 14)),
+                              ]),
+                            )),
+                        const Spacer(),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 30),
-              const Text('JusLegal',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 42,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.2)),
-              const SizedBox(height: 8),
-              const Text('Expert Legal Guidance',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w400)),
-              const SizedBox(height: 28),
-              ...[
-                'Instant Legal Answers',
-                'Case References & Laws',
-                '100% Private & Secure',
-              ].map((item) => Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: Row(children: [
-                      const Icon(Icons.check_circle_rounded,
-                          color: Colors.white, size: 20),
-                      const SizedBox(width: 10),
-                      Text(item,
-                          style: TextStyle(
-                              color: Colors.white.withValues(alpha: .92),
-                              fontSize: 15)),
-                    ]),
-                  )),
-              const Spacer(),
-            ],
+              );
+            },
           ),
         ),
       );
@@ -339,57 +341,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
       );
 }
 
-class _ScalesPainter extends CustomPainter {
-  _ScalesPainter(this.progress);
-  final double progress;
 
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final glow = Paint()
-      ..shader = RadialGradient(
-              colors: [Colors.white.withValues(alpha: .3), Colors.transparent])
-          .createShader(Rect.fromCircle(center: center, radius: 105));
-    canvas.drawCircle(center, 105, glow);
-    canvas.save();
-    canvas.translate(center.dx, center.dy);
-    canvas.rotate((progress - .5) * .42);
-    final stroke = Paint()
-      ..color = Colors.white
-      ..strokeWidth = 5
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-    final fill = Paint()..color = Colors.white;
-    canvas.drawLine(const Offset(0, -78), const Offset(0, 70), stroke);
-    canvas.drawLine(const Offset(-48, -35), const Offset(48, -35), stroke);
-    canvas.drawCircle(const Offset(0, -84), 8, fill);
-    canvas.drawPath(
-        Path()
-          ..moveTo(-16, 70)
-          ..lineTo(16, 70)
-          ..lineTo(8, 56)
-          ..lineTo(-8, 56)
-          ..close(),
-        fill);
-    final left = -48.0 + (progress - .5) * 12;
-    final right = 48.0 - (progress - .5) * 12;
-    canvas.drawLine(Offset(left, -35), Offset(left - 22, 15), stroke);
-    canvas.drawLine(Offset(left, -35), Offset(left + 22, 15), stroke);
-    canvas.drawLine(Offset(right, -35), Offset(right - 22, 15), stroke);
-    canvas.drawLine(Offset(right, -35), Offset(right + 22, 15), stroke);
-    canvas.drawOval(
-        Rect.fromCenter(center: Offset(left, 21), width: 78, height: 18),
-        stroke);
-    canvas.drawOval(
-        Rect.fromCenter(center: Offset(right, 21), width: 78, height: 18),
-        stroke);
-    canvas.restore();
-  }
-
-  @override
-  bool shouldRepaint(covariant _ScalesPainter oldDelegate) =>
-      oldDelegate.progress != progress;
-}
 
 class SignUpMethodScreen extends ConsumerWidget {
   const SignUpMethodScreen({super.key});

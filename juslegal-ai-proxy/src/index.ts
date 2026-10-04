@@ -331,9 +331,9 @@ export default {
 		
 		// ✅ FIXED: Use correct free models
 		const expectedModel = pathname === "/callGroq"
-			? "openai/gpt-oss-120b"  // Groq free model (120B - better quality)
+			? "llama-3.3-70b-versatile"
 			: pathname === "/callOpenRouter"
-				? "nvidia/nemotron-3.5-lightning:free"  // OpenRouter free model
+				? "meta-llama/llama-3.3-70b-instruct:free"
 				: null;
 		
 		if (!expectedModel) return jsonResponse({ error: "Not found" }, 404, cors);
@@ -377,7 +377,8 @@ export default {
 			);
 
 			if (!upstreamResponse.ok) {
-				return jsonResponse({ error: "AI provider request failed" }, 502, cors);
+				const detail = await upstreamResponse.text();
+				return jsonResponse({ error: "AI provider request failed", upstreamStatus: upstreamResponse.status, detail }, 502, cors);
 			}
 
 			const headers = new Headers(cors);

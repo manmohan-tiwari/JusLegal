@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:juslegal/l10n/gen/app_localizations.dart';
-import 'package:url_launcher/url_launcher.dart';
+
 
 import 'package:juslegal/core/core.dart';
 import '../services/auth_handler.dart';
@@ -119,7 +119,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               : AppBar(
                   toolbarHeight: 64,
                   titleSpacing: 16,
-                  elevation: 8,
+                  elevation: 2,
                   shadowColor: AppColors.shadowStrong,
                   backgroundColor: Colors.transparent,
                   foregroundColor: AppColors.deepForest,
@@ -330,7 +330,7 @@ class _HomeContent extends StatelessWidget {
       children: [
         AppAnimations.fadeSlideIn(
           _HeroSection(isDesktop: isDesktop),
-          duration: const Duration(milliseconds: 520),
+          duration: const Duration(milliseconds: 300),
         ),
         const SizedBox(height: 24),
 
@@ -427,7 +427,7 @@ class _HomeContent extends StatelessWidget {
         const SizedBox(height: 14),
         AppAnimations.fadeSlideIn(
           _AiToolsGrid(tools: aiChatTools, isDesktop: isDesktop),
-          delay: const Duration(milliseconds: 120),
+          delay: const Duration(milliseconds: 50),
         ),
 
         // -- Documents & Contracts Tools -------------------
@@ -450,7 +450,7 @@ class _HomeContent extends StatelessWidget {
         const SizedBox(height: 14),
         AppAnimations.fadeSlideIn(
           _AiToolsGrid(tools: documentTools, isDesktop: isDesktop),
-          delay: const Duration(milliseconds: 180),
+          delay: const Duration(milliseconds: 90),
         ),
 
       ],
@@ -508,12 +508,27 @@ class _AiToolCard extends StatelessWidget {
 
   const _AiToolCard({required this.tool, required this.onTap});
 
+  static const _blueIconBg = Color(0x1F2563EB);
+  static const _blueSplash = Color(0x142563EB);
+  static const _goldSplash = Color(0x14D97706);
+  static const _cardShadow = [
+    BoxShadow(
+      color: AppColors.shadowBlack,
+      blurRadius: 12,
+      offset: Offset(0, 4),
+    ),
+  ];
+
   Color get _accentColor =>
       tool.category == 'documents' ? AppColors.legalGold : AppColors.trustBlue;
 
   Color get _iconBg => tool.category == 'documents'
       ? AppColors.grey100
-      : AppColors.trustBlue.withValues(alpha: 0.12);
+      : _blueIconBg;
+
+  Color get _splashColor => tool.category == 'documents'
+      ? _goldSplash
+      : _blueSplash;
 
   @override
   Widget build(BuildContext context) {
@@ -521,20 +536,14 @@ class _AiToolCard extends StatelessWidget {
     return AppAnimations.pressScale(
       onTap: onTap,
       borderRadius: radius,
-      splashColor: _accentColor.withValues(alpha: 0.08),
+      splashColor: _splashColor,
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: AppColors.cardBackground,
           borderRadius: radius,
           border: Border.all(color: AppColors.border),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.shadowBlack,
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          boxShadow: _cardShadow,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -953,147 +962,7 @@ class _PopularLegalCategory {
   String get name => title;
 }
 
-class _BenefitItem extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String description;
-  final bool isGold;
 
-  const _BenefitItem({
-    required this.icon,
-    required this.title,
-    required this.description,
-    this.isGold = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final color = isGold ? AppColors.legalGold : AppColors.primaryNavy;
-
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppColors.cardBackground,
-        border: Border.all(color: AppColors.border),
-        borderRadius: BorderRadius.circular(18),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadowBlack,
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.14),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Icon(icon, color: color, size: 26),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.w800,
-                      ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  description,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DisclaimerBanner extends StatelessWidget {
-  final VoidCallback onTap;
-  final String text;
-  final String moreText;
-
-  const _DisclaimerBanner({
-    required this.onTap,
-    required this.text,
-    required this.moreText,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return AppAnimations.pressScale(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: AppColors.cardBackground,
-          border: Border.all(color: AppColors.border),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.shadowBlack,
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Icon(
-              Icons.warning_rounded,
-              color: AppColors.legalGold,
-              size: 20,
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: RichText(
-                text: TextSpan(
-                  style: const TextStyle(
-                    color: Color(0xFF94A3B8),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                  ).copyWith(
-                    color: AppColors.textPrimary,
-                    height: 1.4,
-                  ),
-                  children: [
-                    TextSpan(text: text),
-                    TextSpan(
-                      text: moreText,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.trustBlue,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class _SectionLabel extends StatelessWidget {
   final String title;
@@ -1196,75 +1065,16 @@ class _HeaderLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return Image.asset(
+      'assets/images/logo.png',
       height: iconHeight,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            height: iconHeight * .72,
-            width: iconHeight * .72,
-            child: CustomPaint(painter: _JusLegalMarkPainter()),
-          ),
-          SizedBox(width: iconHeight * .18),
-          Text(
-            'JusLegal',
-            style: GoogleFonts.notoSans(
-              color: AppColors.deepForest,
-              fontSize: iconHeight * .43,
-              fontWeight: FontWeight.w700,
-              letterSpacing: -.6,
-            ),
-          ),
-        ],
-      ),
+      fit: BoxFit.contain,
     );
   }
 }
 
-class _JusLegalMarkPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = AppColors.deepForest
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = size.width * .085
-      ..strokeCap = StrokeCap.round;
-    final center = Offset(size.width / 2, size.height * .30);
-    canvas.drawCircle(
-        center, size.width * .075, Paint()..color = AppColors.brightEmerald);
-    canvas.drawLine(center, Offset(center.dx, size.height * .78), paint);
-    canvas.drawLine(Offset(size.width * .16, size.height * .44),
-        Offset(size.width * .84, size.height * .44), paint);
-    canvas.drawLine(Offset(size.width * .27, size.height * .44),
-        Offset(size.width * .16, size.height * .67), paint);
-    canvas.drawLine(Offset(size.width * .73, size.height * .44),
-        Offset(size.width * .84, size.height * .67), paint);
-    canvas.drawArc(
-        Rect.fromCenter(
-            center: Offset(size.width * .16, size.height * .67),
-            width: size.width * .28,
-            height: size.height * .15),
-        0,
-        3.14,
-        false,
-        paint);
-    canvas.drawArc(
-        Rect.fromCenter(
-            center: Offset(size.width * .84, size.height * .67),
-            width: size.width * .28,
-            height: size.height * .15),
-        0,
-        3.14,
-        false,
-        paint);
-    canvas.drawLine(Offset(size.width * .27, size.height * .85),
-        Offset(size.width * .73, size.height * .85), paint);
-  }
 
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
+
 
 class _FloatingBottomNav extends StatelessWidget {
   final int selectedIndex;

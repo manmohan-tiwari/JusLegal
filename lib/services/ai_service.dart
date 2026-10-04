@@ -10,27 +10,25 @@ import 'firebase_token_service.dart';
 /// SecurityAudit: AI service with structured exception handling and PII sanitization.
 /// All errors are logged with PII removed and returned as UserFacingExceptions to UI.
 class AIService {
-  late final OpenRouterService _openRouterService;
-  late final GroqService _groqService;
+  late final WorkerChatClient _openRouterClient;
+  late final WorkerChatClient _groqClient;
 
   /// Currently preferred provider. Chat/analysis requests try this provider
   /// first and fall back to the other worker-routed provider on failure.
-  AiProvider preferredProvider = AiProvider.openrouter;
+  AiProvider _preferredProvider = AiProvider.openrouter;
+  AiProvider get preferredProvider => _preferredProvider;
 
-  /// Switch the preferred provider at runtime (groq, openrouter, siliconflow).
-  /// Note: siliconflow image generation is handled by [SiliconFlowService];
-  /// chat-completion calls to siliconflow require the Worker `/callSiliconFlow`
-  /// endpoint to be enabled.
+  /// Switch the preferred provider at runtime (groq, openrouter).
   void switchProvider(AiProvider provider) {
-    preferredProvider = provider;
+    _preferredProvider = provider;
     if (kDebugMode) {
       debugPrint('[AIService] Preferred provider switched to ${provider.name}');
     }
   }
 
   AIService() {
-    _openRouterService = OpenRouterService();
-    _groqService = GroqService();
+    _openRouterClient = WorkerChatClient(provider: AiProvider.openrouter);
+    _groqClient = WorkerChatClient(provider: AiProvider.groq);
   }
 
   Future<void> initialize() async {
@@ -58,61 +56,63 @@ class AIService {
     }
   }
 
-  /// Sends a chat message with structured exception handling and fallback.
-  /// OpenRouter is preferred and Groq is used when it cannot respond.
-  /// Throws UserFacingException with sanitized message.
-  Future<String> sendMessage(
-      String userMessage, List<Map<String, String>> conversationHistory,
-      {String languageCode = 'en'}) async {
-    String openRouterError = 'Unknown error';
+  /// Generic helper to execute AI operations using the preferred provider first,
+  /// falling back to the secondary provider if the primary provider fails.
+  Future<T> _executeWithFallback<T>(
+    Future<T> Function(WorkerChatClient client) action, {
+    required String operationLabel,
+  }) async {
+    final primaryClient = _preferredProvider == AiProvider.openrouter
+        ? _openRouterClient
+        : _groqClient;
+    final secondaryClient = _preferredProvider == AiProvider.openrouter
+        ? _groqClient
+        : _openRouterClient;
+    final primaryName =
+        _preferredProvider == AiProvider.openrouter ? 'OpenRouter' : 'Groq';
+    final secondaryName =
+        _preferredProvider == AiProvider.openrouter ? 'Groq' : 'OpenRouter';
+
+    String primaryError = 'Unknown error';
     try {
       if (kDebugMode) {
-        debugPrint('[AIService] Sending chat message to OpenRouter');
+        debugPrint('[AIService] Executing $operationLabel with $primaryName...');
       }
-      return await _openRouterService.sendMessage(
-        userMessage,
-        conversationHistory,
-        languageCode: languageCode,
-      );
-    } on RateLimitException catch (error) {
-      openRouterError = error.toString();
-      _logError('OpenRouter rate limit', error);
-    } on NetworkException catch (error) {
-      openRouterError = error.toString();
-      _logError('OpenRouter network error', error);
-    } catch (error) {
-      openRouterError = error.toString();
-      _logError('OpenRouter chat failed', error);
+      return await action(primaryClient);
+    } catch (e) {
+      primaryError = e.toString();
+      _logError('$primaryName $operationLabel failed', e);
     }
 
     if (kDebugMode) {
-      debugPrint('[AIService] OpenRouter failed, attempting Groq fallback');
+      debugPrint(
+          '[AIService] $primaryName failed, attempting $secondaryName fallback...');
+    }
+    String secondaryError = 'Unknown error';
+    try {
+      return await action(secondaryClient);
+    } catch (e) {
+      secondaryError = e.toString();
+      _logError('$secondaryName $operationLabel failed', e);
     }
 
-    String groqError = 'Unknown error';
-    try {
-      if (kDebugMode) {
-        debugPrint('[AIService] Sending chat message to Groq');
-      }
-      return await _groqService.sendMessage(
+    throw ErrorSanitizer.toUserFacing(
+        AllProvidersFailedException(primaryError, secondaryError));
+  }
+
+  /// Sends a chat message with structured exception handling and fallback.
+  /// Uses preferredProvider first and falls back to secondary provider.
+  Future<String> sendMessage(
+      String userMessage, List<Map<String, String>> conversationHistory,
+      {String languageCode = 'en'}) async {
+    return await _executeWithFallback(
+      (client) => client.sendMessage(
         userMessage,
         conversationHistory,
         languageCode: languageCode,
-      );
-    } on RateLimitException catch (error) {
-      groqError = error.toString();
-      _logError('Groq rate limit', error);
-    } on NetworkException catch (error) {
-      groqError = error.toString();
-      _logError('Groq network error', error);
-    } catch (error) {
-      groqError = error.toString();
-      _logError('Groq chat failed', error);
-    }
-
-    // Both providers failed - throw UserFacingException
-    throw ErrorSanitizer.toUserFacing(
-        AllProvidersFailedException(openRouterError, groqError));
+      ),
+      operationLabel: 'chat message',
+    );
   }
 
   /// Simplified analysis method for chat-based interactions
@@ -142,16 +142,11 @@ class AIService {
     Map<String, String> dynamicFieldValues = const {},
     String languageCode = 'en',
   }) async {
-    // Empty submissions cannot be analyzed remotely.
     if (summary.trim().isEmpty) {
       if (kDebugMode) {
         debugPrint('[AIService] A problem description is required.');
       }
       throw ArgumentError('A problem description is required');
-    }
-
-    if (kDebugMode) {
-      debugPrint('[AIService] Using the Cloudflare Worker AI proxy');
     }
 
     String dynamicFieldsText = '';
@@ -180,69 +175,26 @@ Provide: 1) Legal rights under Indian consumer law, 2) Step-by-step action plan,
 """;
     final localizedPrompt =
         '$fullPrompt\n${_languageInstruction(languageCode)}';
+    const legalContext =
+        'Consumer protection laws and regulations applicable to the case.';
+    final systemPrompt =
+        _buildStrictSystemPrompt(legalContext, languageCode);
 
-    String openRouterError = 'Unknown error';
-
-    // 1. Try OpenRouter first.
-    try {
-      if (kDebugMode) debugPrint('[AIService] Attempting OpenRouter...');
-      final result = await _tryWithRetry(
-        () => _openRouterService.analyze(
-          _buildStrictSystemPrompt(
-              'Consumer protection laws and regulations applicable to the case.',
-              languageCode),
+    return await _executeWithFallback(
+      (client) => _tryWithRetry(
+        () => client.analyze(
+          systemPrompt,
           localizedPrompt,
           category: category,
         ),
-        'OpenRouter',
-      );
-      if (kDebugMode) debugPrint('[AIService] OpenRouter success');
-      return result;
-    } on RateLimitException catch (error) {
-      openRouterError = error.toString();
-      _logError('OpenRouter analysis rate limit', error);
-    } on NetworkException catch (error) {
-      openRouterError = error.toString();
-      _logError('OpenRouter analysis network error', error);
-    } catch (e) {
-      openRouterError = e.toString();
-      _logError('OpenRouter analysis failed', e);
-    }
-
-    const legalContext =
-        'Consumer protection laws and regulations applicable to the case.';
-
-    final String systemPrompt =
-        _buildStrictSystemPrompt(legalContext, languageCode);
-    String groqError = 'Unknown error';
-
-    // 2. Fall back to Groq.
-    try {
-      if (kDebugMode) debugPrint('[AIService] Attempting Groq...');
-      final result = await _tryWithRetry(
-        () => _groqService.analyze(systemPrompt, localizedPrompt,
-            category: category),
-        'Groq',
-      );
-      if (kDebugMode) debugPrint('[AIService] ✅ Groq success');
-      return result;
-    } on RateLimitException catch (error) {
-      groqError = error.toString();
-      _logError('Groq analysis rate limit', error);
-    } on NetworkException catch (error) {
-      groqError = error.toString();
-      _logError('Groq analysis network error', error);
-    } catch (e) {
-      groqError = e.toString();
-      _logError('Groq analysis failed', e);
-    }
-
-    // Both providers failed
-    throw ErrorSanitizer.toUserFacing(
-        AllProvidersFailedException(openRouterError, groqError));
+        client._label,
+      ),
+      operationLabel: 'legal analysis',
+    );
   }
 
-  // Backward compatibility
+  /// Backward compatibility alias
+  @Deprecated('Use analyzeProblem() instead.')
   Future<Map<String, dynamic>> analyze({
     required String category,
     required String dateOfIncident,
@@ -307,72 +259,23 @@ Provide: 1) Legal rights under Indian consumer law, 2) Step-by-step action plan,
     final localizedSystemPrompt =
         '$systemPrompt\n${_languageInstruction(languageCode)}';
 
-    String openRouterError = 'Unknown error';
-    String groqError = 'Unknown error';
-
-    try {
-      if (kDebugMode) {
-        debugPrint('[AIService] Generating $letterType with OpenRouter...');
-      }
-      final result = await _openRouterService.generateRaw(
-          localizedSystemPrompt, userPrompt);
-      if (kDebugMode) debugPrint('[AIService] OpenRouter $letterType success');
-      return _documentTextFromJson(result);
-    } on NetworkException catch (error) {
-      openRouterError = error.toString();
-      _logError('OpenRouter $letterType network error', error);
-    } on ParseException catch (error) {
-      openRouterError = error.toString();
-      _logError('OpenRouter $letterType parse error', error);
-    } catch (e) {
-      openRouterError = e.toString();
-      _logError('OpenRouter $letterType failed', e);
-    }
-
-    try {
-      if (kDebugMode) {
-        debugPrint('[AIService] Generating $letterType with Groq fallback...');
-      }
-      final result =
-          await _groqService.generateRaw(localizedSystemPrompt, userPrompt);
-      if (kDebugMode) debugPrint('[AIService] ✅ Groq $letterType success');
-      return _documentTextFromJson(result);
-    } on NetworkException catch (error) {
-      groqError = error.toString();
-      _logError('Groq $letterType network error', error);
-    } on ParseException catch (error) {
-      groqError = error.toString();
-      _logError('Groq $letterType parse error', error);
-    } catch (e) {
-      groqError = e.toString();
-      _logError('Groq $letterType failed', e);
-    }
-
-    if (kDebugMode) {
-      debugPrint(
-          '[AIService] $letterType generation failed. OpenRouter: $openRouterError. Groq: $groqError.');
-    }
-    throw ErrorSanitizer.toUserFacing(
-        AllProvidersFailedException(openRouterError, groqError));
+    final result = await _executeWithFallback(
+      (client) async {
+        final raw = await client.generateRaw(localizedSystemPrompt, userPrompt);
+        return _documentTextFromJson(raw);
+      },
+      operationLabel: 'generate letter ($letterType)',
+    );
+    return result;
   }
 
-  /// Generates structured fields for a printable legal document.  Providers
-  /// occasionally wrap JSON in a Markdown fence, so normalize that response
-  /// before decoding it at the service boundary.
+  /// Generates structured fields for a printable legal document.
   Future<Map<String, dynamic>> generateDocumentFields({
     required String documentType,
     required String fieldsText,
     String languageCode = 'en',
   }) async {
     final type = documentType.toLowerCase();
-    if (kDebugMode) {
-      debugPrint(
-          '[AIService] generateDocumentFields - documentType: $documentType');
-      debugPrint(
-          '[AIService] generateDocumentFields - type (lowercase): $type');
-      debugPrint(
-          '[AIService] generateDocumentFields - fieldsText: $fieldsText');
-    }
     final schema = type.contains('consumer') || type.contains('complaint')
         ? '''{
   "consumer_status_reason": "...",
@@ -432,12 +335,11 @@ Return JSON matching this schema exactly, with no keys outside the schema:
 $schema''';
     final localizedPrompt = '$prompt\n${_languageInstruction(languageCode)}';
 
-    String rawResponse;
-    try {
-      rawResponse = await _openRouterService.generateRaw('', localizedPrompt);
-    } catch (_) {
-      rawResponse = await _groqService.generateRaw('', localizedPrompt);
-    }
+    final rawResponse = await _executeWithFallback(
+      (client) => client.generateRaw('', localizedPrompt),
+      operationLabel: 'generate document fields ($documentType)',
+    );
+
     if (kDebugMode) {
       debugPrint('RAW AI RESPONSE: $rawResponse');
     }
@@ -475,9 +377,6 @@ $schema''';
         .replaceAll(RegExp(r'\*\*$'), '')
         .trim();
 
-    // Some providers ignore the JSON instruction and return the agreement as
-    // markdown/plain text. It is still a valid generated document, so do not
-    // reject it solely because it is not a JSON object.
     if (!cleaned.startsWith('{')) return cleaned;
 
     final decoded = jsonDecode(cleaned);
@@ -579,8 +478,13 @@ Keep legal terms like RTI, PIL, FIR, IPC, CPC, CrPC, and act names in English wh
     if (kDebugMode) {
       debugPrint('[AIService] $context (sanitized): $sanitized');
     }
-    // TODO: Send sanitized error to Crashlytics or other crash reporting service
-    // Example: FirebaseCrashlytics.instance.recordError(error, StackTrace.current, reason: context);
+    AppLogger().error('$context: $sanitized', tag: 'AIService', error: error);
+    if (SafeAnalytics.analyticsEnabled) {
+      SafeAnalytics.logEvent(
+        name: 'ai_service_error',
+        parameters: {'context': ErrorSanitizer.sanitizeForLog(context)},
+      );
+    }
   }
 
   /// Generate text with custom system prompt and user prompt
@@ -590,41 +494,13 @@ Keep legal terms like RTI, PIL, FIR, IPC, CPC, CrPC, and act names in English wh
     required String userPrompt,
     double temperature = 0.3,
   }) async {
-    try {
-      // Try OpenRouter first
-      if (kDebugMode) {
-        debugPrint('[AIService] Generating text with OpenRouter...');
-      }
-      final result =
-          await _openRouterService.generateRaw(systemPrompt, userPrompt);
-      if (kDebugMode) {
-        debugPrint('[AIService] OpenRouter text generation success');
-      }
-      return result;
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('[AIService] OpenRouter text generation failed: $e');
-      }
-    }
-
-    // Fallback to Groq
-    try {
-      if (kDebugMode) {
-        debugPrint('[AIService] Generating text with Groq...');
-      }
-      final result = await _groqService.generateRaw(systemPrompt, userPrompt);
-      if (kDebugMode) debugPrint('[AIService] Groq text generation success');
-      return result;
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('[AIService] Groq text generation failed: $e');
-      }
-      throw Exception('All AI providers failed for text generation: $e');
-    }
+    return await _executeWithFallback(
+      (client) => client.generateRaw(systemPrompt, userPrompt),
+      operationLabel: 'generate text',
+    );
   }
 
   /// Generate a legal document as plain text (not JSON)
-  /// This method is used for document generation where we want the full document text
   Future<String> generateDocument({
     required String documentType,
     required String fieldsText,
@@ -667,17 +543,17 @@ Output the complete document in $language language.''';
 // =============================================================================
 
 /// AI providers routable through the Cloudflare Worker proxy.
-enum AiProvider { groq, openrouter, siliconflow }
+enum AiProvider { groq, openrouter }
 
 /// Single adapter that routes every chat-completion call through the
 /// `juslegal-ai-proxy` Cloudflare Worker, authenticated with a Firebase ID
-/// token. Supports provider switching between groq, openrouter and siliconflow.
-class _WorkerChatClient {
+/// token. Supports provider switching between groq and openrouter.
+class WorkerChatClient {
   final Dio _dio;
   final FirebaseTokenService _tokenService;
   final AiProvider provider;
 
-  _WorkerChatClient({
+  WorkerChatClient({
     required this.provider,
     Dio? dio,
     FirebaseTokenService? tokenService,
@@ -712,8 +588,6 @@ class _WorkerChatClient {
         return '/callGroq';
       case AiProvider.openrouter:
         return '/callOpenRouter';
-      case AiProvider.siliconflow:
-        return '/callSiliconFlow';
     }
   }
 
@@ -723,8 +597,6 @@ class _WorkerChatClient {
         return 'Groq';
       case AiProvider.openrouter:
         return 'OpenRouter';
-      case AiProvider.siliconflow:
-        return 'SiliconFlow';
     }
   }
 
@@ -760,12 +632,12 @@ class _WorkerChatClient {
   /// Performs the Dio POST with automatic 401 token-refresh retry: when the
   /// Worker rejects an expired Firebase ID token, the token is force-refreshed
   /// and the request retried exactly once.
-  Future<Response<Map<String, dynamic>>> _postWithAuthRetry(
+  Future<Response<dynamic>> _postWithAuthRetry(
     String endpoint,
     Map<String, dynamic> data,
   ) async {
     try {
-      return await _dio.post<Map<String, dynamic>>(endpoint, data: data);
+      return await _dio.post<dynamic>(endpoint, data: data);
     } on DioException catch (error) {
       if (error.response?.statusCode != 401) rethrow;
       if (kDebugMode) {
@@ -773,7 +645,7 @@ class _WorkerChatClient {
       }
       final refreshed = await _tokenService.forceRefreshToken();
       if (refreshed == null) rethrow;
-      return await _dio.post<Map<String, dynamic>>(endpoint, data: data);
+      return await _dio.post<dynamic>(endpoint, data: data);
     }
   }
 
@@ -853,8 +725,11 @@ class _WorkerChatClient {
     }
   }
 
-  String _contentFrom(Map<String, dynamic>? data) {
-    final choices = data?['choices'];
+  String _contentFrom(dynamic data) {
+    if (data is! Map) {
+      throw ParseException('Invalid JSON payload returned from $_label');
+    }
+    final choices = data['choices'];
     if (choices is! List || choices.isEmpty || choices.first is! Map) {
       throw ParseException('No choices returned from $_label');
     }
@@ -967,10 +842,13 @@ class _WorkerChatClient {
         if (body is Map) {
           final safeError = body['error'];
           final safeReason = body['reason'];
-          if (safeError is String || safeReason is String) {
+          final upstreamStatus = body['upstreamStatus'];
+          final detail = body['detail'];
+          if (safeError is String || safeReason is String || detail != null) {
             debugPrint('[$_label] Worker error: '
                 '${safeError is String ? safeError : 'unknown'} '
-                '(reason: ${safeReason is String ? safeReason : 'none'})');
+                '(reason: ${safeReason is String ? safeReason : 'none'}, '
+                'upstreamStatus: $upstreamStatus, detail: $detail)');
           }
         }
       }
@@ -986,14 +864,15 @@ class _WorkerChatClient {
 
 /// Compatibility alias. Groq is now routed through the unified worker adapter.
 class GroqService {
-  final _WorkerChatClient _client;
+  final WorkerChatClient _client;
 
-  GroqService({Dio? dio, FirebaseTokenService? tokenService})
-      : _client = _WorkerChatClient(
-          provider: AiProvider.groq,
-          dio: dio,
-          tokenService: tokenService,
-        );
+  GroqService({WorkerChatClient? client, Dio? dio, FirebaseTokenService? tokenService})
+      : _client = client ??
+            WorkerChatClient(
+              provider: AiProvider.groq,
+              dio: dio,
+              tokenService: tokenService,
+            );
 
   Future<Map<String, dynamic>> analyze(
     String systemPrompt,
@@ -1015,14 +894,15 @@ class GroqService {
 /// Compatibility alias. OpenRouter is now routed through the unified worker
 /// adapter.
 class OpenRouterService {
-  final _WorkerChatClient _client;
+  final WorkerChatClient _client;
 
-  OpenRouterService({Dio? dio, FirebaseTokenService? tokenService})
-      : _client = _WorkerChatClient(
-          provider: AiProvider.openrouter,
-          dio: dio,
-          tokenService: tokenService,
-        );
+  OpenRouterService({WorkerChatClient? client, Dio? dio, FirebaseTokenService? tokenService})
+      : _client = client ??
+            WorkerChatClient(
+              provider: AiProvider.openrouter,
+              dio: dio,
+              tokenService: tokenService,
+            );
 
   Future<Map<String, dynamic>> analyze(
     String systemPrompt,
@@ -1039,262 +919,4 @@ class OpenRouterService {
           {String languageCode = 'en'}) =>
       _client.sendMessage(userMessage, conversationHistory,
           languageCode: languageCode);
-}
-
-/// Compatibility alias for the former `siliconflow_service.dart`.
-///
-/// SiliconFlow image generation has not yet been moved behind the Worker, so
-/// the original implementation is retained here. This class is exposed as a
-/// stub-style alias so screens/providers importing `ai_service.dart` keep
-/// working after `siliconflow_service.dart` was removed.
-class SiliconFlowService {
-  static const String baseUrl = 'https://api.siliconflow.cn/v1';
-  static const Duration connectionTimeout = Duration(seconds: 30);
-  static const Duration receiveTimeout = Duration(seconds: 60);
-
-  late final Dio _dio;
-  final String apiKey;
-
-  SiliconFlowService({required this.apiKey}) {
-    _dio = Dio(
-      BaseOptions(
-        baseUrl: baseUrl,
-        connectTimeout: connectionTimeout,
-        receiveTimeout: receiveTimeout,
-        headers: {
-          'Authorization': 'Bearer $apiKey',
-          'Content-Type': 'application/json',
-        },
-      ),
-    );
-
-    // Add request/response logging in debug mode
-    if (kDebugMode) {
-      _dio.interceptors.add(
-        LogInterceptor(
-          requestBody: true,
-          responseBody: true,
-          requestHeader: true,
-          responseHeader: true,
-        ),
-      );
-    }
-  }
-
-  /// Generate an image for legal document illustration
-  /// Common use cases: case diagrams, timeline illustrations, process flows
-  Future<String> generateLegalDocumentImage({
-    required String prompt,
-    String model = 'black-forest-labs/FLUX.1-pro',
-    String aspectRatio = '1024x768',
-    int numInferenceSteps = 20,
-    double guidanceScale = 7.5,
-  }) async {
-    if (apiKey.isEmpty) {
-      throw Exception('SiliconFlow API key not configured');
-    }
-
-    if (prompt.trim().isEmpty) {
-      throw ArgumentError.value(prompt, 'prompt', 'Prompt cannot be empty');
-    }
-
-    try {
-      if (kDebugMode) {
-        debugPrint('[SiliconFlow] Generating image with prompt: $prompt');
-      }
-
-      final response = await _dio.post(
-        '/image/generations',
-        data: {
-          'prompt': prompt,
-          'model': model,
-          'image_size': aspectRatio,
-          'num_inference_steps': numInferenceSteps,
-          'guidance_scale': guidanceScale,
-        },
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final data = response.data as Map<String, dynamic>;
-
-        if (data['images'] != null && data['images'].isNotEmpty) {
-          final imageUrl = data['images'][0]['url'] as String?;
-          if (imageUrl != null && imageUrl.isNotEmpty) {
-            if (kDebugMode) {
-              debugPrint(
-                  '[SiliconFlow] Image generated successfully: $imageUrl');
-            }
-            return imageUrl;
-          }
-        }
-
-        throw Exception('No image URL in response: $data');
-      } else {
-        throw Exception(
-          'Image generation failed: ${response.statusCode} - ${response.statusMessage}',
-        );
-      }
-    } on DioException catch (e) {
-      if (kDebugMode) {
-        debugPrint('[SiliconFlow] DioException: ${e.message}');
-      }
-
-      if (e.type == DioExceptionType.connectionTimeout) {
-        throw TimeoutException('Connection timeout while generating image');
-      } else if (e.type == DioExceptionType.receiveTimeout) {
-        throw TimeoutException('Receive timeout while generating image');
-      } else if (e.response?.statusCode == 401) {
-        throw ApiKeyException('SiliconFlow');
-      } else if (e.response?.statusCode == 429) {
-        throw RateLimitException(
-          'SiliconFlow rate limit exceeded. Please try again later.',
-          'SiliconFlow',
-        );
-      }
-
-      throw Exception('Image generation failed: ${e.message}');
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('[SiliconFlow] Unexpected error: $e');
-      }
-      rethrow;
-    }
-  }
-
-  /// Generate images for case timeline visualization
-  /// Returns a list of image URLs showing different stages of a legal case
-  Future<List<String>> generateCaseTimelineImages({
-    required String caseType,
-    required List<String> stages,
-    int imagesPerStage = 1,
-  }) async {
-    final images = <String>[];
-
-    for (int i = 0; i < stages.length; i++) {
-      final stage = stages[i];
-      final prompt =
-          _buildTimelinePrompt(caseType, stage, i + 1, stages.length);
-
-      try {
-        final imageUrl = await generateLegalDocumentImage(
-          prompt: prompt,
-          aspectRatio: '1024x576', // Wider for timeline visualization
-        );
-        images.add(imageUrl);
-
-        // Rate limiting: small delay between requests to avoid throttling
-        if (i < stages.length - 1) {
-          await Future.delayed(const Duration(milliseconds: 500));
-        }
-      } catch (e) {
-        if (kDebugMode) {
-          debugPrint(
-              '[SiliconFlow] Failed to generate stage image for "$stage": $e');
-        }
-        // Continue with other stages even if one fails
-      }
-    }
-
-    if (images.isEmpty) {
-      throw Exception('Failed to generate any timeline images');
-    }
-
-    return images;
-  }
-
-  /// Generate an image for case documentation or complaint letter header
-  Future<String> generateCaseHeaderImage({
-    required String caseTitle,
-    required String category,
-  }) async {
-    final prompt = _buildHeaderPrompt(caseTitle, category);
-    return generateLegalDocumentImage(
-      prompt: prompt,
-      aspectRatio: '1280x400',
-      numInferenceSteps: 15,
-    );
-  }
-
-  /// List available models (requires active API connection)
-  Future<List<String>> getAvailableModels() async {
-    try {
-      if (kDebugMode) {
-        debugPrint('[SiliconFlow] Fetching available models');
-      }
-
-      final response = await _dio.get('/models');
-
-      if (response.statusCode == 200) {
-        final data = response.data as Map<String, dynamic>;
-        final models = (data['data'] as List?)
-                ?.whereType<Map<String, dynamic>>()
-                .map((m) => m['id'] as String)
-                .toList() ??
-            [];
-
-        if (kDebugMode) {
-          debugPrint('[SiliconFlow] Found ${models.length} available models');
-        }
-
-        return models;
-      } else {
-        throw Exception('Failed to fetch models: ${response.statusCode}');
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('[SiliconFlow] Failed to fetch models: $e');
-      }
-      rethrow;
-    }
-  }
-
-  /// Get current account balance and usage info
-  Future<Map<String, dynamic>> getAccountInfo() async {
-    try {
-      if (kDebugMode) {
-        debugPrint('[SiliconFlow] Fetching account info');
-      }
-
-      final response = await _dio.get('/user/info');
-
-      if (response.statusCode == 200) {
-        final data = response.data as Map<String, dynamic>;
-        if (kDebugMode) {
-          debugPrint('[SiliconFlow] Account info: $data');
-        }
-        return data;
-      } else {
-        throw Exception('Failed to fetch account info: ${response.statusCode}');
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        debugPrint('[SiliconFlow] Failed to fetch account info: $e');
-      }
-      rethrow;
-    }
-  }
-
-  String _buildTimelinePrompt(
-    String caseType,
-    String stage,
-    int stageNumber,
-    int totalStages,
-  ) {
-    return '''Professional legal case timeline illustration for a $caseType case.
-Stage $stageNumber of $totalStages: $stage
-Style: Clean, professional, corporate legal document aesthetic.
-Colors: Blues, grays, and professional tones.
-Include stage indicator and progress visualization.
-High quality, clear, and suitable for legal documentation.''';
-  }
-
-  String _buildHeaderPrompt(String caseTitle, String category) {
-    return '''Professional header illustration for a legal case document.
-Case: $caseTitle
-Category: $category
-Style: Modern, professional, formal legal aesthetic.
-Include symbolic elements representing justice, law, and protection.
-Colors: Deep blues, golds, and professional tones.
-High resolution, suitable for document header.''';
-  }
 }

@@ -48,6 +48,27 @@ class AppRouteNames {
   static const String homeDocumentReview = 'documentReview';
 }
 
+Page<dynamic> _buildFadeSlidePage(GoRouterState state, Widget child) {
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: child,
+    transitionDuration: const Duration(milliseconds: 240),
+    reverseTransitionDuration: const Duration(milliseconds: 200),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      return FadeTransition(
+        opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0.03, 0.0),
+            end: Offset.zero,
+          ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic)),
+          child: child,
+        ),
+      );
+    },
+  );
+}
+
 GoRouter buildRouter({
   required bool firebaseAvailable,
   required AuthState Function() getAuthState,
@@ -83,12 +104,14 @@ GoRouter buildRouter({
       GoRoute(
         path: '/privacy-policy',
         name: AppRouteNames.privacyPolicy,
-        builder: (context, state) => const PrivacyPolicyScreen(),
+        pageBuilder: (context, state) =>
+            _buildFadeSlidePage(state, const PrivacyPolicyScreen()),
       ),
       GoRoute(
         path: '/legal-terms',
         name: AppRouteNames.legalTermsRoot,
-        builder: (context, state) => const LegalTermsScreen(),
+        pageBuilder: (context, state) =>
+            _buildFadeSlidePage(state, const LegalTermsScreen()),
       ),
       GoRoute(
         path: '/firebase-unavailable',
@@ -98,104 +121,155 @@ GoRouter buildRouter({
       GoRoute(
         path: '/',
         name: AppRouteNames.welcome,
-        builder: (context, state) => const WelcomeScreen(),
+        pageBuilder: (context, state) =>
+            _buildFadeSlidePage(state, const WelcomeScreen()),
       ),
       GoRoute(
         path: '/login',
         name: AppRouteNames.login,
-        builder: (context, state) => const LoginScreen(),
+        pageBuilder: (context, state) =>
+            _buildFadeSlidePage(state, const LoginScreen()),
       ),
       GoRoute(
         path: '/signup-method',
-        builder: (context, state) => const SignUpMethodScreen(),
+        pageBuilder: (context, state) =>
+            _buildFadeSlidePage(state, const SignUpMethodScreen()),
       ),
-      GoRoute(path: '/email-signup', builder: (context, state) => const EmailSignupScreen()),
+      GoRoute(
+        path: '/email-signup',
+        pageBuilder: (context, state) =>
+            _buildFadeSlidePage(state, const EmailSignupScreen()),
+      ),
       GoRoute(
         path: '/email-verification',
         name: AppRouteNames.emailAuth,
-        builder: (context, state) => EmailVerificationScreen(email: state.extra as String? ?? ''),
+        pageBuilder: (context, state) => _buildFadeSlidePage(
+          state,
+          EmailVerificationScreen(email: state.extra as String? ?? ''),
+        ),
       ),
-      GoRoute(path: '/forgot-password', builder: (context, state) => const ForgotPasswordScreen()),
-      GoRoute(path: '/mobile-signup', builder: (context, state) => const MobileEntryScreen(signup: true)),
-      GoRoute(path: '/mobile-login', builder: (context, state) => const MobileEntryScreen(signup: false)),
-      GoRoute(path: '/confirm-name', builder: (context, state) => ConfirmNameScreen(user: state.extra! as User)),
+      GoRoute(
+        path: '/forgot-password',
+        pageBuilder: (context, state) =>
+            _buildFadeSlidePage(state, const ForgotPasswordScreen()),
+      ),
+      GoRoute(
+        path: '/mobile-signup',
+        pageBuilder: (context, state) => _buildFadeSlidePage(
+          state,
+          const MobileEntryScreen(signup: true),
+        ),
+      ),
+      GoRoute(
+        path: '/mobile-login',
+        pageBuilder: (context, state) => _buildFadeSlidePage(
+          state,
+          const MobileEntryScreen(signup: false),
+        ),
+      ),
+      GoRoute(
+        path: '/confirm-name',
+        pageBuilder: (context, state) => _buildFadeSlidePage(
+          state,
+          ConfirmNameScreen(user: state.extra! as User),
+        ),
+      ),
       GoRoute(
         path: '/otp',
         name: AppRouteNames.otp,
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final params = OtpRouteParams.fromExtra(state.extra);
-          return OtpScreen(
-            verificationId: params.verificationId,
-            phoneNumber: params.phoneNumber,
-            legalName: params.legalName,
-            isSignup: params.isSignup,
+          return _buildFadeSlidePage(
+            state,
+            OtpScreen(
+              verificationId: params.verificationId,
+              phoneNumber: params.phoneNumber,
+              legalName: params.legalName,
+              isSignup: params.isSignup,
+            ),
           );
         },
       ),
       GoRoute(
         path: '/analyze',
         name: 'analyzeLegacy',
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final category = state.uri.queryParameters['category'];
-          return ProblemAnalyzerScreen(initialCategory: category);
+          return _buildFadeSlidePage(
+            state,
+            ProblemAnalyzerScreen(initialCategory: category),
+          );
         },
       ),
       GoRoute(
         path: '/home',
         name: AppRouteNames.home,
-        builder: (context, state) => const HomeScreen(),
+        pageBuilder: (context, state) =>
+            _buildFadeSlidePage(state, const HomeScreen()),
         routes: [
           GoRoute(
             path: 'analyzer',
             name: AppRouteNames.analyzer,
-            builder: (context, state) {
+            pageBuilder: (context, state) {
               final category = state.uri.queryParameters['category'];
-              return ProblemAnalyzerScreen(initialCategory: category);
+              return _buildFadeSlidePage(
+                state,
+                ProblemAnalyzerScreen(initialCategory: category),
+              );
             },
           ),
           GoRoute(
             path: 'result',
             name: AppRouteNames.result,
-            builder: (context, state) {
+            pageBuilder: (context, state) {
               final initialResult = state.extra is LegalResultModel
                   ? state.extra as LegalResultModel
                   : null;
-              return ResultScreen(initialResult: initialResult);
+              return _buildFadeSlidePage(
+                state,
+                ResultScreen(initialResult: initialResult),
+              );
             },
           ),
           GoRoute(
             path: 'cases',
             name: AppRouteNames.cases,
-            builder: (context, state) => const MyCasesScreen(),
+            pageBuilder: (context, state) =>
+                _buildFadeSlidePage(state, const MyCasesScreen()),
           ),
           GoRoute(
             path: 'settings',
             name: AppRouteNames.settings,
-            builder: (context, state) => const SettingsScreen(),
+            pageBuilder: (context, state) =>
+                _buildFadeSlidePage(state, const SettingsScreen()),
           ),
 
           // Legal utility routes
           GoRoute(
             path: 'ai-lawyer-chat',
             name: AppRouteNames.aiLawyerChat,
-            builder: (context, state) => const AILegalChatScreen(
-              userName: 'there',
+            pageBuilder: (context, state) => _buildFadeSlidePage(
+              state,
+              const AILegalChatScreen(userName: 'there'),
             ),
           ),
           GoRoute(
             path: 'legal-terms',
             name: AppRouteNames.homeLegalTerms,
-            builder: (context, state) => const LegalTermsScreen(),
+            pageBuilder: (context, state) =>
+                _buildFadeSlidePage(state, const LegalTermsScreen()),
           ),
           GoRoute(
             path: 'legal-writing',
             name: AppRouteNames.homeLegalWriting,
-            builder: (context, state) => const LegalWritingScreen(),
+            pageBuilder: (context, state) =>
+                _buildFadeSlidePage(state, const LegalWritingScreen()),
           ),
           GoRoute(
             path: 'document-review',
             name: AppRouteNames.homeDocumentReview,
-            builder: (context, state) => const DocumentReviewScreen(),
+            pageBuilder: (context, state) =>
+                _buildFadeSlidePage(state, const DocumentReviewScreen()),
           ),
         ],
       ),
