@@ -17,18 +17,9 @@ class AILegalChatScreen extends ConsumerStatefulWidget {
   ConsumerState<AILegalChatScreen> createState() => _AILegalChatScreenState();
 }
 
-class _AILegalChatScreenState extends ConsumerState<AILegalChatScreen>
-    with TickerProviderStateMixin {
+class _AILegalChatScreenState extends ConsumerState<AILegalChatScreen> {
   final _textController = TextEditingController();
   final _scrollController = ScrollController();
-
-  // Fix 4: screen ownership provides one clear controller lifecycle.
-  late final _spinnerController = AnimationController(
-    vsync: this, duration: const Duration(milliseconds: 950),
-  )..repeat();
-  late final _dotsController = AnimationController(
-    vsync: this, duration: const Duration(milliseconds: 900),
-  )..repeat();
 
   // Fix 8: covers the provider's debounce interval before isSending is true.
   bool _isSendQueued = false;
@@ -51,8 +42,6 @@ class _AILegalChatScreenState extends ConsumerState<AILegalChatScreen>
   void dispose() {
     _textController.dispose();
     _scrollController.dispose();
-    _spinnerController.dispose();
-    _dotsController.dispose();
     super.dispose();
   }
 
@@ -141,7 +130,7 @@ class _AILegalChatScreenState extends ConsumerState<AILegalChatScreen>
           decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
           child: Column(children: [
             Expanded(child: _messageList(chat.conversationHistory, isSendUnavailable)),
-            if (chat.isSending) _TypingIndicator(spinnerAnimation: _spinnerController, dotsAnimation: _dotsController),
+            if (chat.isSending) const _TypingIndicator(),
             // Fix 2: viewInsets lifts the composer; its scroll view prevents
             // a multi-line composer/banner from being obscured by the keyboard.
             AnimatedPadding(
@@ -626,25 +615,76 @@ class _MessageBubble extends StatelessWidget {
   }
 }
 
-class _TypingIndicator extends StatelessWidget {
-  final Animation<double> spinnerAnimation;
-  final Animation<double> dotsAnimation;
-  const _TypingIndicator({required this.spinnerAnimation, required this.dotsAnimation});
+class _TypingIndicator extends StatefulWidget {
+  const _TypingIndicator();
+
+  @override
+  State<_TypingIndicator> createState() => _TypingIndicatorState();
+}
+
+class _TypingIndicatorState extends State<_TypingIndicator>
+    with TickerProviderStateMixin {
+  late final AnimationController _spinnerController;
+  late final AnimationController _dotsController;
+
+  @override
+  void initState() {
+    super.initState();
+    _spinnerController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 950),
+    )..repeat();
+    _dotsController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _spinnerController.dispose();
+    _dotsController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.only(left: 18, bottom: 10),
     child: Semantics(
-      liveRegion: true, label: 'JusLegal is responding',
+      liveRegion: true,
+      label: 'JusLegal is responding',
       child: Align(
         alignment: Alignment.centerLeft,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(gradient: AppColors.botBubbleGradient, borderRadius: BorderRadius.circular(999)),
-          child: Row(mainAxisSize: MainAxisSize.min, children: [
-            RotationTransition(turns: spinnerAnimation, child: const Icon(Icons.sync_rounded, color: AppColors.legalGold, size: 18)),
-            const SizedBox(width: 8), _AnimatedDots(animation: dotsAnimation), const SizedBox(width: 8),
-            const Text('JusLegal is responding...', style: TextStyle(color: AppColors.textSecondary, fontSize: 14, fontWeight: FontWeight.w600)),
-          ]),
+          decoration: BoxDecoration(
+            gradient: AppColors.botBubbleGradient,
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RotationTransition(
+                turns: _spinnerController,
+                child: const Icon(
+                  Icons.sync_rounded,
+                  color: AppColors.legalGold,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 8),
+              _AnimatedDots(animation: _dotsController),
+              const SizedBox(width: 8),
+              const Text(
+                'JusLegal is responding...',
+                style: TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     ),

@@ -74,10 +74,12 @@ Future<void> main() async {
   try {
     final storage = StorageService();
     await storage.init();
-    await storage.openEncryptedBox<dynamic>('cases');
-    await storage.openEncryptedBox<dynamic>('settings');
-    await storage.openEncryptedBox<dynamic>('chat_history');
-    await storage.openEncryptedBox<dynamic>('user_profile');
+    await Future.wait([
+      storage.openEncryptedBox<dynamic>('cases'),
+      storage.openEncryptedBox<dynamic>('settings'),
+      storage.openEncryptedBox<dynamic>('chat_history'),
+      storage.openEncryptedBox<dynamic>('user_profile'),
+    ]);
   } catch (e, stackTrace) {
     logger.error('Failed to initialize encrypted local storage', tag: 'Main', error: e, stackTrace: stackTrace);
   }

@@ -48,13 +48,12 @@ class WelcomeScreen extends ConsumerStatefulWidget {
 }
 
 class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
-    with TickerProviderStateMixin {
+    with SingleTickerProviderStateMixin {
   final _form = GlobalKey<FormState>();
   final _name = TextEditingController();
   final _email = TextEditingController();
   final _password = TextEditingController();
   late final AnimationController _entrance;
-  late final AnimationController _scales;
   bool _acceptedTerms = false;
   bool _hidePassword = true;
   bool _loading = false;
@@ -66,16 +65,11 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
       vsync: this,
       duration: const Duration(milliseconds: 850),
     )..forward();
-    _scales = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 3600),
-    )..repeat(reverse: true);
   }
 
   @override
   void dispose() {
     _entrance.dispose();
-    _scales.dispose();
     _name.dispose();
     _email.dispose();
     _password.dispose();

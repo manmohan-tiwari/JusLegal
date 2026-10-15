@@ -54,6 +54,7 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 /android/local.properties
+/android/key.properties
 /android/app/juslegal-release*.jks
 .aider*
 

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
 import 'package:juslegal/screens/ai_legal_chat_screen.dart';
 import 'package:juslegal/core/core.dart';
 
@@ -24,10 +23,51 @@ class FloatingAIButton extends StatefulWidget {
 
 class _FloatingAIButtonState extends State<FloatingAIButton>
     with TickerProviderStateMixin {
-  late AnimationController _pulseController;
-  late AnimationController _rotateController;
-  late Animation<double> _pulseAnimation;
-  late Animation<double> _rotateAnimation;
+  late final AnimationController _pulseController;
+  late final AnimationController _rotateController;
+  late final Animation<double> _pulseAnimation;
+
+  late final Widget _outerRing = Container(
+    width: 64,
+    height: 64,
+    decoration: BoxDecoration(
+      shape: BoxShape.circle,
+      gradient: SweepGradient(
+        colors: [
+          AppColors.primaryDark.withValues(alpha: 0),
+          AppColors.primaryLight,
+          AppColors.legalGold,
+          AppColors.primaryDark.withValues(alpha: 0),
+        ],
+      ),
+    ),
+  );
+
+  late final Widget _innerButton = Container(
+    width: 56,
+    height: 56,
+    decoration: BoxDecoration(
+      shape: BoxShape.circle,
+      gradient: const LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [
+          AppColors.legalGold,
+          AppColors.amber,
+          AppColors.amberDark,
+        ],
+      ),
+      boxShadow: [
+        BoxShadow(
+          color: AppColors.shadowGold.withValues(alpha: 0.9),
+          blurRadius: 20,
+          spreadRadius: 2,
+          offset: const Offset(0, 8),
+        ),
+      ],
+    ),
+    child: const _AIBotIcon(),
+  );
 
   @override
   void initState() {
@@ -45,10 +85,6 @@ class _FloatingAIButtonState extends State<FloatingAIButton>
 
     _pulseAnimation = Tween<double>(begin: 0.95, end: 1.05).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
-    );
-
-    _rotateAnimation = Tween<double>(begin: 0, end: 2 * math.pi).animate(
-      CurvedAnimation(parent: _rotateController, curve: Curves.linear),
     );
   }
 
@@ -83,67 +119,24 @@ class _FloatingAIButtonState extends State<FloatingAIButton>
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: _openChat,
-      child: AnimatedBuilder(
-        animation: Listenable.merge([_pulseAnimation, _rotateAnimation]),
-        builder: (context, child) {
-          return Transform.scale(
-            scale: _pulseAnimation.value,
-            child: SizedBox(
-              width: 64,
-              height: 64,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  // Outer rotating gradient ring
-                  Transform.rotate(
-                    angle: _rotateAnimation.value,
-                    child: Container(
-                      width: 64,
-                      height: 64,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: SweepGradient(
-                          colors: [
-                            AppColors.primaryDark.withValues(alpha: 0),
-                            AppColors.primaryLight,
-                            AppColors.legalGold,
-                            AppColors.primaryDark.withValues(alpha: 0),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  // Inner button
-                  Container(
-                    width: 56,
-                    height: 56,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          AppColors.legalGold,
-                          AppColors.amber,
-                          AppColors.amberDark,
-                        ],
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.shadowGold.withValues(alpha: 0.9),
-                          blurRadius: 20,
-                          spreadRadius: 2,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                    ),
-                    child: const _AIBotIcon(),
-                  ),
-                ],
+      child: ScaleTransition(
+        scale: _pulseAnimation,
+        child: SizedBox(
+          width: 64,
+          height: 64,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              // Outer rotating gradient ring rendered via GPU compositor
+              RotationTransition(
+                turns: _rotateController,
+                child: _outerRing,
               ),
-            ),
-          );
-        },
+              // Inner static button
+              _innerButton,
+            ],
+          ),
+        ),
       ),
     );
   }

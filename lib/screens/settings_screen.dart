@@ -346,62 +346,67 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       if (method == 'password') {
         if (!mounted) return false;
         final email = user.email ?? '';
-        final password = await showDialog<String?>(
-          context: context,
-          builder: (pwdCtx) {
-            final pwdController = TextEditingController();
-            return StatefulBuilder(
-              builder: (ctx, setPwdState) {
-                return AlertDialog(
-                  backgroundColor: AppColors.background,
-                  title: Text(l10n.reauthenticationRequired),
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        email.isNotEmpty ? email : l10n.email,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: Color(0xFF6B7280),
+        final pwdController = TextEditingController();
+        final String? password;
+        try {
+          password = await showDialog<String?>(
+            context: context,
+            builder: (pwdCtx) {
+              return StatefulBuilder(
+                builder: (ctx, setPwdState) {
+                  return AlertDialog(
+                    backgroundColor: AppColors.background,
+                    title: Text(l10n.reauthenticationRequired),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          email.isNotEmpty ? email : l10n.email,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Color(0xFF6B7280),
+                          ),
                         ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: pwdController,
+                          obscureText: true,
+                          autofocus: true,
+                          decoration: InputDecoration(
+                            labelText: l10n.password,
+                            border: const OutlineInputBorder(),
+                            isDense: true,
+                          ),
+                          onSubmitted: (_) =>
+                              Navigator.of(pwdCtx).pop(pwdController.text),
+                        ),
+                      ],
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(pwdCtx).pop(null),
+                        child: Text(l10n.cancel),
                       ),
-                      const SizedBox(height: 12),
-                      TextField(
-                        controller: pwdController,
-                        obscureText: true,
-                        autofocus: true,
-                        decoration: InputDecoration(
-                          labelText: l10n.password,
-                          border: const OutlineInputBorder(),
-                          isDense: true,
+                      TextButton(
+                        onPressed: pwdController.text.isNotEmpty
+                            ? () =>
+                                Navigator.of(pwdCtx).pop(pwdController.text)
+                            : null,
+                        style: TextButton.styleFrom(
+                          foregroundColor: AppColors.primaryNavy,
                         ),
-                        onSubmitted: (_) =>
-                            Navigator.of(pwdCtx).pop(pwdController.text),
+                        child: Text(l10n.ok),
                       ),
                     ],
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(pwdCtx).pop(null),
-                      child: Text(l10n.cancel),
-                    ),
-                    TextButton(
-                      onPressed: pwdController.text.isNotEmpty
-                          ? () =>
-                              Navigator.of(pwdCtx).pop(pwdController.text)
-                          : null,
-                      style: TextButton.styleFrom(
-                        foregroundColor: AppColors.primaryNavy,
-                      ),
-                      child: Text(l10n.ok),
-                    ),
-                  ],
-                );
-              },
-            );
-          },
-        );
+                  );
+                },
+              );
+            },
+          );
+        } finally {
+          pwdController.dispose();
+        }
 
         if (password == null || password.isEmpty) {
           if (!mounted) return false;

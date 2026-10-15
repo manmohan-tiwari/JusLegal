@@ -1,0 +1,8 @@
+# JusLegal Android Release Signing Configuration Example
+# Copy this file to `android/key.properties` and replace with your real keystore values.
+# NEVER commit key.properties or .jks files to public source control.
+
+storePassword=YOUR_KEYSTORE_PASSWORD
+keyPassword=YOUR_KEY_PASSWORD
+keyAlias=juslegal-release
+storeFile=juslegal-release.jks

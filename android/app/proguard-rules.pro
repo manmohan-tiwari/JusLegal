@@ -53,3 +53,27 @@
     public static **[] values();
     public static ** valueOf(java.lang.String);
 }
+
+# Keep Flutter Secure Storage & AndroidX Security Crypto
+-keep class androidx.security.crypto.** { *; }
+-dontwarn androidx.security.crypto.**
+
+# Keep Speech To Text
+-keep class com.csdcorp.speech_to_text.** { *; }
+-dontwarn com.csdcorp.speech_to_text.**
+
+# Keep File Picker
+-keep class com.mr.flutter.plugin.filepicker.** { *; }
+-dontwarn com.mr.flutter.plugin.filepicker.**
+
+# Keep Printing & PDF
+-keep class net.nfet.flutter.printing.** { *; }
+-dontwarn net.nfet.flutter.printing.**
+
+# Keep Share Plus & URL Launcher
+-keep class dev.fluttercommunity.plus.share.** { *; }
+-keep class io.flutter.plugins.urllauncher.** { *; }
+
+# Suppress annotations and checker warnings
+-dontwarn javax.annotation.**
+-dontwarn org.checkerframework.**
