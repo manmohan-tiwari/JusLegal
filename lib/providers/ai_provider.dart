@@ -11,7 +11,6 @@ import '../models/chat_message_model.dart';
 import '../models/legal_result_model.dart';
 import '../models/problem_model.dart';
 import '../services/ai_service.dart';
-import '../services/firebase_token_service.dart';
 import '../services/storage_service.dart';
 import 'locale_provider.dart';
 
@@ -353,7 +352,6 @@ class AnalysisState {
 // AsyncNotifier for analysis state management
 class AnalysisNotifier extends AsyncNotifier<AnalysisState> {
   late final AIService _aiService;
-  final FirebaseTokenService _tokenService = FirebaseTokenService();
 
   @override
   AnalysisState build() {
@@ -398,7 +396,7 @@ class AnalysisNotifier extends AsyncNotifier<AnalysisState> {
         },
       );
 
-      // Initialize AI service (validates worker-only API key configuration)
+      // Initialize AI service (validates Gemini API key configuration)
       await _aiService.initialize();
       _setProgress(0.15, 'service_initialized');
 
@@ -479,28 +477,9 @@ class AnalysisNotifier extends AsyncNotifier<AnalysisState> {
 
   /// Retries the analysis once when a 401 indicates an expired Firebase ID
   /// token. Forces a token refresh and logs the attempt to analytics.
+  /// Backward compatibility alias
   Future<LegalResultModel> analyzeWithTokenRetry(ProblemModel problem) async {
-    try {
-      return await analyze(problem);
-    } catch (error) {
-      final message = error.toString();
-      final unauthorized =
-          message.contains('HTTP 401') || message.contains('401');
-      if (!unauthorized) rethrow;
-
-      AppLogger.warning(
-          'AnalysisNotifier', '401 received - attempting token refresh retry');
-      await SafeAnalytics.logEvent(name: 'token_refresh', parameters: {
-        'context': 'analysis',
-        'reason': 'unauthorized',
-      });
-
-      final refreshedToken = await _tokenService.forceRefreshToken();
-      if (refreshedToken == null) rethrow;
-
-      // Retry exactly once with the refreshed token.
-      return analyze(problem);
-    }
+    return analyze(problem);
   }
 
   LegalResultModel _mapToLegalResultModel(Map<String, dynamic> data) {

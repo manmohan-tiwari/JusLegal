@@ -107,6 +107,14 @@ class ErrorSanitizer {
       return error;
     }
 
+    if (error is ApiKeyException) {
+      return UserFacingException(
+        'Gemini API key is not configured. Please add GEMINI_API_KEY in your .env or --dart-define.',
+        category: 'api_key_missing',
+        isRetryable: false,
+      );
+    }
+
     if (error is AuthRequiredException) {
       return UserFacingException(
         error.message,

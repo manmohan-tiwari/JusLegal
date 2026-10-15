@@ -25,13 +25,7 @@ part 'app_config.theme.dart';
 part 'app_config.animations.dart';
 part 'app_config.environment.dart';
 
-// ============================== API / WORKER =================================
-
-// ignore: constant_identifier_names
-const String WORKER_BASE_URL = String.fromEnvironment(
-  'JUSLEGAL_AI_PROXY_BASE_URL',
-  defaultValue: 'https://juslegal-ai-proxy.juslegalai.workers.dev',
-);
+// ============================== API CONSTANTS =================================
 
 class ApiConstants {
   // Shared Settings
@@ -48,21 +42,6 @@ class ApiConstants {
   // Timeouts
   static const Duration connectionTimeout = Duration(seconds: 15);
   static const Duration receiveTimeout = Duration(seconds: 30);
-}
-
-/// Client-side mirror of the Worker request envelope limits.
-///
-/// The Worker is authoritative and selects the upstream model based on the
-/// endpoint. These values only keep the app from creating requests that the
-/// Worker would reject; matching values must be updated alongside
-/// `juslegal-ai-proxy/src/index.ts`.
-class WorkerAiRequestLimits {
-  static const int maxMessages = 20;
-  static const int maxMessageContentChars = 20000;
-  static const int maxTotalMessageChars = 60000;
-  static const int maxTokens = 2400;
-  static const double minTemperature = 0;
-  static const double maxTemperature = 1;
 }
 
 const String jusLegalChatSystemPrompt =
@@ -97,21 +76,18 @@ String chatSystemPromptForLanguage(String languageCode) {
 // ============================ RUNTIME / ENV ==================================
 
 /// Compatibility shim for callers that log AI configuration.
-/// Provider credentials and URLs are intentionally server-side only.
 class AiRuntimeConfig {
   AiRuntimeConfig._();
 
   static void logConfig() {
     if (kDebugMode) {
       debugPrint(
-          '[AiRuntimeConfig] AI requests use the Cloudflare Worker proxy.');
+          '[AiRuntimeConfig] AI requests use Google Gemini direct integration.');
     }
   }
 }
 
-/// App-level configuration values. Provider keys deliberately do not belong in
-/// this client application; requests are authenticated with Firebase and sent
-/// to the Cloudflare Worker.
+/// App-level configuration values.
 class EnvConfig {
   EnvConfig._();
 
@@ -129,7 +105,7 @@ class EnvConfig {
       _EnvironmentState.load(dotenv.dotenv.env);
       if (!EnvironmentState.isValid) {
         throw const ConfigurationException(
-          'Worker URL, website URL, and country code must be valid.',
+          'Website URL and country code must be valid.',
         );
       }
     } catch (error, stackTrace) {
@@ -152,7 +128,7 @@ class EnvConfig {
     if (kDebugMode) {
       debugPrint(
           '[EnvConfig] environment=${EnvironmentTypeConfig.current.name} '
-          'baseUrl=${EnvironmentState.workerBaseUrl} '
+          'geminiConfigured=${EnvironmentState.geminiApiKey.isNotEmpty} '
           'firebaseProject=${EnvironmentState.firebaseProjectId}');
     }
   }
@@ -203,8 +179,10 @@ class AppConfig {
   static String get dgcaUrl => 'https://dgca.gov.in';
   static String get googleMapsUrl => 'https://www.google.com/maps/search';
 
-  // Optional API Keys (for future use)
-  static String? get apiKey => null;
+  // API Keys
+  static String? get apiKey =>
+      EnvironmentState.geminiApiKey.isNotEmpty ? EnvironmentState.geminiApiKey : null;
+  static String get geminiApiKey => EnvironmentState.geminiApiKey;
   static String? get analyticsKey => null;
 
   // Phone authentication

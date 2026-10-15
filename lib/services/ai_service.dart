@@ -1,25 +1,21 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
+import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:juslegal/constants/document_prompts_complete.dart';
 import 'package:juslegal/core/core.dart';
 import 'package:juslegal/models/chat_message_model.dart';
-import 'firebase_token_service.dart';
 
 /// SecurityAudit: AI service with structured exception handling and PII sanitization.
-/// All errors are logged with PII removed and returned as UserFacingExceptions to UI.
+/// Uses Google Gemini (via google_generative_ai SDK) directly.
 class AIService {
-  late final WorkerChatClient _openRouterClient;
-  late final WorkerChatClient _groqClient;
+  final GeminiChatClient _client;
 
-  /// Currently preferred provider. Chat/analysis requests try this provider
-  /// first and fall back to the other worker-routed provider on failure.
-  AiProvider _preferredProvider = AiProvider.groq;
+  AiProvider _preferredProvider = AiProvider.gemini;
   AiProvider get preferredProvider => _preferredProvider;
 
-  /// Switch the preferred provider at runtime (groq, openrouter).
+  /// Compatibility switch
   void switchProvider(AiProvider provider) {
     _preferredProvider = provider;
     if (kDebugMode) {
@@ -27,87 +23,55 @@ class AIService {
     }
   }
 
-  AIService() {
-    _openRouterClient = WorkerChatClient(provider: AiProvider.openrouter);
-    _groqClient = WorkerChatClient(provider: AiProvider.groq);
-  }
+  AIService({GeminiChatClient? client})
+      : _client = client ?? GeminiChatClient();
 
   Future<void> initialize() async {
     _validateApiKeyConfig();
     if (kDebugMode) {
-      debugPrint('[AIService] Initialized AI providers');
+      debugPrint('[AIService] Initialized Google Gemini client');
     }
   }
 
-  /// SecurityAudit: Validates that all AI traffic is configured to route
-  /// through the Cloudflare Worker proxy and that no provider API keys are
-  /// embedded client-side. Throws [ApiKeyException] on misconfiguration.
+  /// Validates that Gemini API key is configured.
   void _validateApiKeyConfig() {
-    final workerUrl = EnvironmentState.workerBaseUrl;
-    if (workerUrl.isEmpty) {
-      const message = 'Cloudflare Worker proxy URL is not configured.';
+    final apiKey = AppConfig.geminiApiKey;
+    if (apiKey.isEmpty) {
+      const message =
+          'Gemini API key is not configured. Please set GEMINI_API_KEY in .env or --dart-define.';
       if (kDebugMode) {
         debugPrint('[AIService] $message');
       }
-      throw ApiKeyException('Cloudflare Worker proxy');
+      throw ApiKeyException('Google Gemini');
     }
     if (kDebugMode) {
-      debugPrint(
-          '[AIService] API key validation OK (worker-routed, no client-side keys)');
+      debugPrint('[AIService] Gemini API key configured successfully.');
     }
   }
 
-  /// Generic helper to execute AI operations using the preferred provider first,
-  /// falling back to the secondary provider if the primary provider fails.
-  Future<T> _executeWithFallback<T>(
-    Future<T> Function(WorkerChatClient client) action, {
+  Future<T> _execute<T>(
+    Future<T> Function(GeminiChatClient client) action, {
     required String operationLabel,
   }) async {
-    final primaryClient = _preferredProvider == AiProvider.openrouter
-        ? _openRouterClient
-        : _groqClient;
-    final secondaryClient = _preferredProvider == AiProvider.openrouter
-        ? _groqClient
-        : _openRouterClient;
-    final primaryName =
-        _preferredProvider == AiProvider.openrouter ? 'OpenRouter' : 'Groq';
-    final secondaryName =
-        _preferredProvider == AiProvider.openrouter ? 'Groq' : 'OpenRouter';
-
-    String primaryError = 'Unknown error';
     try {
       if (kDebugMode) {
-        debugPrint(
-            '[AIService] Executing $operationLabel with $primaryName...');
+        debugPrint('[AIService] Executing $operationLabel with Gemini...');
       }
-      return await action(primaryClient);
+      return await action(_client);
     } catch (e) {
-      primaryError = e.toString();
-      _logError('$primaryName $operationLabel failed', e);
+      _logError('$operationLabel failed', e);
+      rethrow;
     }
-
-    if (kDebugMode) {
-      debugPrint(
-          '[AIService] $primaryName failed, attempting $secondaryName fallback...');
-    }
-    String secondaryError = 'Unknown error';
-    try {
-      return await action(secondaryClient);
-    } catch (e) {
-      secondaryError = e.toString();
-      _logError('$secondaryName $operationLabel failed', e);
-    }
-
-    throw ErrorSanitizer.toUserFacing(
-        AllProvidersFailedException(primaryError, secondaryError));
   }
 
-  /// Sends a chat message with structured exception handling and fallback.
-  /// Uses preferredProvider first and falls back to secondary provider.
+  /// Sends a chat message with structured exception handling.
   Future<String> sendMessage(
-      String userMessage, List<Map<String, String>> conversationHistory,
-      {String languageCode = 'en', CaseState? caseState}) async {
-    return await _executeWithFallback(
+    String userMessage,
+    List<Map<String, String>> conversationHistory, {
+    String languageCode = 'en',
+    CaseState? caseState,
+  }) async {
+    return await _execute(
       (client) => client.sendMessage(
         userMessage,
         conversationHistory,
@@ -132,8 +96,7 @@ class AIService {
     );
   }
 
-  /// Analyzes legal problem with structured exception handling and fallback logic.
-  /// Sanitizes PII from errors before logging to crash reporting services.
+  /// Analyzes legal problem with structured exception handling.
   Future<Map<String, dynamic>> analyzeProblem({
     required String category,
     required String dateOfIncident,
@@ -182,14 +145,14 @@ Provide: 1) Legal rights under Indian consumer law, 2) Step-by-step action plan,
         'Consumer protection laws and regulations applicable to the case.';
     final systemPrompt = _buildStrictSystemPrompt(legalContext, languageCode);
 
-    return await _executeWithFallback(
+    return await _execute(
       (client) => _tryWithRetry(
         () => client.analyze(
           systemPrompt,
           localizedPrompt,
           category: category,
         ),
-        client._label,
+        'Gemini',
       ),
       operationLabel: 'legal analysis',
     );
@@ -261,14 +224,13 @@ Provide: 1) Legal rights under Indian consumer law, 2) Step-by-step action plan,
     final localizedSystemPrompt =
         '$systemPrompt\n${_languageInstruction(languageCode)}';
 
-    final result = await _executeWithFallback(
+    return await _execute(
       (client) async {
         final raw = await client.generateRaw(localizedSystemPrompt, userPrompt);
         return _documentTextFromJson(raw);
       },
       operationLabel: 'generate letter ($letterType)',
     );
-    return result;
   }
 
   /// Generates structured fields for a printable legal document.
@@ -337,8 +299,8 @@ Return JSON matching this schema exactly, with no keys outside the schema:
 $schema''';
     final localizedPrompt = '$prompt\n${_languageInstruction(languageCode)}';
 
-    final rawResponse = await _executeWithFallback(
-      (client) => client.generateRaw('', localizedPrompt),
+    final rawResponse = await _execute(
+      (client) => client.generateRaw('', localizedPrompt, jsonResponse: true),
       operationLabel: 'generate document fields ($documentType)',
     );
 
@@ -473,8 +435,6 @@ Keep legal terms like RTI, PIL, FIR, IPC, CPC, CrPC, and act names in English wh
     return 'Respond in English.';
   }
 
-  /// SecurityAudit: Logs error with PII sanitization.
-  /// Removes sensitive information before logging to crash reporting services.
   void _logError(String context, Object error) {
     final sanitized = ErrorSanitizer.sanitizeForLog(error.toString());
     if (kDebugMode) {
@@ -490,13 +450,12 @@ Keep legal terms like RTI, PIL, FIR, IPC, CPC, CrPC, and act names in English wh
   }
 
   /// Generate text with custom system prompt and user prompt
-  /// Used for document generation with specific prompts
   Future<String> generateText({
     required String systemPrompt,
     required String userPrompt,
     double temperature = 0.3,
   }) async {
-    return await _executeWithFallback(
+    return await _execute(
       (client) => client.generateRaw(systemPrompt, userPrompt),
       operationLabel: 'generate text',
     );
@@ -541,64 +500,94 @@ Output the complete document in $language language.''';
 }
 
 // =============================================================================
-// Unified AI provider adapter (Cloudflare Worker `juslegal-ai-proxy`)
+// Gemini Client (Direct Google AI Studio SDK)
 // =============================================================================
 
-/// AI providers routable through the Cloudflare Worker proxy.
-enum AiProvider { groq, openrouter }
+class GeminiChatClient {
+  final String modelName;
+  final String? _explicitApiKey;
 
-/// Single adapter that routes every chat-completion call through the
-/// `juslegal-ai-proxy` Cloudflare Worker, authenticated with a Firebase ID
-/// token. Supports provider switching between groq and openrouter.
-class WorkerChatClient {
-  final Dio _dio;
-  final FirebaseTokenService _tokenService;
-  final AiProvider provider;
+  GeminiChatClient({
+    this.modelName = 'gemini-1.5-flash',
+    String? apiKey,
+    AiProvider? provider,
+  }) : _explicitApiKey = apiKey;
 
-  WorkerChatClient({
-    required this.provider,
-    Dio? dio,
-    FirebaseTokenService? tokenService,
-  })  : _tokenService = tokenService ?? FirebaseTokenService(),
-        _dio = dio ??
-            Dio(BaseOptions(
-              baseUrl: EnvironmentState.workerBaseUrl,
-              connectTimeout: ApiConstants.connectionTimeout,
-              receiveTimeout: ApiConstants.receiveTimeout,
-              headers: {
-                'Content-Type': 'application/json',
-              },
-            )) {
-    _dio.interceptors.add(
-      InterceptorsWrapper(
-        onRequest: (options, handler) async {
-          final token = await _tokenService.getIdToken();
-          if (token != null) {
-            options.headers['Authorization'] = 'Bearer $token';
-          } else if (kDebugMode) {
-            debugPrint('[AiService/$provider] Warning: No Firebase token');
-          }
-          return handler.next(options);
-        },
+  String get _apiKey {
+    final key = _explicitApiKey ?? AppConfig.geminiApiKey;
+    if (key.trim().isEmpty) {
+      throw ApiKeyException('Google Gemini');
+    }
+    return key.trim();
+  }
+
+  GenerativeModel _createModel({
+    String? systemInstruction,
+    bool jsonResponse = false,
+    double? temperature,
+    int? maxTokens,
+  }) {
+    return GenerativeModel(
+      model: modelName,
+      apiKey: _apiKey,
+      generationConfig: GenerationConfig(
+        temperature: temperature ?? ApiConstants.temperature,
+        maxOutputTokens: maxTokens ?? ApiConstants.maxTokens,
+        responseMimeType: jsonResponse ? 'application/json' : 'text/plain',
       ),
+      systemInstruction:
+          systemInstruction != null && systemInstruction.trim().isNotEmpty
+              ? Content.system(systemInstruction.trim())
+              : null,
     );
   }
 
-  String get _endpoint {
-    switch (provider) {
-      case AiProvider.groq:
-        return '/callGroq';
-      case AiProvider.openrouter:
-        return '/callOpenRouter';
-    }
-  }
+  Future<String> sendMessage(
+    String userMessage,
+    List<Map<String, String>> conversationHistory, {
+    String languageCode = 'en',
+    CaseState? caseState,
+  }) async {
+    try {
+      final systemPrompt =
+          StringBuffer(chatSystemPromptForLanguage(languageCode));
+      if (caseState != null) {
+        systemPrompt
+            .write('\n\nCURRENT CASE STATE:\n${caseState.toPromptSummary()}');
+      }
 
-  String get _label {
-    switch (provider) {
-      case AiProvider.groq:
-        return 'Groq';
-      case AiProvider.openrouter:
-        return 'OpenRouter';
+      final model = _createModel(
+        systemInstruction: systemPrompt.toString(),
+        jsonResponse: true,
+        maxTokens: ApiConstants.chatMaxTokens,
+      );
+
+      final contents = <Content>[];
+      for (final message in conversationHistory) {
+        final role = message['role'];
+        final text = (message['content'] ?? '').trim();
+        if (text.isEmpty) continue;
+        if (role == 'user') {
+          contents.add(Content.text(text));
+        } else if (role == 'assistant' || role == 'model') {
+          contents.add(Content.model([TextPart(text)]));
+        }
+      }
+      contents.add(Content.text(userMessage));
+
+      if (kDebugMode) {
+        debugPrint(
+            '[GeminiChatClient] Calling Gemini for chat ($modelName, history=${conversationHistory.length})');
+      }
+
+      final response = await model.generateContent(contents);
+      final responseText = response.text;
+      if (responseText == null || responseText.trim().isEmpty) {
+        throw ParseException('Empty response received from Gemini');
+      }
+      return _stripCodeFence(responseText);
+    } catch (e) {
+      _handleError(e, 'sendMessage');
     }
   }
 
@@ -607,228 +596,62 @@ class WorkerChatClient {
     String problemText, {
     String category = 'general',
   }) async {
-    final content = await _call(systemPrompt, problemText, jsonResponse: true);
     try {
-      final parsed =
-          jsonDecode(_stripCodeFence(content)) as Map<String, dynamic>;
-      parsed['_provider'] = provider.name;
+      final model = _createModel(
+        systemInstruction: systemPrompt,
+        jsonResponse: true,
+        maxTokens: ApiConstants.maxTokens,
+      );
+
+      if (kDebugMode) {
+        debugPrint(
+            '[GeminiChatClient] Calling Gemini for analysis ($modelName, category=$category)');
+      }
+
+      final response = await model.generateContent([Content.text(problemText)]);
+      final responseText = response.text;
+      if (responseText == null || responseText.trim().isEmpty) {
+        throw ParseException('Empty analysis response received from Gemini');
+      }
+
+      final clean = _stripCodeFence(responseText);
+      final parsed = jsonDecode(clean) as Map<String, dynamic>;
+      parsed['_provider'] = 'gemini';
       return parsed;
-    } on FormatException catch (error) {
-      throw ParseException('Failed to parse $_label response: $error');
+    } on FormatException catch (e) {
+      throw ParseException('Failed to parse Gemini response as JSON: $e');
+    } catch (e) {
+      _handleError(e, 'analyze');
     }
   }
 
-  Future<String> generateRaw(String systemPrompt, String prompt) => _call(
-        systemPrompt,
-        prompt,
-        jsonResponse: false,
-        maxTokens: ApiConstants.letterMaxTokens,
-      );
-
-  /// Sends a conversational request with JusLegal's chat context.
-  Future<String> sendMessage(
-          String userMessage, List<Map<String, String>> conversationHistory,
-          {String languageCode = 'en', CaseState? caseState}) =>
-      _sendChatRequest(userMessage, conversationHistory, languageCode,
-          caseState: caseState);
-
-  /// Performs the Dio POST with automatic 401 token-refresh retry: when the
-  /// Worker rejects an expired Firebase ID token, the token is force-refreshed
-  /// and the request retried exactly once.
-  Future<Response<dynamic>> _postWithAuthRetry(
-    String endpoint,
-    Map<String, dynamic> data,
-  ) async {
-    try {
-      return await _dio.post<dynamic>(endpoint, data: data);
-    } on DioException catch (error) {
-      if (error.response?.statusCode != 401) rethrow;
-      if (kDebugMode) {
-        debugPrint('[$_label] 401 received - refreshing token and retrying');
-      }
-      final refreshed = await _tokenService.forceRefreshToken();
-      if (refreshed == null) rethrow;
-      return await _dio.post<dynamic>(endpoint, data: data);
-    }
-  }
-
-  Future<String> _sendChatRequest(
-    String userMessage,
-    List<Map<String, String>> conversationHistory,
-    String languageCode, {
-    CaseState? caseState,
-  }) async {
-    try {
-      if (kDebugMode) {
-        debugPrint('[$_label] Calling Worker $_endpoint for chat');
-      }
-
-      final systemPrompt =
-          StringBuffer(chatSystemPromptForLanguage(languageCode));
-      if (caseState != null) {
-        systemPrompt
-            .write('\n\nCURRENT CASE STATE:\n${caseState.toPromptSummary()}');
-      }
-
-      final response = await _postWithAuthRetry(
-        _endpoint,
-        _requestPayload(
-          _boundedMessages([
-            {
-              'role': 'system',
-              'content': systemPrompt.toString(),
-            },
-            ..._historyWithCurrentMessage(userMessage, conversationHistory),
-          ]),
-          maxTokens: ApiConstants.chatMaxTokens,
-          jsonResponse: true,
-        ),
-      );
-      return _contentFrom(response.data);
-    } on DioException catch (error) {
-      _throwDioError(error);
-    }
-  }
-
-  List<Map<String, String>> _historyWithCurrentMessage(
-    String userMessage,
-    List<Map<String, String>> history,
-  ) {
-    final messages = history
-        .where((message) =>
-            message['role'] == 'user' || message['role'] == 'assistant')
-        .map((message) => <String, String>{
-              'role': message['role']!,
-              'content': message['content'] ?? '',
-            })
-        .toList();
-    if (messages.isEmpty ||
-        messages.last['role'] != 'user' ||
-        messages.last['content'] != userMessage) {
-      messages.add({'role': 'user', 'content': userMessage});
-    }
-    return messages;
-  }
-
-  Future<String> _call(
+  Future<String> generateRaw(
     String systemPrompt,
     String prompt, {
-    required bool jsonResponse,
+    bool jsonResponse = false,
     int? maxTokens,
   }) async {
     try {
-      if (kDebugMode) {
-        debugPrint('[$_label] Calling Worker $_endpoint');
-      }
-      final response = await _postWithAuthRetry(
-        _endpoint,
-        _requestPayload(
-          _boundedMessages([
-            if (systemPrompt.isNotEmpty)
-              {'role': 'system', 'content': systemPrompt},
-            {'role': 'user', 'content': prompt},
-          ]),
-          maxTokens: maxTokens ?? ApiConstants.maxTokens,
-          jsonResponse: jsonResponse,
-        ),
+      final model = _createModel(
+        systemInstruction: systemPrompt,
+        jsonResponse: jsonResponse,
+        maxTokens: maxTokens ?? ApiConstants.letterMaxTokens,
       );
-      return _contentFrom(response.data);
-    } on DioException catch (error) {
-      _throwDioError(error);
-    }
-  }
 
-  String _contentFrom(dynamic data) {
-    if (data is! Map) {
-      throw ParseException('Invalid JSON payload returned from $_label');
-    }
-    final choices = data['choices'];
-    if (choices is! List || choices.isEmpty || choices.first is! Map) {
-      throw ParseException('No choices returned from $_label');
-    }
-    final message = Map<String, dynamic>.from(choices.first as Map)['message'];
-    if (message is! Map || message['content'] is! String) {
-      throw ParseException('Unexpected $_label response format');
-    }
-    final content = message['content'] as String;
-    if (kDebugMode) {
-      debugPrint('[$_label] response received (length=${content.length})');
-    }
-    return content;
-  }
-
-  /// Shapes requests to the public Worker contract. Models are intentionally
-  /// omitted: the Worker selects the allow-listed model from the endpoint.
-  Map<String, dynamic> _requestPayload(
-    List<Map<String, String>> messages, {
-    required int maxTokens,
-    bool jsonResponse = false,
-  }) =>
-      {
-        'messages': messages,
-        'temperature': _validatedTemperature(ApiConstants.temperature),
-        'max_tokens': _validatedMaxTokens(maxTokens),
-        if (jsonResponse) 'response_format': {'type': 'json_object'},
-        'stream': false,
-      };
-
-  double _validatedTemperature(double value) {
-    if (!value.isFinite ||
-        value < WorkerAiRequestLimits.minTemperature ||
-        value > WorkerAiRequestLimits.maxTemperature) {
-      throw StateError('Configured AI temperature is outside Worker limits');
-    }
-    return value;
-  }
-
-  int _validatedMaxTokens(int value) {
-    if (value < 1 || value > WorkerAiRequestLimits.maxTokens) {
-      throw StateError('Configured AI max_tokens is outside Worker limits');
-    }
-    return value;
-  }
-
-  /// Preserves the system message and newest conversation context while
-  /// deterministically fitting the Worker message and character limits.
-  List<Map<String, String>> _boundedMessages(
-    List<Map<String, String>> input,
-  ) {
-    final system =
-        input.where((message) => message['role'] == 'system').take(1);
-    final conversation = input
-        .where((message) =>
-            message['role'] == 'user' || message['role'] == 'assistant')
-        .toList();
-    final result = <Map<String, String>>[];
-    var remainingChars = WorkerAiRequestLimits.maxTotalMessageChars;
-
-    for (final message in system) {
-      final content = _truncate(message['content'] ?? '', remainingChars);
-      result.add({'role': 'system', 'content': content});
-      remainingChars -= content.length;
-    }
-
-    final newestFirst = <Map<String, String>>[];
-    for (final message in conversation.reversed) {
-      if (newestFirst.length >=
-              WorkerAiRequestLimits.maxMessages - result.length ||
-          remainingChars <= 0) {
-        break;
+      if (kDebugMode) {
+        debugPrint(
+            '[GeminiChatClient] Calling Gemini for text generation ($modelName)');
       }
-      final content = _truncate(message['content'] ?? '', remainingChars);
-      newestFirst.add({'role': message['role']!, 'content': content});
-      remainingChars -= content.length;
-    }
-    result.addAll(newestFirst.reversed);
-    return result;
-  }
 
-  String _truncate(String value, int remainingChars) {
-    final maximum =
-        remainingChars < WorkerAiRequestLimits.maxMessageContentChars
-            ? remainingChars
-            : WorkerAiRequestLimits.maxMessageContentChars;
-    return value.length <= maximum ? value : value.substring(0, maximum);
+      final response = await model.generateContent([Content.text(prompt)]);
+      final responseText = response.text;
+      if (responseText == null || responseText.trim().isEmpty) {
+        throw ParseException('Empty text response received from Gemini');
+      }
+      return responseText.trim();
+    } catch (e) {
+      _handleError(e, 'generateRaw');
+    }
   }
 
   String _stripCodeFence(String value) {
@@ -839,106 +662,38 @@ class WorkerChatClient {
     return result.trim();
   }
 
-  Never _throwDioError(DioException error) {
-    if (error.type == DioExceptionType.connectionTimeout ||
-        error.type == DioExceptionType.receiveTimeout) {
-      throw NetworkException('$_label request timed out');
+  Never _handleError(Object error, String operation) {
+    if (error is UserFacingException ||
+        error is ParseException ||
+        error is ApiKeyException) {
+      throw error;
     }
-
-    final statusCode = error.response?.statusCode;
-    if (statusCode == 401) {
-      throw AuthRequiredException(
-        'Authentication required. Please sign in to use AI legal features.',
-      );
+    final errorStr = error.toString();
+    if (kDebugMode) {
+      debugPrint('[GeminiChatClient] $operation error: $errorStr');
     }
-    if (statusCode == 429) {
-      throw RateLimitException('$_label rate limit exceeded', _label);
+    if (errorStr.contains('API_KEY_INVALID') ||
+        errorStr.contains('API key not valid') ||
+        errorStr.contains('ApiKeyException')) {
+      throw ApiKeyException('Google Gemini');
     }
-
-    if (statusCode != null) {
-      if (kDebugMode) {
-        debugPrint('[$_label] Worker returned HTTP $statusCode');
-        final body = error.response?.data;
-        if (body is Map) {
-          final safeError = body['error'];
-          final safeReason = body['reason'];
-          final upstreamStatus = body['upstreamStatus'];
-          final detail = body['detail'];
-          if (safeError is String || safeReason is String || detail != null) {
-            debugPrint('[$_label] Worker error: '
-                '${safeError is String ? safeError : 'unknown'} '
-                '(reason: ${safeReason is String ? safeReason : 'none'}, '
-                'upstreamStatus: $upstreamStatus, detail: $detail)');
-          }
-        }
-      }
-      throw NetworkException('$_label request failed (HTTP $statusCode)');
+    if (errorStr.contains('RESOURCE_EXHAUSTED') || errorStr.contains('429')) {
+      throw RateLimitException(
+          'Gemini rate limit exceeded. Please wait a moment.', 'Gemini');
     }
-    throw NetworkException('$_label request failed (network error)');
+    if (errorStr.contains('SocketException') ||
+        errorStr.contains('HandshakeException') ||
+        errorStr.contains('timed out')) {
+      throw NetworkException(
+          'Network error connecting to Gemini. Please check your connection.');
+    }
+    throw NetworkException('Gemini request failed: $errorStr');
   }
 }
 
 // =============================================================================
-// Backward-compatibility aliases (former groq_service.dart / openrouter_service.dart)
+// Provider configuration
 // =============================================================================
 
-/// Compatibility alias. Groq is now routed through the unified worker adapter.
-class GroqService {
-  final WorkerChatClient _client;
+enum AiProvider { gemini }
 
-  GroqService(
-      {WorkerChatClient? client, Dio? dio, FirebaseTokenService? tokenService})
-      : _client = client ??
-            WorkerChatClient(
-              provider: AiProvider.groq,
-              dio: dio,
-              tokenService: tokenService,
-            );
-
-  Future<Map<String, dynamic>> analyze(
-    String systemPrompt,
-    String problemText, {
-    String category = 'general',
-  }) =>
-      _client.analyze(systemPrompt, problemText, category: category);
-
-  Future<String> generateRaw(String systemPrompt, String prompt) =>
-      _client.generateRaw(systemPrompt, prompt);
-
-  Future<String> sendMessage(
-          String userMessage, List<Map<String, String>> conversationHistory,
-          {String languageCode = 'en', CaseState? caseState}) =>
-      _client.sendMessage(userMessage, conversationHistory,
-          languageCode: languageCode, caseState: caseState);
-}
-
-/// Compatibility alias. OpenRouter is now routed through the unified worker
-/// adapter.
-class OpenRouterService {
-  final WorkerChatClient _client;
-
-  OpenRouterService(
-      {WorkerChatClient? client, Dio? dio, FirebaseTokenService? tokenService})
-      : _client = client ??
-            WorkerChatClient(
-              provider: AiProvider.openrouter,
-              dio: dio,
-              tokenService: tokenService,
-            );
-
-  Future<Map<String, dynamic>> analyze(
-    String systemPrompt,
-    String problemText, {
-    String category = 'general',
-  }) =>
-      _client.analyze(systemPrompt, problemText, category: category);
-
-  Future<String> generateRaw(String systemPrompt, String prompt) =>
-      _client.generateRaw(systemPrompt, prompt);
-
-  Future<String> sendMessage(
-          String userMessage, List<Map<String, String>> conversationHistory,
-          {String languageCode = 'en', CaseState? caseState}) =>
-      _client.sendMessage(userMessage, conversationHistory,
-          languageCode: languageCode, caseState: caseState);
-}

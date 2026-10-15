@@ -8,7 +8,7 @@
 
 ## Overview
 
-JusLegal is an **AI-powered consumer legal guidance app** for Indian citizens. It translates everyday disputes (failed e-commerce refunds, UPI fraud, builder delays) into structured legal analysis, identifying applicable laws, user rights, actionable steps, relevant authorities, and necessary documents—all powered by AI with a secure server-side proxy.
+JusLegal is an **AI-powered consumer legal guidance app** for Indian citizens. It translates everyday disputes (failed e-commerce refunds, UPI fraud, builder delays) into structured legal analysis, identifying applicable laws, user rights, actionable steps, relevant authorities, and necessary documents—all powered directly by Google Gemini AI.
 
 **🎯 Product Focus:** Structured case analysis + conversational AI legal assistance for Indian Consumer Protection Law.
 
@@ -17,7 +17,7 @@ JusLegal is an **AI-powered consumer legal guidance app** for Indian citizens. I
 ### Legal Analysis & Guidance
 - **Structured Case Analyzer** - Convert free-form problem descriptions into validated legal analysis
 - **AI Legal Chat** - Multi-turn conversational assistant with context retention (powered by Riverpod)
-- **AI-Powered Analysis** - OpenRouter with Groq fallback via Cloudflare Worker proxy
+- **AI-Powered Analysis** - High-speed, high-accuracy analysis powered directly by Google Gemini (`gemini-1.5-flash`)
 - **Consumer Law Specialization** - Focus on Indian Consumer Protection Act 2019 and related regulations
 - **Step-by-Step Resolution Guidance** - Clear, actionable legal remedies and next steps
 - **Authority Directory** - Regulatory contact information and relevant agencies
@@ -50,12 +50,11 @@ JusLegal is an **AI-powered consumer legal guidance app** for Indian citizens. I
 - **Framework:** Flutter 3.19.0+
 - **State Management:** flutter_riverpod 3.3.1
 - **Navigation:** go_router 17.2.3
-- **HTTP Client:** dio 5.4.0
 - **Local Storage:** hive_flutter 1.1.0 + shared_preferences 2.3.0
 
-**Backend Integration:**
-- **API Proxy:** Cloudflare Worker (juslegal-ai-proxy)
-- **AI Providers:** OpenRouter (primary) → Groq (fallback)
+**AI & Backend:**
+- **AI Engine:** Google Gemini SDK (`google_generative_ai 0.4.7`)
+- **Model:** `gemini-1.5-flash`
 - **Authentication:** Firebase Auth 6.5.2 + Google Sign-In 6.2.0
 - **Analytics:** Firebase Analytics 12.4.1
 - **Error Tracking:** Firebase Crashlytics 5.2.2
@@ -132,17 +131,6 @@ lib/
 └── widgets/                      # Reusable UI components
 ```
 
-### Cloudflare Worker (`juslegal-ai-proxy/`)
-```
-juslegal-ai-proxy/
-├── src/
-│   └── index.ts                  # Worker entry point with AI provider routing
-├── test/
-│   └── index.spec.ts             # Vitest integration tests
-├── wrangler.jsonc                # Cloudflare Worker configuration
-└── vitest.config.mts             # Test configuration
-```
-
 ### Assets
 ```
 assets/
@@ -157,10 +145,9 @@ Before setting up JusLegal, ensure you have:
 
 - [Flutter SDK](https://flutter.dev/docs/get-started/install) 3.19.0 or higher
 - [Dart SDK](https://dart.dev/get-dart) 3.2.3 or higher
-- [Node.js](https://nodejs.org/) 18+ (for Cloudflare Worker development)
-- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/install-and-update/) (for Worker deployment)
+- Google Gemini API key from [Google AI Studio](https://aistudio.google.com) (free)
 - Git for version control
-- Code editor (VS Code recommended with Flutter + Dart extensions)
+- Code editor (VS Code or Android Studio recommended with Flutter + Dart extensions)
 
 ## Installation
 
@@ -177,41 +164,25 @@ cd juslegal
 # Install Flutter dependencies
 flutter pub get
 
-# Get the correct Flutter and Dart versions
+# Verify Flutter and Dart versions
 flutter doctor
 ```
 
-### 3. Set Up Cloudflare Worker (AI Proxy)
+### 3. Configure Gemini API Key
 
+1. Generate a free API key at [aistudio.google.com](https://aistudio.google.com).
+2. Create a `.env` file in the project root:
+
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
+```
+
+Or pass it at runtime via compile-time define:
 ```bash
-# Navigate to the worker directory
-cd juslegal-ai-proxy
-
-# Install dependencies
-npm install
-
-# Set up environment variables
-cp .env.example .env.local  # (if exists, or create manually)
-
-# Configure secrets (see AI Security section below)
-wrangler secret put OPENROUTER_API_KEY
-wrangler secret put GROQ_API_KEY
-wrangler secret put PROXY_AUTH_TOKEN
-
-# Deploy the worker
-wrangler deploy
+flutter run -d chrome --dart-define=GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
-### 4. Configure Flutter App Constants
-
-Update `lib/core/constants/api_constants.dart` with your Cloudflare Worker URL:
-
-```dart
-const String WORKER_BASE_URL = 'https://your-worker-subdomain.workers.dev';
-const String PROXY_AUTH_TOKEN = 'your-proxy-token-here';
-```
-
-### 5. Set Up Firebase (Optional but Recommended)
+### 4. Set Up Firebase (Optional but Recommended)
 
 For production with analytics and error tracking:
 
@@ -312,28 +283,10 @@ final chatHistory = ref.watch(aiChatProvider);
 
 ### Environment Variables
 
-The app uses Dart defines for runtime configuration:
+The app loads configuration from `.env` or compile-time Dart defines:
 
 ```bash
-flutter run --dart-define=PROXY_AUTH_TOKEN='your-token' \
-            --dart-define=WORKER_BASE_URL='https://your-worker.workers.dev'
-```
-
-### Cloudflare Worker Configuration (`wrangler.jsonc`)
-
-```jsonc
-{
-  "name": "juslegal-ai-proxy",
-  "main": "src/index.ts",
-  "compatibility_date": "2024-11-01",
-  "env": {
-    "production": {
-      "routes": [
-        { "pattern": "api.juslegal.app/ai/*", "zone_id": "your-zone-id" }
-      ]
-    }
-  }
-}
+flutter run -d chrome --dart-define=GEMINI_API_KEY='your-key'
 ```
 
 ### Local Storage (Hive)
@@ -364,68 +317,25 @@ The app supports two auth methods:
 
 Configure in your Firebase console and ensure Google Sign-In credentials are set for both Android and Web.
 
-## AI API Security & Deployment
+## AI Architecture & Gemini Integration
 
-### Design Principle: Server-Side Secrets
+### Design Principle: Direct & Reliable
 
-- **Flutter client never holds AI provider API keys**
-- **All AI calls routed through Cloudflare Worker proxy**
-- **Worker enforces authentication and provider fallback**
-
-### Cloudflare Worker Setup
-
-From a secure terminal (never commit secrets):
-
-```bash
-cd juslegal-ai-proxy
-
-# Set provider secrets
-wrangler secret put OPENROUTER_API_KEY
-# (Paste your OpenRouter API key when prompted)
-
-wrangler secret put GROQ_API_KEY
-# (Paste your Groq API key when prompted)
-
-wrangler secret put PROXY_AUTH_TOKEN
-# (Generate a secure random token, e.g., using: openssl rand -base64 32)
-
-# Deploy to Cloudflare
-wrangler deploy
-```
-
-### Provider Fallback Chain
-
-1. **Primary:** OpenRouter (supports multiple model providers)
-2. **Fallback:** Groq (local LPU inference, faster responses)
-
-The Worker automatically falls back if OpenRouter is unavailable or rate-limited.
-
-### Authentication Flow
-
-Current implementation uses a shared proxy token (`PROXY_AUTH_TOKEN`). For production, migrate to:
-- **Firebase App Check** - Verify requests come from your app
-- **Firebase ID Tokens** - Per-user authentication and quota enforcement
-
-**Example migration:**
-```typescript
-// In Cloudflare Worker (worker-configuration.d.ts)
-const idToken = request.headers.get('Authorization')?.split('Bearer ')[1];
-const verified = await verifyFirebaseIdToken(idToken);
-```
+- **Direct SDK Integration:** Powered by Google's official `google_generative_ai` SDK
+- **Structured JSON Output:** `responseMimeType: 'application/json'` guarantees deterministic schema compliance
+- **Low Latency & High Limits:** Gemini 1.5 Flash delivers sub-second responses with 15 RPM / 1M TPM free tier
+- **Indian Legal & Multi-Language:** Built-in prompt engineering for Indian Consumer Protection Law and Hindi/English translation
 
 ### Security Best Practices
 
 ✅ **Do:**
-- Rotate secrets regularly
-- Use Cloudflare Workers KV for non-sensitive config
-- Monitor Worker logs for unusual activity
-- Enable CORS only for your domain
+- Store `GEMINI_API_KEY` in local `.env` (which is git-ignored)
+- Restrict your API key in Google Cloud Console / AI Studio (HTTP referrer or Android package name + SHA-1)
+- Use `--dart-define=GEMINI_API_KEY=...` in CI/CD pipelines
 
 ❌ **Don't:**
-- Commit `.env`, `.env.local`, or service account JSON files
-- Pass provider keys via `--dart-define` or `pubspec.yaml`
-- Expose `PROXY_AUTH_TOKEN` in Flutter code
-- Use shared tokens in production (implement per-user auth)
+- Commit `.env` or raw API keys to Git
+- Hardcode API keys in Dart source files
 
 ## Development
 

@@ -9,8 +9,8 @@ const String _compileTimeEnvironment = String.fromEnvironment(
   'JUSLEGAL_ENV',
   defaultValue: '',
 );
-const String _compileTimeWorkerBaseUrl = String.fromEnvironment(
-  'JUSLEGAL_AI_PROXY_BASE_URL',
+const String _compileTimeGeminiApiKey = String.fromEnvironment(
+  'GEMINI_API_KEY',
   defaultValue: '',
 );
 const String _compileTimeWebsiteUrl = String.fromEnvironment(
@@ -132,10 +132,6 @@ class EnvironmentState {
   EnvironmentState._();
 
   static EnvironmentType get environment => EnvironmentTypeConfig.current;
-  static String get workerBaseUrl => _EnvironmentState.value(
-        'JUSLEGAL_AI_PROXY_BASE_URL',
-        WORKER_BASE_URL,
-      );
   static String get websiteUrl => _EnvironmentState.value(
         'WEBSITE_URL',
         environment == EnvironmentType.production
@@ -162,9 +158,10 @@ class EnvironmentState {
       _EnvironmentState.value('FIREBASE_MEASUREMENT_ID', 'G-978QD9MRZR');
   static String get defaultCountryCode =>
       _EnvironmentState.value('DEFAULT_COUNTRY_CODE', '+91');
+  static String get geminiApiKey =>
+      _EnvironmentState.value('GEMINI_API_KEY', '');
 
-    static bool get isValid =>
-      Uri.tryParse(workerBaseUrl)?.hasScheme == true &&
+  static bool get isValid =>
       Uri.tryParse(websiteUrl)?.hasScheme == true &&
       defaultCountryCode.startsWith('+');
 }
@@ -181,7 +178,7 @@ class _EnvironmentState {
   static String value(String key, String defaultValue) {
     final buildValue = switch (key) {
       'JUSLEGAL_ENV' => _compileTimeEnvironment,
-      'JUSLEGAL_AI_PROXY_BASE_URL' => _compileTimeWorkerBaseUrl,
+      'GEMINI_API_KEY' => _compileTimeGeminiApiKey,
       'WEBSITE_URL' => _compileTimeWebsiteUrl,
       'FIREBASE_PROJECT_ID' => _compileTimeFirebaseProjectId,
       'FIREBASE_AUTH_DOMAIN' => _compileTimeFirebaseAuthDomain,
