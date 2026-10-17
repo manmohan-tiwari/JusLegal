@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:juslegal/core/core.dart';
+import 'hover_stay_reveal_box.dart';
 
 class AuthorityCard extends StatelessWidget {
   final String name;
@@ -17,88 +18,112 @@ class AuthorityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: AppTheme.cardGradientFor(AppTheme.primaryBlue),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppTheme.border),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadowBlack,
-            blurRadius: 18,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              gradient: AppTheme.heroGradient,
-              borderRadius: BorderRadius.circular(14),
-              boxShadow: [
-                BoxShadow(
-                  color: AppTheme.primaryBlue.withValues(alpha: 0.24),
-                  blurRadius: 12,
-                  offset: const Offset(0, 5),
-                ),
-              ],
+    final radius = BorderRadius.circular(AppTheme.radiusL);
+    return HoverStayRevealBox(
+      onTap: onAction,
+      borderRadius: radius,
+      builder: (context, isRevealed) {
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceContainerLowest,
+            borderRadius: radius,
+            border: Border.all(
+              color: isRevealed
+                  ? AppColors.deepNavy.withValues(alpha: 0.35)
+                  : AppColors.outline,
+              width: isRevealed ? 1.5 : 1,
             ),
-            child: const Icon(
-              Icons.account_balance_outlined,
-              size: 26,
-              color: Colors.white,
-            ),
+            boxShadow: [
+              BoxShadow(
+                color: isRevealed
+                    ? AppColors.deepNavy.withValues(alpha: 0.12)
+                    : AppColors.shadow,
+                blurRadius: isRevealed ? 14 : 10,
+                offset: Offset(0, isRevealed ? 5 : 3),
+              ),
+            ],
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  name,
-                  style: TextStyle(
-                    color: AppTheme.darkText,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                  ),
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: isRevealed
+                      ? AppColors.mustardGold.withValues(alpha: 0.25)
+                      : AppColors.paleBlue,
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                if (purpose != null && purpose!.isNotEmpty) ...[
-                  const SizedBox(height: 4),
+                child: const Icon(
+                  Icons.account_balance_outlined,
+                  size: 24,
+                  color: AppColors.deepNavy,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: const TextStyle(
+                        color: AppColors.deepNavy,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    if (purpose != null && purpose!.isNotEmpty)
+                      HoverRevealContent(
+                        isRevealed: isRevealed,
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text(
+                          purpose!,
+                          style: const TextStyle(
+                            color: AppColors.navyBlue,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w400,
+                            height: 1.4,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
                   Text(
-                    purpose!,
-                    style: TextStyle(
-                      color: AppTheme.mediumText,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
+                    action,
+                    style: const TextStyle(
+                      color: AppColors.deepNavy,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(width: 2),
+                  AnimatedSlide(
+                    duration: const Duration(milliseconds: 180),
+                    offset: isRevealed ? const Offset(0.25, 0) : Offset.zero,
+                    child: const Icon(
+                      Icons.arrow_forward_rounded,
+                      size: 14,
+                      color: AppColors.mustardGold,
                     ),
                   ),
                 ],
-              ],
-            ),
-          ),
-          TextButton(
-            onPressed: onAction,
-            style: TextButton.styleFrom(
-              foregroundColor: AppTheme.legalGold,
-              minimumSize: const Size(48, 48),
-            ),
-            child: Text(
-              action,
-              style: const TextStyle(
-                color: AppTheme.legalGold,
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
+
 

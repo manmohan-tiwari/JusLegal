@@ -426,12 +426,7 @@ Do not invent law sections; only include sections you are reasonably confident a
 ${_languageInstruction(languageCode)}''';
   }
 
-  String _languageInstruction(String languageCode) {
-    if (languageCode.toLowerCase() == 'hi') {
-      return '''Respond in Hindi (Devanagari script).
-Generate the document content in Hindi.
-Keep legal terms like RTI, PIL, FIR, IPC, CPC, CrPC, and act names in English where appropriate, but all other content must be in Hindi.''';
-    }
+  String _languageInstruction([String languageCode = 'en']) {
     return 'Respond in English.';
   }
 
@@ -467,7 +462,7 @@ Keep legal terms like RTI, PIL, FIR, IPC, CPC, CrPC, and act names in English wh
     required String fieldsText,
     String languageCode = 'en',
   }) async {
-    final language = languageCode == 'hi' ? 'Hindi' : 'English';
+    const language = 'English';
 
     final systemPrompt =
         '''You are a professional Indian legal document drafter.
@@ -508,7 +503,7 @@ class GeminiChatClient {
   final String? _explicitApiKey;
 
   GeminiChatClient({
-    this.modelName = 'gemini-1.5-flash',
+    this.modelName = 'gemini-3.8-flash',
     String? apiKey,
     AiProvider? provider,
   }) : _explicitApiKey = apiKey;

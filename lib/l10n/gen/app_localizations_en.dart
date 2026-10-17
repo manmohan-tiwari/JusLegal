@@ -24,18 +24,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings => 'Settings';
 
   @override
-  String get language => 'Language';
-
-  @override
-  String get selectLanguage => 'Select Language';
-
-  @override
-  String get english => 'English';
-
-  @override
-  String get hindi => 'Hindi';
-
-  @override
   String get preferences => 'Preferences';
 
   @override
@@ -140,15 +128,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsTooltip => 'Settings';
-
-  @override
-  String get languageSubtitleEnglish => 'English';
-
-  @override
-  String get languageSubtitleHindi => 'Hindi';
-
-  @override
-  String get languageTileSubtitle => 'Switch between English and Hindi';
 
   @override
   String get homeHeroHeadline1 => 'Know Your Rights.';

@@ -109,36 +109,36 @@ class _RateUsSheetState extends ConsumerState<RateUsSheet> {
           // but we add a nice header
           Center(
             child: Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: AppTheme.primaryBlue.withValues(alpha: 0.1),
+              width: 52,
+              height: 52,
+              decoration: const BoxDecoration(
+                color: AppColors.paleBlue,
                 shape: BoxShape.circle,
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.rate_review_outlined,
-                color: AppTheme.primaryBlue,
+                color: AppColors.deepNavy,
                 size: 26,
               ),
             ),
           ),
           const SizedBox(height: 16),
-          Text(
+          const Text(
             'Enjoying JusLegal?',
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: AppTheme.darkText,
-              fontSize: 24,
+            style: TextStyle(
+              color: AppColors.deepNavy,
+              fontSize: 22,
               fontWeight: FontWeight.w800,
             ),
           ),
           const SizedBox(height: 8),
-          Text(
+          const Text(
             'Tap a star to rate us. Your feedback helps us make legal assistance accessible to everyone.',
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: AppTheme.mediumText,
-              fontSize: 14,
+            style: TextStyle(
+              color: AppColors.navyBlue,
+              fontSize: 13.5,
               fontWeight: FontWeight.w400,
             ),
           ),
@@ -164,8 +164,8 @@ class _RateUsSheetState extends ConsumerState<RateUsSheet> {
                   child: Icon(
                     isSelected ? Icons.star_rounded : Icons.star_outline_rounded,
                     key: ValueKey<bool>(isSelected),
-                    color: isSelected ? Colors.amber[700] : Colors.grey[400],
-                    size: 48,
+                    color: isSelected ? AppColors.mustardGold : const Color(0xFFC8D5E0),
+                    size: 44,
                   ),
                 ),
                 tooltip: '$starValue Star${starValue > 1 ? 's' : ''}',
@@ -183,12 +183,12 @@ class _RateUsSheetState extends ConsumerState<RateUsSheet> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
+                  const Text(
                     "We'd love to know how we can improve:",
-                    style: const TextStyle(
-                      color: AppTheme.darkText,
+                    style: TextStyle(
+                      color: AppColors.deepNavy,
                       fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -196,16 +196,12 @@ class _RateUsSheetState extends ConsumerState<RateUsSheet> {
                     controller: _feedbackController,
                     maxLines: 3,
                     style: const TextStyle(
-                      color: AppTheme.darkText,
+                      color: AppColors.deepNavy,
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
                     ),
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'Tell us about your experience...',
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: AppTheme.primaryBlue, width: 2),
-                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -219,14 +215,19 @@ class _RateUsSheetState extends ConsumerState<RateUsSheet> {
             ElevatedButton(
               onPressed: _isSubmitting ? null : _handleRatingSubmit,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primaryBlue,
-                foregroundColor: AppTheme.surface,
+                backgroundColor: AppColors.mustardGold,
+                foregroundColor: AppColors.deepNavy,
+                padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusM),
                 ),
               ),
               child: Text(
                 _selectedRating >= 4 ? 'Rate on Play Store' : 'Submit Feedback',
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 15,
+                ),
               ),
             ),
             const SizedBox(height: 12),

@@ -5,10 +5,7 @@
   "myCases": "My Cases",
   "authorities": "Authorities",
   "settings": "Settings",
-  "language": "Language",
-  "selectLanguage": "Select Language",
-  "english": "English",
-  "hindi": "Hindi",
+
   "preferences": "Preferences",
   "appInfo": "App Info",
   "appNameLabel": "App Name",
@@ -41,9 +38,7 @@
   "accountDataDeletionEmail": "By email: send a deletion request to support@juslegal.app from your registered email address. We will process your request within a reasonable timeframe.",
   "legalDisclaimer": "Legal Disclaimer",
   "settingsTooltip": "Settings",
-  "languageSubtitleEnglish": "English",
-  "languageSubtitleHindi": "Hindi",
-  "languageTileSubtitle": "Switch between English and Hindi",
+
 
   "homeHeroHeadline1": "Know Your Rights.",
   "homeHeroHeadline2": "Take Action.",

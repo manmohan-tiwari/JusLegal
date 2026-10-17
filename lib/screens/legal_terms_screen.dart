@@ -342,10 +342,26 @@ If the term is not a legal term, return:
     final showPopularTerms = result == null && !_loading && _error == null;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.warmOffWhite,
       appBar: AppBar(
-        title: const Text('Legal Terms Dictionary'),
-        leading: BackButton(onPressed: () => Navigator.of(context).pop()),
+        title: const Text(
+          'Legal Terms Dictionary',
+          style: TextStyle(
+            color: AppColors.deepNavy,
+            fontSize: 18,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        backgroundColor: AppColors.warmOffWhite,
+        elevation: 0,
+        leading: BackButton(
+          color: AppColors.deepNavy,
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(color: AppColors.divider, height: 1),
+        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -355,14 +371,14 @@ If the term is not a legal term, return:
             children: [
               Container(
                 decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  border: Border.all(color: AppColors.border),
+                  color: Colors.white,
+                  border: Border.all(color: AppColors.outline),
                   borderRadius: BorderRadius.circular(14),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primaryNavy.withValues(alpha: 0.05),
+                      color: Colors.black.withValues(alpha: 0.04),
                       blurRadius: 10,
-                      offset: const Offset(0, 4),
+                      offset: const Offset(0, 3),
                     ),
                   ],
                 ),
@@ -370,7 +386,7 @@ If the term is not a legal term, return:
                   children: [
                     const SizedBox(width: 14),
                     const Icon(Icons.search_rounded,
-                        color: Color(0xFF9CA3AF), size: 22),
+                        color: AppColors.slateBlue, size: 22),
                     const SizedBox(width: 10),
                     Expanded(
                       child: TextField(
@@ -378,8 +394,17 @@ If the term is not a legal term, return:
                         focusNode: _focusNode,
                         textInputAction: TextInputAction.search,
                         onSubmitted: _search,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.deepNavy,
+                        ),
                         decoration: const InputDecoration(
                           hintText: 'Search a legal term...',
+                          hintStyle: TextStyle(
+                            color: AppColors.slateBlue,
+                            fontSize: 14,
+                          ),
                           border: InputBorder.none,
                           contentPadding: EdgeInsets.symmetric(vertical: 14),
                         ),
@@ -388,7 +413,7 @@ If the term is not a legal term, return:
                     if (_searchController.text.isNotEmpty)
                       IconButton(
                         icon: const Icon(Icons.close_rounded,
-                            size: 20, color: Color(0xFF9CA3AF)),
+                            size: 20, color: AppColors.slateBlue),
                         onPressed: _clear,
                       ),
                     const SizedBox(width: 4),
@@ -399,28 +424,30 @@ If the term is not a legal term, return:
                             ? null
                             : () => _search(_searchController.text),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.legalGold,
-                          foregroundColor: const Color(0xFF0B0F19),
+                          backgroundColor: AppColors.mustardGold,
+                          foregroundColor: AppColors.deepNavy,
                           elevation: 0,
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 10),
+                              horizontal: 16, vertical: 11),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        child: const Text('Search',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w800,
-                              color: Color(0xFF0B0F19),
-                            )),
+                        child: const Text(
+                          'Search',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.deepNavy,
+                          ),
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 22),
               if (showPopularTerms) ...[
-                SectionLabel('POPULAR TERMS'),
+                const SectionLabel('POPULAR TERMS'),
                 const SizedBox(height: 12),
                 Wrap(
                   spacing: 8,
@@ -436,21 +463,24 @@ If the term is not a legal term, return:
                       .toList(),
                 ),
                 const SizedBox(height: 24),
-                _DisclaimerBanner(),
+                const _DisclaimerBanner(),
               ],
               if (_loading) ...[
                 const SizedBox(height: 32),
                 Center(
                   child: Column(
                     children: [
-                      const CircularProgressIndicator(),
+                      const CircularProgressIndicator(
+                        color: AppColors.deepNavy,
+                      ),
                       const SizedBox(height: 16),
                       Text(
                         'Looking up "$_searchedTerm"...',
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyMedium
-                            ?.copyWith(color: AppColors.textSecondary),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.deepNavy,
+                        ),
                       ),
                     ],
                   ),
@@ -461,7 +491,7 @@ If the term is not a legal term, return:
                 Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: Colors.red.withValues(alpha: 0.08),
+                    color: AppColors.palePeach,
                     border: Border.all(color: Colors.red.shade300),
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -473,10 +503,11 @@ If the term is not a legal term, return:
                       Expanded(
                         child: Text(
                           'Something went wrong. Please try again.',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall
-                              ?.copyWith(color: Colors.red.shade700),
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.red.shade900,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                       TextButton(
@@ -499,11 +530,20 @@ If the term is not a legal term, return:
                 Center(
                   child: OutlinedButton.icon(
                     onPressed: _clear,
-                    icon: const Icon(Icons.search_rounded, size: 18),
-                    label: const Text('Search Another Term'),
+                    icon: const Icon(Icons.search_rounded,
+                        size: 18, color: AppColors.deepNavy),
+                    label: const Text(
+                      'Search Another Term',
+                      style: TextStyle(
+                        color: AppColors.deepNavy,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.legalGold,
-                      side: const BorderSide(color: AppColors.border),
+                      side: const BorderSide(color: AppColors.outline),
+                      backgroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -532,40 +572,62 @@ class _TermResultCard extends StatelessWidget {
       children: [
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [AppColors.primaryNavy, AppColors.trustBlue],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+            color: AppColors.deepNavy,
             borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.deepNavy.withValues(alpha: 0.15),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
           child: Row(
             children: [
-              const Icon(Icons.menu_book_outlined,
-                  color: Colors.white, size: 28),
-              const SizedBox(width: 12),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppColors.mustardGold.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppColors.mustardGold.withValues(alpha: 0.4),
+                  ),
+                ),
+                child: const Icon(
+                  Icons.menu_book_outlined,
+                  color: AppColors.mustardGold,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       result.term,
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          color: Colors.white, fontWeight: FontWeight.w800),
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                      ),
                     ),
-                    Text(
-                      'Legal Term - Indian Law',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.white.withValues(alpha: 0.75)),
+                    const SizedBox(height: 2),
+                    const Text(
+                      'Legal Term - Indian Jurisprudence',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.paleBlue,
+                      ),
                     ),
                   ],
                 ),
               ),
               IconButton(
                 icon: const Icon(Icons.copy_outlined,
-                    color: Colors.white, size: 20),
+                    color: AppColors.paleBlue, size: 20),
                 tooltip: 'Copy definition',
                 onPressed: () {
                   Clipboard.setData(ClipboardData(
@@ -585,12 +647,17 @@ class _TermResultCard extends StatelessWidget {
         _InfoBlock(
           icon: Icons.info_outline_rounded,
           title: 'Definition',
+          cardColor: AppColors.paleBlue,
+          borderColor: const Color(0xFFD4E2EC),
+          iconColor: AppColors.deepNavy,
           child: Text(
             result.definition,
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium
-                ?.copyWith(color: AppColors.primaryNavy, height: 1.6),
+            style: const TextStyle(
+              fontSize: 14,
+              color: AppColors.deepNavy,
+              height: 1.6,
+              fontWeight: FontWeight.w500,
+            ),
           ),
         ),
         if (result.indianContext.isNotEmpty) ...[
@@ -598,12 +665,17 @@ class _TermResultCard extends StatelessWidget {
           _InfoBlock(
             icon: Icons.account_balance_outlined,
             title: 'Under Indian Law',
+            cardColor: AppColors.paleYellow,
+            borderColor: const Color(0xFFEDDAA8),
+            iconColor: const Color(0xFFB45309),
             child: Text(
               result.indianContext,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(color: AppColors.primaryNavy, height: 1.6),
+              style: const TextStyle(
+                fontSize: 14,
+                color: AppColors.deepNavy,
+                height: 1.6,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ],
@@ -611,27 +683,32 @@ class _TermResultCard extends StatelessWidget {
           const SizedBox(height: 12),
           _InfoBlock(
             icon: Icons.lightbulb_outline_rounded,
-            title: 'Example',
+            title: 'Practical Example',
+            cardColor: AppColors.paleGreen,
+            borderColor: const Color(0xFFCADCCF),
+            iconColor: const Color(0xFF2E7D32),
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.trustBlue.withValues(alpha: 0.05),
+                color: Colors.white.withValues(alpha: 0.6),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                    color: AppColors.trustBlue.withValues(alpha: 0.2)),
+                border: Border.all(color: const Color(0xFFCADCCF)),
               ),
               child: Text(
                 result.example,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.primaryNavy,
-                    height: 1.6,
-                    fontStyle: FontStyle.italic),
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: AppColors.deepNavy,
+                  height: 1.6,
+                  fontStyle: FontStyle.italic,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
           ),
         ],
-        const SizedBox(height: 12),
-        _DisclaimerBanner(),
+        const SizedBox(height: 14),
+        const _DisclaimerBanner(),
       ],
     );
   }
@@ -647,26 +724,34 @@ class _TermChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
         decoration: BoxDecoration(
-          color: AppColors.surface,
-          border: Border.all(color: AppColors.border),
-          borderRadius: BorderRadius.circular(20),
+          color: Colors.white,
+          border: Border.all(color: AppColors.outline),
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.02),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(Icons.menu_book_outlined,
-                size: 14, color: AppColors.trustBlue),
+                size: 14, color: AppColors.slateBlue),
             const SizedBox(width: 6),
             Text(
               label,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.primaryNavy,
-                    fontWeight: FontWeight.w500,
-                  ),
+              style: const TextStyle(
+                fontSize: 13,
+                color: AppColors.deepNavy,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),
@@ -678,19 +763,28 @@ class _TermChip extends StatelessWidget {
 class _InfoBlock extends StatelessWidget {
   final IconData icon;
   final String title;
+  final Color cardColor;
+  final Color borderColor;
+  final Color iconColor;
   final Widget child;
 
-  const _InfoBlock(
-      {required this.icon, required this.title, required this.child});
+  const _InfoBlock({
+    required this.icon,
+    required this.title,
+    required this.cardColor,
+    required this.borderColor,
+    required this.iconColor,
+    required this.child,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        border: Border.all(color: AppColors.border),
+        color: cardColor,
+        border: Border.all(color: borderColor),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
@@ -698,15 +792,16 @@ class _InfoBlock extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, size: 16, color: AppColors.trustBlue),
+              Icon(icon, size: 16, color: iconColor),
               const SizedBox(width: 6),
               Text(
                 title.toUpperCase(),
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: AppColors.primaryNavy,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.5,
-                    ),
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.5,
+                  color: iconColor,
+                ),
               ),
             ],
           ),
@@ -724,24 +819,26 @@ class _DisclaimerBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.legalGold.withValues(alpha: 0.10),
-        border: Border.all(color: AppColors.legalGold),
+        color: AppColors.paleBlue,
+        border: Border.all(color: const Color(0xFFD4E2EC)),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Row(
+      child: const Row(
         children: [
-          const Icon(Icons.info_outline_rounded,
-              color: AppColors.legalGold, size: 18),
-          const SizedBox(width: 10),
+          Icon(Icons.info_outline_rounded,
+              color: AppColors.slateBlue, size: 18),
+          SizedBox(width: 10),
           Expanded(
             child: Text(
               'Definitions are AI-generated for educational purposes. Not legal advice.',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodySmall
-                  ?.copyWith(color: AppColors.primaryNavy, height: 1.4),
+              style: TextStyle(
+                fontSize: 12,
+                color: AppColors.deepNavy,
+                fontWeight: FontWeight.w500,
+                height: 1.4,
+              ),
             ),
           ),
         ],

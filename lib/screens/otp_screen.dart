@@ -339,12 +339,12 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     final displayError = authState.error ?? _localError;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.warmOffWhite,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+          icon: const Icon(Icons.arrow_back, color: AppColors.deepNavy),
           onPressed: _isSubmitting ? null : () => context.pop(),
         ),
       ),
@@ -362,10 +362,10 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                       Expanded(
                         child: Text(
                           l10n.verifyYourNumber,
-                          style: GoogleFonts.merriweather(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 26,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.deepNavy,
                           ),
                         ),
                       ),
@@ -379,14 +379,14 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                   Text(
                     l10n.otpSentTo(_getDisplayPhoneNumber()),
                     style: const TextStyle(
-                      color: AppColors.textSecondary,
+                      color: AppColors.slateBlue,
                       fontSize: 14,
-                      fontWeight: FontWeight.w400,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                   const SizedBox(height: 32),
 
-                  // ✅ FIX: OTP Input Fields with improved UX
+                  // OTP Input Fields with design system styling
                   LayoutBuilder(
                     builder: (context, constraints) {
                       final fields = <Widget>[];
@@ -396,7 +396,6 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                             child: SizedBox(
                               height: 60,
                               child: Semantics(
-                                // ✅ FIX: Added accessibility
                                 label: 'OTP input field ${index + 1} of 6',
                                 textField: true,
                                 child: TextField(
@@ -410,50 +409,48 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                                     FilteringTextInputFormatter.digitsOnly,
                                     LengthLimitingTextInputFormatter(1),
                                   ],
-                                  style: GoogleFonts.inter(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.textPrimary,
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w800,
+                                    color: AppColors.deepNavy,
                                   ),
                                   decoration: InputDecoration(
                                     counterText: "",
                                     contentPadding: EdgeInsets.zero,
                                     filled: true,
-                                    fillColor: _focusNodes[index].hasFocus 
-                                        ? AppColors.surfaceContainerLow.withValues(alpha: 0.3)
-                                        : Colors.transparent,
+                                    fillColor: Colors.white,
                                     enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
+                                      borderRadius: BorderRadius.circular(12),
                                       borderSide: BorderSide(
                                         color: _controllers[index].text.isNotEmpty 
-                                            ? AppColors.legalGold 
+                                            ? AppColors.mustardGold 
                                             : AppColors.outline,
+                                        width: _controllers[index].text.isNotEmpty ? 1.5 : 1,
                                       ),
                                     ),
                                     focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
+                                      borderRadius: BorderRadius.circular(12),
                                       borderSide: const BorderSide(
-                                        color: AppColors.legalGold,
+                                        color: AppColors.deepNavy,
                                         width: 2,
                                       ),
                                     ),
                                     errorBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
+                                      borderRadius: BorderRadius.circular(12),
                                       borderSide: const BorderSide(
-                                        color: Colors.red, 
+                                        color: AppColors.error, 
                                         width: 2,
                                       ),
                                     ),
                                   ),
                                   onChanged: (value) {
-                                    // ✅ FIX: Handle backspace properly
+                                    // Handle backspace properly
                                     if (value.isEmpty && index > 0) {
                                       _focusNodes[index - 1].requestFocus();
                                     } else if (value.isNotEmpty) {
                                       if (index < 5) {
                                         _focusNodes[index + 1].requestFocus();
                                       }
-                                      // ✅ FIX: Dismiss keyboard on last digit
                                       if (index == 5) {
                                         FocusScope.of(context).unfocus();
                                       }
@@ -482,17 +479,19 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                       );
                     },
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 28),
 
-                  // ✅ FIX: Verify OTP button with proper state
+                  // Verify OTP button
                   ElevatedButton(
                     onPressed: (isLoading || _isSubmitting) ? null : _verifyOtp,
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size(double.infinity, 52),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      backgroundColor: AppColors.legalGold,
+                      backgroundColor: AppColors.mustardGold,
+                      foregroundColor: AppColors.deepNavy,
+                      elevation: 0,
                     ),
                     child: _isSubmitting
                         ? const SizedBox(
@@ -500,10 +499,17 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                             width: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: Colors.white,
+                              color: AppColors.deepNavy,
                             ),
                           )
-                        : Text(l10n.verifyOtp),
+                        : Text(
+                            l10n.verifyOtp,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.deepNavy,
+                            ),
+                          ),
                   ),
                   const SizedBox(height: 16),
 
@@ -514,20 +520,21 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                       Text(
                         l10n.didntReceiveOtp,
                         style: const TextStyle(
-                          color: Color(0xFF6B7280),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
+                          color: AppColors.slateBlue,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
+                      const SizedBox(width: 4),
                       _secondsRemaining > 0
                           ? Text(
                               l10n.resendIn(
                                 '0:${_secondsRemaining.toString().padLeft(2, '0')}',
                               ),
                               style: const TextStyle(
-                                color: Color(0xFF6B7280),
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
+                                color: AppColors.deepNavy,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
                               ),
                             )
                           : TextButton(
@@ -535,14 +542,18 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                                   ? null 
                                   : _resendOtp,
                               style: TextButton.styleFrom(
-                                foregroundColor: AppColors.legalGold,
+                                foregroundColor: AppColors.deepNavy,
                                 padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
+                                  vertical: 8,
                                   horizontal: 8,
                                 ),
-                                minimumSize: const Size(64, 48),
                               ),
-                              child: Text(l10n.resend),
+                              child: Text(
+                                l10n.resend,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
                             ),
                     ],
                   ),

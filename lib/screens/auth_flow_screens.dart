@@ -22,9 +22,14 @@ class AuthScaffold extends StatelessWidget {
   final bool showBack;
   @override
   Widget build(BuildContext context) => Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: AppColors.warmOffWhite,
         appBar: showBack
-            ? AppBar(backgroundColor: Colors.transparent, elevation: 0)
+            ? AppBar(
+                backgroundColor: AppColors.warmOffWhite,
+                foregroundColor: AppColors.deepNavy,
+                iconTheme: const IconThemeData(color: AppColors.deepNavy),
+                elevation: 0,
+              )
             : null,
         body: SafeArea(
           child: Center(
@@ -109,7 +114,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        backgroundColor: const Color(0xFFF5FAF7),
+        backgroundColor: AppColors.warmOffWhite,
         body: SafeArea(
           child: LayoutBuilder(
             builder: (context, constraints) {
@@ -133,13 +138,10 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
       );
 
   Widget _visualPanel() => Container(
-        padding: const EdgeInsets.all(24),
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF7CB342), Color(0xFF558B2F)],
-          ),
+        padding: const EdgeInsets.all(28),
+        decoration: BoxDecoration(
+          color: AppColors.deepNavy,
+          borderRadius: BorderRadius.circular(16),
         ),
         child: AnimatedBuilder(
           animation: _entrance,
@@ -164,7 +166,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                         Center(
                           child: Image.asset(
                             'assets/images/logo.png',
-                            height: constraints.maxHeight < 300 ? 70 : 100,
+                            height: constraints.maxHeight < 300 ? 70 : 90,
                             fit: BoxFit.contain,
                           ),
                         ),
@@ -173,7 +175,13 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                             style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
-                                fontWeight: FontWeight.w500)),
+                                fontWeight: FontWeight.w800)),
+                        const SizedBox(height: 8),
+                        const Text('Instant clarity on Indian laws, rights, and remedies.',
+                            style: TextStyle(
+                                color: AppColors.paleBlue,
+                                fontSize: 13,
+                                height: 1.4)),
                         const SizedBox(height: 16),
                         ...[
                           'Instant Legal Answers',
@@ -183,12 +191,13 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                               padding: const EdgeInsets.only(bottom: 10),
                               child: Row(children: [
                                 const Icon(Icons.check_circle_rounded,
-                                    color: Colors.white, size: 18),
+                                    color: AppColors.mustardGold, size: 18),
                                 const SizedBox(width: 8),
                                 Text(item,
                                     style: TextStyle(
                                         color: Colors.white.withValues(alpha: .92),
-                                        fontSize: 14)),
+                                        fontSize: 13.5,
+                                        fontWeight: FontWeight.w600)),
                               ]),
                             )),
                         const Spacer(),
@@ -214,13 +223,13 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                 children: [
                   const Text('Get Legal Clarity',
                       style: TextStyle(
-                          color: Color(0xFF2D3B2D),
-                          fontSize: 32,
-                          fontWeight: FontWeight.w700)),
+                          color: AppColors.deepNavy,
+                          fontSize: 30,
+                          fontWeight: FontWeight.w800)),
                   const SizedBox(height: 8),
                   const Text('Sign up to start exploring your rights',
-                      style: TextStyle(color: Color(0xFF7A8478), fontSize: 16)),
-                  const SizedBox(height: 34),
+                      style: TextStyle(color: AppColors.slateBlue, fontSize: 15)),
+                  const SizedBox(height: 32),
                   _input(_name, 'Full name', Icons.person_outline,
                       validator: legalNameError),
                   const SizedBox(height: 16),
@@ -250,68 +259,62 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
                         setState(() => _acceptedTerms = value ?? false),
                     contentPadding: EdgeInsets.zero,
                     controlAffinity: ListTileControlAffinity.leading,
-                    activeColor: const Color(0xFF7CB342),
+                    activeColor: AppColors.mustardGold,
+                    checkColor: AppColors.deepNavy,
                     title: const Text('I agree to the Terms of Service',
                         style:
-                            TextStyle(color: Color(0xFF7A8478), fontSize: 13)),
+                            TextStyle(color: AppColors.slateBlue, fontSize: 13, fontWeight: FontWeight.w600)),
                   ),
                   const SizedBox(height: 16),
                   SizedBox(
                     width: double.infinity,
-                    height: 54,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                            colors: [Color(0xFF7CB342), Color(0xFF558B2F)]),
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: const [
-                          BoxShadow(
-                              color: Color(0x337CB342),
-                              blurRadius: 14,
-                              offset: Offset(0, 6))
-                        ],
+                    height: 52,
+                    child: ElevatedButton(
+                      onPressed: _loading ? null : _submit,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.mustardGold,
+                        foregroundColor: AppColors.deepNavy,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                      child: ElevatedButton(
-                        onPressed: _loading ? null : _submit,
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            shadowColor: Colors.transparent,
-                            foregroundColor: Colors.white),
-                        child: _loading
-                            ? const SizedBox(
-                                width: 22,
-                                height: 22,
-                                child: CircularProgressIndicator(
-                                    strokeWidth: 2, color: Colors.white))
-                            : const Text('Create account',
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.w600)),
-                      ),
+                      child: _loading
+                          ? const SizedBox(
+                              width: 22,
+                              height: 22,
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2, color: AppColors.deepNavy))
+                          : const Text('Create account',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppColors.deepNavy)),
                     ),
                   ),
                   const SizedBox(height: 16),
                   Center(
                     child: TextButton.icon(
                       onPressed: () => context.go('/home'),
-                      icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+                      icon: const Icon(Icons.arrow_forward_rounded, size: 18, color: AppColors.mustardGold),
                       label: const Text(
                         'Explore App as Guest',
                         style: TextStyle(
                           fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF558B2F),
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.deepNavy,
                         ),
                       ),
                     ),
                   ),
                   const SizedBox(height: 12),
                   Center(
-                      child: Wrap(alignment: WrapAlignment.center, children: [
+                      child: Wrap(alignment: WrapAlignment.center, crossAxisAlignment: WrapCrossAlignment.center, children: [
                     const Text('Already have an account? ',
-                        style: TextStyle(color: Color(0xFF7A8478))),
+                        style: TextStyle(color: AppColors.slateBlue, fontWeight: FontWeight.w500)),
                     TextButton(
                         onPressed: () => context.push('/login'),
-                        child: const Text('Log in'))
+                        child: const Text('Log in', style: TextStyle(color: AppColors.deepNavy, fontWeight: FontWeight.w800)))
                   ])),
                 ],
               ),
@@ -629,12 +632,12 @@ class _EmailVerificationScreenState
                 child: const Text('Change Email')),
             TextButton.icon(
               onPressed: () => context.go('/home'),
-              icon: const Icon(Icons.arrow_forward_rounded, size: 16),
+              icon: const Icon(Icons.arrow_forward_rounded, size: 16, color: AppColors.mustardGold),
               label: const Text(
                 'Explore App as Guest / Skip for now',
                 style: TextStyle(
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF558B2F),
+                  color: AppColors.deepNavy,
                 ),
               ),
             ),
@@ -759,12 +762,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 child: const Text('Login with Mobile')),
             TextButton.icon(
               onPressed: () => context.go('/home'),
-              icon: const Icon(Icons.arrow_forward_rounded, size: 16),
+              icon: const Icon(Icons.arrow_forward_rounded, size: 16, color: AppColors.mustardGold),
               label: const Text(
                 'Explore App as Guest',
                 style: TextStyle(
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF558B2F),
+                  color: AppColors.deepNavy,
                 ),
               ),
             ),
@@ -1027,6 +1030,7 @@ Widget _field(TextEditingController controller, String label, String hint,
         obscureText: obscure,
         inputFormatters: formatters,
         textCapitalization: textCapitalization,
+        style: const TextStyle(color: AppColors.deepNavy, fontSize: 15),
         decoration: InputDecoration(
             labelText: label, hintText: hint, suffixIcon: suffix));
 void _snack(BuildContext context, String message, {bool success = false}) =>

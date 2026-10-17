@@ -14,6 +14,7 @@ import '../services/auth_handler.dart';
 import '../providers/rate_us_provider.dart';
 import '../widgets/empty_state_widget.dart';
 import '../widgets/floating_ai_button.dart';
+import '../widgets/hover_stay_reveal_box.dart';
 import '../widgets/rate_us_sheet.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -119,21 +120,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               : AppBar(
                   toolbarHeight: 64,
                   titleSpacing: 16,
-                  elevation: 2,
-                  shadowColor: AppColors.shadowStrong,
-                  backgroundColor: Colors.transparent,
-                  foregroundColor: AppColors.deepForest,
+                  elevation: 0,
+                  shadowColor: Colors.transparent,
+                  backgroundColor: AppColors.warmOffWhite,
+                  foregroundColor: AppColors.deepNavy,
                   surfaceTintColor: Colors.transparent,
-                  flexibleSpace: const ColoredBox(color: AppColors.surface),
                   centerTitle: false,
                   systemOverlayStyle: _lightSurfaceOverlayStyle,
+                  bottom: const PreferredSize(
+                    preferredSize: Size.fromHeight(1),
+                    child: Divider(
+                      height: 1,
+                      thickness: 1,
+                      color: AppColors.divider,
+                    ),
+                  ),
                   title: const Align(
                     alignment: Alignment.centerLeft,
                     child: _HeaderLogo(iconHeight: 40),
                   ),
                   actions: [
                     IconButton(
-                      icon: const Icon(Icons.settings_outlined),
+                      icon: const Icon(Icons.settings_outlined, color: AppColors.deepNavy),
                       onPressed: () => context.go('/home/settings'),
                       tooltip: l10n.settings,
                       constraints:
@@ -508,123 +516,126 @@ class _AiToolCard extends StatelessWidget {
 
   const _AiToolCard({required this.tool, required this.onTap});
 
-  static const _blueIconBg = Color(0x1F2563EB);
-  static const _blueSplash = Color(0x142563EB);
-  static const _goldSplash = Color(0x14D97706);
-  static const _cardShadow = [
-    BoxShadow(
-      color: AppColors.shadowBlack,
-      blurRadius: 12,
-      offset: Offset(0, 4),
-    ),
-  ];
-
   Color get _accentColor =>
-      tool.category == 'documents' ? AppColors.legalGold : AppColors.trustBlue;
+      tool.category == 'documents' ? AppColors.mustardGold : AppColors.slateBlue;
 
   Color get _iconBg => tool.category == 'documents'
-      ? AppColors.grey100
-      : _blueIconBg;
-
-  Color get _splashColor => tool.category == 'documents'
-      ? _goldSplash
-      : _blueSplash;
+      ? AppColors.paleYellow
+      : AppColors.paleBlue;
 
   @override
   Widget build(BuildContext context) {
     final radius = BorderRadius.circular(18);
-    return AppAnimations.pressScale(
+    return HoverStayRevealBox(
       onTap: onTap,
       borderRadius: radius,
-      splashColor: _splashColor,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.cardBackground,
-          borderRadius: radius,
-          border: Border.all(color: AppColors.border),
-          boxShadow: _cardShadow,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Icon circle
-            Container(
-              width: 52,
-              height: 52,
-              decoration: BoxDecoration(
-                color: _iconBg,
-                shape: BoxShape.circle,
+      builder: (context, isRevealed) {
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceContainerLowest,
+            borderRadius: radius,
+            border: Border.all(
+              color: isRevealed
+                  ? _accentColor.withValues(alpha: 0.5)
+                  : AppColors.border,
+              width: isRevealed ? 1.5 : 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: isRevealed
+                    ? _accentColor.withValues(alpha: 0.14)
+                    : const Color(0x0A162B49),
+                blurRadius: isRevealed ? 14 : 10,
+                offset: Offset(0, isRevealed ? 5 : 4),
               ),
-              child: Icon(
-                tool.icon,
-                color: _accentColor,
-                size: 28,
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // Title
-            Text(
-              tool.title,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: AppColors.textPrimary,
-                    fontWeight: FontWeight.w800,
-                  ),
-            ),
-            const SizedBox(height: 6),
-
-            // Description
-            Text(
-              tool.description,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
-                    height: 1.35,
-                  ),
-            ),
-
-            // Bottom arrow chip
-            const SizedBox(height: 12),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Icon circle
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: 48,
+                height: 48,
                 decoration: BoxDecoration(
-                  color: Colors.transparent,
-                  borderRadius: BorderRadius.circular(20),
+                  color: _iconBg,
+                  shape: BoxShape.circle,
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Open',
-                      style: const TextStyle(
-                        color: Color(0xFF6B7280),
-                        fontSize: 11,
-                        fontWeight: FontWeight.w400,
-                      ).copyWith(
-                        color: _accentColor,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(width: 2),
-                    Icon(
-                      Icons.arrow_forward_rounded,
-                      size: 12,
-                      color: _accentColor,
-                    ),
-                  ],
+                child: Icon(
+                  tool.icon,
+                  color: _accentColor,
+                  size: 24,
                 ),
               ),
-            ),
-          ],
-        ),
-      ),
+              const SizedBox(height: 12),
+
+              // Title
+              Text(
+                tool.title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.w800,
+                    ),
+              ),
+
+              // Description (revealed on hover or mobile stay)
+              HoverRevealContent(
+                isRevealed: isRevealed,
+                padding: const EdgeInsets.only(top: 6),
+                child: Text(
+                  tool.description,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.textSecondary,
+                        height: 1.35,
+                      ),
+                ),
+              ),
+
+              // Bottom arrow chip
+              const SizedBox(height: 10),
+              Align(
+                alignment: Alignment.centerRight,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Open',
+                        style: TextStyle(
+                          color: _accentColor,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(width: 2),
+                      AnimatedSlide(
+                        duration: const Duration(milliseconds: 180),
+                        offset: isRevealed ? const Offset(0.25, 0) : Offset.zero,
+                        child: Icon(
+                          Icons.arrow_forward_rounded,
+                          size: 12,
+                          color: _accentColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -650,13 +661,13 @@ class _HeroSection extends StatelessWidget {
         vertical: verticalPadding,
       ),
       decoration: BoxDecoration(
-        gradient: AppColors.heroGradient,
-        borderRadius: BorderRadius.circular(AppTheme.radiusM),
-        boxShadow: [
+        color: AppColors.deepNavy,
+        borderRadius: BorderRadius.circular(AppTheme.radiusL),
+        boxShadow: const [
           BoxShadow(
-            color: AppColors.deepForest.withValues(alpha: 0.26),
-            blurRadius: 24,
-            offset: const Offset(0, 12),
+            color: AppColors.shadowStrong,
+            blurRadius: 20,
+            offset: Offset(0, 8),
           ),
         ],
       ),
@@ -696,14 +707,15 @@ class _HeroContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.sizeOf(context).width;
     final compactMobile = !isDesktop && screenWidth <= 360;
-    final headlineStyle = GoogleFonts.notoSans(
+    final headlineStyle = GoogleFonts.plusJakartaSans(
       color: Colors.white,
-      fontSize: isDesktop ? 40 : (compactMobile ? 28 : 32),
-      fontWeight: FontWeight.w700,
-      height: compactMobile ? 1.15 : 1.2,
+      fontSize: isDesktop ? 38 : (compactMobile ? 26 : 30),
+      fontWeight: FontWeight.w800,
+      height: 1.2,
+      letterSpacing: -0.01,
     );
-    final bodyStyle = GoogleFonts.notoSans(
-      color: Colors.white,
+    final bodyStyle = GoogleFonts.plusJakartaSans(
+      color: AppColors.paleBlue,
       fontSize: compactMobile ? 13 : 14,
       fontWeight: FontWeight.w400,
       height: 1.5,
@@ -728,16 +740,15 @@ class _HeroContent extends StatelessWidget {
           child: ElevatedButton(
             onPressed: () => context.go('/home/analyzer'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.brightEmerald,
-              foregroundColor: AppColors.deepForestDark,
-              elevation: 2,
-              shadowColor: Colors.black26,
-              minimumSize: const Size.fromHeight(48),
+              backgroundColor: AppColors.mustardGold,
+              foregroundColor: AppColors.deepNavy,
+              elevation: 0,
+              minimumSize: const Size.fromHeight(50),
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppTheme.radiusM),
               ),
-              textStyle: GoogleFonts.notoSans(
+              textStyle: GoogleFonts.plusJakartaSans(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
               ),
@@ -772,11 +783,11 @@ class _LegalOfficeIllustration extends StatelessWidget {
 class _LegalOfficePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final forest = Paint()..color = const Color(0xFF062B20);
-    const emerald = AppColors.brightEmerald;
-    final glass = Paint()..color = Colors.white.withValues(alpha: 0.10);
-    final light = Paint()..color = Colors.white.withValues(alpha: 0.72);
-    final plant = Paint()..color = const Color(0xFF74D995);
+    final darkNavy = Paint()..color = const Color(0xFF0F1E33);
+    const gold = AppColors.mustardGold;
+    final glass = Paint()..color = Colors.white.withValues(alpha: 0.12);
+    final light = Paint()..color = Colors.white.withValues(alpha: 0.85);
+    final accentBlue = Paint()..color = AppColors.navyBlue;
 
     canvas.drawRRect(
         RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(8)),
@@ -785,7 +796,7 @@ class _LegalOfficePainter extends CustomPainter {
     final window = Rect.fromLTWH(size.width * .12, size.height * .08,
         size.width * .76, size.height * .54);
     canvas.drawRRect(
-        RRect.fromRectAndRadius(window, const Radius.circular(6)), forest);
+        RRect.fromRectAndRadius(window, const Radius.circular(6)), darkNavy);
     for (var x = window.left + window.width / 3;
         x < window.right;
         x += window.width / 3) {
@@ -804,16 +815,16 @@ class _LegalOfficePainter extends CustomPainter {
     canvas.drawRect(
         Rect.fromLTWH(
             size.width * .19, size.height * .82, 8, size.height * .13),
-        forest);
+        darkNavy);
     canvas.drawRect(
         Rect.fromLTWH(
             size.width * .79, size.height * .82, 8, size.height * .13),
-        forest);
-    // Justice scales on the desk.
+        darkNavy);
+    // Justice scales on the desk in Mustard Gold.
     final center = Offset(size.width * .50, size.height * .64);
     final stroke = Paint()
-      ..color = emerald
-      ..strokeWidth = 4
+      ..color = gold
+      ..strokeWidth = 3.5
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
     canvas.drawLine(
@@ -848,7 +859,7 @@ class _LegalOfficePainter extends CustomPainter {
         3.14,
         false,
         stroke);
-    // Plant leaves create the rainforest accent.
+    // Blue accent details
     for (final offset in [
       Offset(size.width * .09, size.height * .67),
       Offset(size.width * .14, size.height * .60),
@@ -859,7 +870,7 @@ class _LegalOfficePainter extends CustomPainter {
               center: offset,
               width: size.width * .12,
               height: size.height * .06),
-          plant);
+          accentBlue);
     }
   }
 
@@ -878,23 +889,22 @@ class _CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final radius = BorderRadius.circular(AppTheme.radiusM);
+    final radius = BorderRadius.circular(AppTheme.radiusL);
     return AppAnimations.pressScale(
       onTap: onTap,
       borderRadius: radius,
-      splashColor: AppColors.trustBlue.withValues(alpha: 0.1),
+      splashColor: AppColors.navyBlue.withValues(alpha: 0.1),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: AppColors.surfaceContainerLowest,
           borderRadius: radius,
-          border: Border.all(
-              color: AppColors.brightEmerald.withValues(alpha: 0.28)),
-          boxShadow: [
+          border: Border.all(color: AppColors.outline),
+          boxShadow: const [
             BoxShadow(
-              color: AppColors.shadowBlack,
-              blurRadius: 12,
-              offset: const Offset(0, 4),
+              color: AppColors.shadow,
+              blurRadius: 10,
+              offset: Offset(0, 3),
             ),
           ],
         ),
@@ -903,16 +913,16 @@ class _CategoryCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 56,
-              height: 56,
+              width: 52,
+              height: 52,
               decoration: BoxDecoration(
-                color: AppColors.brightEmerald.withValues(alpha: 0.14),
-                borderRadius: BorderRadius.circular(AppTheme.radiusM),
+                color: AppColors.paleBlue,
+                borderRadius: BorderRadius.circular(14),
               ),
               child: Icon(
                 category.icon,
-                color: AppColors.deepForest,
-                size: 30,
+                color: AppColors.deepNavy,
+                size: 26,
               ),
             ),
             const SizedBox(height: 12),
@@ -922,10 +932,11 @@ class _CategoryCard extends StatelessWidget {
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.w800,
-                    ),
+                style: const TextStyle(
+                  color: AppColors.deepNavy,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14.5,
+                ),
               ),
             ),
             const SizedBox(height: 6),
@@ -934,10 +945,11 @@ class _CategoryCard extends StatelessWidget {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
-                    height: 1.35,
-                  ),
+              style: const TextStyle(
+                color: AppColors.navyBlue,
+                fontSize: 12.5,
+                height: 1.35,
+              ),
             ),
           ],
         ),
@@ -962,8 +974,6 @@ class _PopularLegalCategory {
   String get name => title;
 }
 
-
-
 class _SectionLabel extends StatelessWidget {
   final String title;
 
@@ -975,23 +985,23 @@ class _SectionLabel extends StatelessWidget {
       children: [
         Container(
           width: 4,
-          height: 20,
+          height: 16,
           decoration: BoxDecoration(
-            gradient: AppColors.goldGradient,
-            borderRadius: BorderRadius.circular(999),
+            color: AppColors.mustardGold,
+            borderRadius: BorderRadius.circular(2),
           ),
         ),
         const SizedBox(width: 8),
         Expanded(
           child: Text(
-            title,
+            title.toUpperCase(),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
-              color: AppColors.textPrimary,
-              fontSize: 14,
+              color: AppColors.deepNavy,
+              fontSize: 13,
               fontWeight: FontWeight.w800,
-              letterSpacing: 0,
+              letterSpacing: 1.1,
             ),
           ),
         ),
@@ -1019,40 +1029,51 @@ class _DesktopHeader extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       systemOverlayStyle: _HomeScreenState._lightSurfaceOverlayStyle,
       toolbarHeight: preferredSize.height,
-      titleSpacing: 20,
+      titleSpacing: 24,
+      backgroundColor: AppColors.warmOffWhite,
       scrolledUnderElevation: 0,
+      elevation: 0,
+      bottom: const PreferredSize(
+        preferredSize: Size.fromHeight(1),
+        child: Divider(height: 1, thickness: 1, color: AppColors.divider),
+      ),
       title: const Align(
         alignment: Alignment.centerLeft,
-        child: _HeaderLogo(iconHeight: 48),
+        child: _HeaderLogo(iconHeight: 44),
       ),
       actions: [
         ...List.generate(items.length, (index) {
           final selected = selectedIndex == index;
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 3),
+            padding: const EdgeInsets.symmetric(horizontal: 4),
             child: TextButton.icon(
               onPressed: () => onSelected(index),
               icon: Icon(
                 selected ? items[index].selectedIcon : items[index].icon,
-                size: 19,
+                size: 18,
+                color: selected ? AppColors.deepNavy : AppColors.navyBlue,
               ),
-              label: Text(items[index].label),
+              label: Text(
+                items[index].label,
+                style: TextStyle(
+                  color: selected ? AppColors.deepNavy : AppColors.navyBlue,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
+                ),
+              ),
               style: TextButton.styleFrom(
-                foregroundColor:
-                    selected ? AppColors.legalGold : AppColors.textSecondary,
                 backgroundColor:
-                    selected ? const Color(0xFF1F2937) : Colors.transparent,
-                minimumSize: const Size(48, 48),
+                    selected ? AppColors.mustardGold : Colors.transparent,
+                minimumSize: const Size(48, 44),
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(999),
+                  borderRadius: BorderRadius.circular(AppTheme.radiusM),
                 ),
               ),
             ),
           );
         }),
-        const SizedBox(width: 21),
+        const SizedBox(width: 20),
       ],
     );
   }
@@ -1073,9 +1094,6 @@ class _HeaderLogo extends StatelessWidget {
   }
 }
 
-
-
-
 class _FloatingBottomNav extends StatelessWidget {
   final int selectedIndex;
   final List<_BottomNavItem> items;
@@ -1092,29 +1110,20 @@ class _FloatingBottomNav extends StatelessWidget {
     return SafeArea(
       minimum: const EdgeInsets.fromLTRB(16, 0, 16, 12),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppTheme.radiusXL),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Color(0xFF111827), Color(0xFF1F2937)],
-              ),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: AppColors.border),
-              boxShadow: [
+              color: AppColors.deepNavy,
+              borderRadius: BorderRadius.circular(AppTheme.radiusXL),
+              border: Border.all(color: const Color(0x26FAF8F2)),
+              boxShadow: const [
                 BoxShadow(
-                  color: AppColors.shadowBlack,
-                  blurRadius: 28,
-                  offset: const Offset(0, 8),
-                ),
-                BoxShadow(
-                  color: AppColors.shadowGold.withValues(alpha: 0.12),
-                  blurRadius: 16,
-                  offset: const Offset(0, 2),
+                  color: AppColors.shadowStrong,
+                  blurRadius: 24,
+                  offset: Offset(0, 8),
                 ),
               ],
             ),
@@ -1125,33 +1134,17 @@ class _FloatingBottomNav extends StatelessWidget {
 
                 return Expanded(
                   child: InkWell(
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusM),
                     onTap: () => onSelected(index),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 180),
                       constraints: const BoxConstraints(minHeight: 48),
-                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      padding: const EdgeInsets.symmetric(vertical: 8),
                       decoration: BoxDecoration(
                         color: selected
-                            ? const Color(0xFF1F2937)
+                            ? AppColors.mustardGold
                             : Colors.transparent,
-                        borderRadius: BorderRadius.circular(20),
-                        border: selected
-                            ? Border.all(
-                                color:
-                                    AppColors.legalGold.withValues(alpha: 0.4),
-                                width: 1)
-                            : null,
-                        boxShadow: selected
-                            ? [
-                                BoxShadow(
-                                  color: AppColors.shadowGold
-                                      .withValues(alpha: 0.2),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ]
-                            : null,
+                        borderRadius: BorderRadius.circular(AppTheme.radiusM),
                       ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -1159,9 +1152,9 @@ class _FloatingBottomNav extends StatelessWidget {
                           Icon(
                             selected ? item.selectedIcon : item.icon,
                             color: selected
-                                ? AppColors.legalGold
-                                : AppColors.textSecondary,
-                            size: 24,
+                                ? AppColors.deepNavy
+                                : AppColors.paleBlue,
+                            size: 22,
                           ),
                           const SizedBox(height: 4),
                           Text(
@@ -1170,11 +1163,11 @@ class _FloatingBottomNav extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: selected
-                                  ? AppColors.legalGold
-                                  : AppColors.textSecondary,
+                                  ? AppColors.deepNavy
+                                  : AppColors.paleBlue,
                               fontSize: 11,
                               fontWeight:
-                                  selected ? FontWeight.w700 : FontWeight.w600,
+                                  selected ? FontWeight.w700 : FontWeight.w500,
                             ),
                           ),
                         ],
@@ -1200,7 +1193,7 @@ class _BottomNavItem {
 }
 
 // ---------------------------------------------
-// 3 Core Action Power Hubs
+// 3 Core Action Power Hubs (Pastel Cards Matching Screenshot 1)
 // ---------------------------------------------
 
 class _ThreeActionHubs extends StatelessWidget {
@@ -1218,12 +1211,9 @@ class _ThreeActionHubs extends StatelessWidget {
             'Rent Agreements, 15-Day Legal Demand Notices, Cheque Bounce, Affidavits & RTIs with instant PDF download.',
         icon: Icons.edit_document,
         buttonText: 'Create Document',
-        gradient: const LinearGradient(
-          colors: [Color(0xFF0B3D2E), Color(0xFF062B20)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        badgeColor: AppColors.brightEmerald,
+        backgroundColor: AppColors.paleBlue,
+        badgeBgColor: AppColors.surfaceContainerLowest,
+        badgeTextColor: AppColors.deepNavy,
         onTap: () => context.push('/home/legal-writing'),
       ),
       _HubData(
@@ -1233,12 +1223,9 @@ class _ThreeActionHubs extends StatelessWidget {
             'Scan leases, offer letters & NDAs before signing. Detect one-sided clauses, lock-in penalties & get a Safety Score.',
         icon: Icons.fact_check_outlined,
         buttonText: 'Audit Document',
-        gradient: const LinearGradient(
-          colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        badgeColor: const Color(0xFF38BDF8),
+        backgroundColor: AppColors.paleYellow,
+        badgeBgColor: AppColors.surfaceContainerLowest,
+        badgeTextColor: AppColors.deepNavy,
         onTap: () => context.push('/home/document-review'),
       ),
       _HubData(
@@ -1248,12 +1235,9 @@ class _ThreeActionHubs extends StatelessWidget {
             'Withheld salary, security deposit theft, money recovery, or cyber fraud — get exact Indian laws & action plans.',
         icon: Icons.gavel_rounded,
         buttonText: 'Solve Dispute',
-        gradient: const LinearGradient(
-          colors: [Color(0xFF312E81), Color(0xFF1E1B4B)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        badgeColor: const Color(0xFFA5B4FC),
+        backgroundColor: AppColors.paleGreen,
+        badgeBgColor: AppColors.surfaceContainerLowest,
+        badgeTextColor: AppColors.deepNavy,
         onTap: () => context.go('/home/analyzer'),
       ),
     ];
@@ -1275,7 +1259,7 @@ class _ThreeActionHubs extends StatelessWidget {
     return Column(
       children: hubs
           .map((hub) => Padding(
-                padding: const EdgeInsets.only(bottom: 14),
+                padding: const EdgeInsets.only(bottom: 12),
                 child: _HubCard(data: hub),
               ))
           .toList(),
@@ -1289,8 +1273,9 @@ class _HubData {
   final String subtitle;
   final IconData icon;
   final String buttonText;
-  final Gradient gradient;
-  final Color badgeColor;
+  final Color backgroundColor;
+  final Color badgeBgColor;
+  final Color badgeTextColor;
   final VoidCallback onTap;
 
   const _HubData({
@@ -1299,8 +1284,9 @@ class _HubData {
     required this.subtitle,
     required this.icon,
     required this.buttonText,
-    required this.gradient,
-    required this.badgeColor,
+    required this.backgroundColor,
+    required this.badgeBgColor,
+    required this.badgeTextColor,
     required this.onTap,
   });
 }
@@ -1312,115 +1298,136 @@ class _HubCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: data.gradient,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.12),
-            blurRadius: 14,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: data.onTap,
-          borderRadius: BorderRadius.circular(20),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Top row: Tag & Icon
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: data.badgeColor.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: data.badgeColor.withValues(alpha: 0.4),
-                        ),
-                      ),
-                      child: Text(
-                        data.tag,
-                        style: TextStyle(
-                          color: data.badgeColor,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Icon(
-                        data.icon,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 14),
-
-                // Title
-                Text(
-                  data.title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 6),
-
-                // Subtitle
-                Text(
-                  data.subtitle,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.82),
-                    fontSize: 12.5,
-                    height: 1.45,
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Action pill
-                Row(
-                  children: [
-                    Text(
-                      data.buttonText,
-                      style: TextStyle(
-                        color: data.badgeColor,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Icon(
-                      Icons.arrow_forward_rounded,
-                      size: 15,
-                      color: data.badgeColor,
-                    ),
-                  ],
-                ),
-              ],
+    final radius = BorderRadius.circular(AppTheme.radiusL);
+    return HoverStayRevealBox(
+      onTap: data.onTap,
+      borderRadius: radius,
+      builder: (context, isRevealed) {
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: data.backgroundColor,
+            borderRadius: radius,
+            border: Border.all(
+              color: isRevealed
+                  ? AppColors.deepNavy.withValues(alpha: 0.35)
+                  : AppColors.outline,
+              width: isRevealed ? 1.5 : 1,
             ),
+            boxShadow: [
+              BoxShadow(
+                color: isRevealed
+                    ? AppColors.deepNavy.withValues(alpha: 0.12)
+                    : AppColors.shadow,
+                blurRadius: isRevealed ? 16 : 10,
+                offset: Offset(0, isRevealed ? 5 : 3),
+              ),
+            ],
           ),
-        ),
-      ),
+          padding: const EdgeInsets.all(18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Top row: Tag badge & Icon badge
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: data.badgeBgColor,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: AppColors.outline,
+                        width: 1,
+                      ),
+                    ),
+                    child: Text(
+                      data.tag,
+                      style: TextStyle(
+                        color: data.badgeTextColor,
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                  ),
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: isRevealed
+                          ? AppColors.mustardGold.withValues(alpha: 0.3)
+                          : AppColors.surfaceContainerLowest,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      data.icon,
+                      color: AppColors.deepNavy,
+                      size: 20,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+
+              // Title
+              Text(
+                data.title,
+                style: const TextStyle(
+                  color: AppColors.deepNavy,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+
+              // Subtitle (revealed on hover or mobile stay)
+              HoverRevealContent(
+                isRevealed: isRevealed,
+                padding: const EdgeInsets.only(top: 8, bottom: 2),
+                child: Text(
+                  data.subtitle,
+                  style: const TextStyle(
+                    color: AppColors.navyBlue,
+                    fontSize: 13,
+                    height: 1.45,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 14),
+
+              // Action pill
+              Row(
+                children: [
+                  Text(
+                    data.buttonText,
+                    style: const TextStyle(
+                      color: AppColors.deepNavy,
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  AnimatedSlide(
+                    duration: const Duration(milliseconds: 200),
+                    offset: isRevealed ? const Offset(0.25, 0) : Offset.zero,
+                    child: const Icon(
+                      Icons.arrow_forward_rounded,
+                      size: 16,
+                      color: AppColors.mustardGold,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
+

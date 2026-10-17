@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:juslegal/core/core.dart';
 
 class EmptyStateWidget extends StatelessWidget {
-
   final IconData icon;
   final String title;
   final String subtitle;
@@ -27,41 +26,38 @@ class EmptyStateWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 88,
-              height: 88,
-              decoration: BoxDecoration(
-                color: AppTheme.primaryBlue.withValues(alpha: 0.12),
+              width: 80,
+              height: 80,
+              decoration: const BoxDecoration(
+                color: AppColors.paleBlue,
                 shape: BoxShape.circle,
               ),
               alignment: Alignment.center,
               child: Icon(
                 icon,
-                size: 42,
-                color: AppTheme.primaryBlue,
+                size: 38,
+                color: AppColors.deepNavy,
               ),
             ),
-            const SizedBox(height: 22),
+            const SizedBox(height: 20),
             Text(
               title,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: AppTheme.darkText,
-                fontSize: 20,
-                fontWeight: FontWeight.w800,
-              ).copyWith(
-                color: AppTheme.primaryBlue,
+                color: AppColors.deepNavy,
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
             Text(
               subtitle,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: AppTheme.darkText,
-                fontSize: 14,
+                color: AppColors.navyBlue,
+                fontSize: 13.5,
                 fontWeight: FontWeight.w400,
-              ).copyWith(
-                color: AppTheme.darkText.withValues(alpha: 0.82),
+                height: 1.4,
               ),
             ),
             if (actionLabel != null) ...[
@@ -69,14 +65,20 @@ class EmptyStateWidget extends StatelessWidget {
               ElevatedButton(
                 onPressed: onActionPressed,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.primaryBlue,
-                  foregroundColor: AppTheme.surface,
-                  padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 14),
+                  backgroundColor: AppColors.mustardGold,
+                  foregroundColor: AppColors.deepNavy,
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppTheme.radiusM),
                   ),
                 ),
-                child: Text(actionLabel!),
+                child: Text(
+                  actionLabel!,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                  ),
+                ),
               ),
             ],
           ],
@@ -85,4 +87,5 @@ class EmptyStateWidget extends StatelessWidget {
     );
   }
 }
+
 

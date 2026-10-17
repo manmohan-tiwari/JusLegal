@@ -377,11 +377,18 @@ Analyze the document thoroughly and provide:
       backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Document & Contract Review'),
-        leading: BackButton(onPressed: () => Navigator.of(context).pop()),
+        leading: BackButton(
+          color: AppColors.deepNavy,
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(color: AppColors.divider, height: 1),
+        ),
         actions: [
           if (result != null)
             IconButton(
-              icon: const Icon(Icons.share_outlined),
+              icon: const Icon(Icons.share_outlined, color: AppColors.deepNavy),
               tooltip: 'Share Report',
               onPressed: () => _shareReport(result),
             ),
@@ -397,18 +404,14 @@ Analyze the document thoroughly and provide:
               // Header description banner
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [AppColors.deepForest, AppColors.deepForestDark],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  color: AppColors.deepNavy,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.deepForest.withValues(alpha: 0.15),
-                      blurRadius: 10,
+                      color: AppColors.deepNavy.withValues(alpha: 0.15),
+                      blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
                   ],
@@ -416,15 +419,18 @@ Analyze the document thoroughly and provide:
                 child: Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.15),
+                        color: AppColors.mustardGold.withValues(alpha: 0.20),
                         borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppColors.mustardGold.withValues(alpha: 0.4),
+                        ),
                       ),
                       child: const Icon(
                         Icons.fact_check_outlined,
-                        color: AppColors.brightEmerald,
-                        size: 28,
+                        color: AppColors.mustardGold,
+                        size: 26,
                       ),
                     ),
                     const SizedBox(width: 14),
@@ -437,14 +443,14 @@ Analyze the document thoroughly and provide:
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 16,
-                              fontWeight: FontWeight.w700,
+                              fontWeight: FontWeight.w800,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             'Identify unfair terms, hidden penalties, and missing protections before you sign.',
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.85),
+                              color: AppColors.paleBlue,
                               fontSize: 12,
                               height: 1.4,
                             ),
@@ -460,7 +466,7 @@ Analyze the document thoroughly and provide:
 
               if (result == null) ...[
                 // Step 1: Select Category
-                SectionLabel('1. SELECT DOCUMENT CATEGORY'),
+                const SectionLabel('1. SELECT DOCUMENT CATEGORY'),
                 const SizedBox(height: 10),
                 Wrap(
                   spacing: 8,
@@ -470,20 +476,26 @@ Analyze the document thoroughly and provide:
                     return InkWell(
                       onTap: () => setState(() => _selectedCategory = cat),
                       borderRadius: BorderRadius.circular(12),
-                      child: Container(
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 180),
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 8),
+                            horizontal: 14, vertical: 9),
                         decoration: BoxDecoration(
-                          color: isSelected
-                              ? AppColors.primary.withValues(alpha: 0.15)
-                              : AppColors.surface,
+                          color: isSelected ? AppColors.deepNavy : Colors.white,
                           border: Border.all(
                             color: isSelected
-                                ? AppColors.primary
-                                : AppColors.border,
-                            width: isSelected ? 1.5 : 1,
+                                ? AppColors.deepNavy
+                                : AppColors.outline,
+                            width: 1,
                           ),
                           borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.03),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -492,20 +504,20 @@ Analyze the document thoroughly and provide:
                               cat.icon,
                               size: 16,
                               color: isSelected
-                                  ? AppColors.deepForest
-                                  : AppColors.textSecondary,
+                                  ? AppColors.mustardGold
+                                  : AppColors.slateBlue,
                             ),
-                            const SizedBox(width: 6),
+                            const SizedBox(width: 8),
                             Text(
                               cat.title,
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: isSelected
                                     ? FontWeight.w700
-                                    : FontWeight.w500,
+                                    : FontWeight.w600,
                                 color: isSelected
-                                    ? AppColors.deepForest
-                                    : AppColors.onSurface,
+                                    ? Colors.white
+                                    : AppColors.deepNavy,
                               ),
                             ),
                           ],
@@ -518,92 +530,117 @@ Analyze the document thoroughly and provide:
                 const SizedBox(height: 20),
 
                 // Step 2: Upload File or Paste Text
-                SectionLabel('2. PROVIDE DOCUMENT CONTENT'),
+                const SectionLabel('2. PROVIDE DOCUMENT CONTENT'),
                 const SizedBox(height: 10),
 
                 // File Upload Card
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(14),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: AppColors.surface,
+                    color: Colors.white,
                     border: Border.all(
-                      color: file != null ? AppColors.primary : AppColors.border,
+                      color: file != null ? AppColors.deepNavy : AppColors.outline,
                       width: file != null ? 1.5 : 1,
                     ),
                     borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.03),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                   child: Column(
                     children: [
                       if (file == null) ...[
                         OutlinedButton.icon(
                           onPressed: _pickDocument,
-                          icon: const Icon(Icons.upload_file_outlined),
-                          label: const Text('Upload Document (PDF / DOCX / TXT)'),
+                          icon: const Icon(Icons.upload_file_outlined,
+                              color: AppColors.deepNavy),
+                          label: const Text(
+                            'Upload Document (PDF / DOCX / TXT)',
+                            style: TextStyle(
+                              color: AppColors.deepNavy,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: AppColors.deepForest,
-                            side: const BorderSide(color: AppColors.border),
+                            backgroundColor: AppColors.paleBlue,
+                            side: const BorderSide(color: AppColors.outline),
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 12),
+                                horizontal: 16, vertical: 13),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(12),
                             ),
                           ),
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 8),
                         const Text(
-                          'Max file size: 50MB. Files are verified on-device.',
+                          'Max file size: 50MB. Files are verified securely.',
                           style: TextStyle(
-                              fontSize: 11, color: AppColors.textSecondary),
+                            fontSize: 11,
+                            color: AppColors.slateBlue,
+                          ),
                         ),
                       ] else ...[
-                        Row(
-                          children: [
-                            const Icon(Icons.insert_drive_file_outlined,
-                                color: AppColors.deepForest, size: 28),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    file.name,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 14,
-                                      color: AppColors.deepForest,
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: AppColors.paleBlue,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: AppColors.outline),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.insert_drive_file_outlined,
+                                  color: AppColors.deepNavy, size: 28),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      file.name,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 14,
+                                        color: AppColors.deepNavy,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  Text(
-                                    FileUploadService.formatFileSize(file.size),
-                                    style: const TextStyle(
+                                    Text(
+                                      FileUploadService.formatFileSize(file.size),
+                                      style: const TextStyle(
                                         fontSize: 11,
-                                        color: AppColors.textSecondary),
-                                  ),
-                                ],
+                                        color: AppColors.slateBlue,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.close_rounded,
-                                  color: Colors.red),
-                              onPressed: _clearFile,
-                              tooltip: 'Remove file',
-                            ),
-                          ],
+                              IconButton(
+                                icon: const Icon(Icons.close_rounded,
+                                    color: Colors.red),
+                                onPressed: _clearFile,
+                                tooltip: 'Remove file',
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ],
                   ),
                 ),
 
-                const SizedBox(height: 14),
+                const SizedBox(height: 16),
 
                 // Or Paste Text
                 Row(
                   children: const [
-                    Expanded(child: Divider(color: AppColors.border)),
+                    Expanded(child: Divider(color: AppColors.outline)),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 10),
                       child: Text(
@@ -611,11 +648,12 @@ Analyze the document thoroughly and provide:
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.textSecondary,
+                          letterSpacing: 0.5,
+                          color: AppColors.slateBlue,
                         ),
                       ),
                     ),
-                    Expanded(child: Divider(color: AppColors.border)),
+                    Expanded(child: Divider(color: AppColors.outline)),
                   ],
                 ),
 
@@ -627,37 +665,41 @@ Analyze the document thoroughly and provide:
                   maxLines: 6,
                   maxLength: 4000,
                   textInputAction: TextInputAction.newline,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: AppColors.deepNavy,
+                  ),
                   decoration: InputDecoration(
                     hintText:
                         'Paste agreement clauses or describe specific terms...\n\nE.g. Clause 4: Tenant agrees that security deposit of ₹1,00,000 shall be non-refundable if tenant leaves before 24 months.',
                     hintStyle: const TextStyle(
-                      color: AppColors.textSecondary,
+                      color: AppColors.slateBlue,
                       fontSize: 13,
                       height: 1.5,
                     ),
                     filled: true,
-                    fillColor: AppColors.surface,
+                    fillColor: Colors.white,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
-                      borderSide: const BorderSide(color: AppColors.border),
+                      borderSide: const BorderSide(color: AppColors.outline),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
-                      borderSide: const BorderSide(color: AppColors.border),
+                      borderSide: const BorderSide(color: AppColors.outline),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(14),
                       borderSide:
-                          const BorderSide(color: AppColors.primary, width: 1.5),
+                          const BorderSide(color: AppColors.deepNavy, width: 1.5),
                     ),
-                    contentPadding: const EdgeInsets.all(14),
+                    contentPadding: const EdgeInsets.all(16),
                   ),
                 ),
 
                 const SizedBox(height: 16),
 
                 // Step 3: Review Focus Parameters
-                SectionLabel('3. REVIEW FOCUS PARAMETERS'),
+                const SectionLabel('3. REVIEW FOCUS PARAMETERS'),
                 const SizedBox(height: 8),
 
                 _CheckboxRow(
@@ -699,20 +741,22 @@ Analyze the document thoroughly and provide:
                             height: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2.5,
-                              color: AppColors.onPrimary,
+                              color: AppColors.deepNavy,
                             ),
                           )
-                        : const Icon(Icons.analytics_outlined),
+                        : const Icon(Icons.analytics_outlined,
+                            color: AppColors.deepNavy),
                     label: Text(
                       _isAnalyzing ? 'Auditing Document...' : 'Analyze Document',
                       style: const TextStyle(
                         fontSize: 15,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.deepNavy,
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: AppColors.onPrimary,
+                      backgroundColor: AppColors.mustardGold,
+                      foregroundColor: AppColors.deepNavy,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
@@ -733,14 +777,16 @@ Analyze the document thoroughly and provide:
                 Center(
                   child: Column(
                     children: [
-                      const CircularProgressIndicator(),
+                      const CircularProgressIndicator(
+                        color: AppColors.deepNavy,
+                      ),
                       const SizedBox(height: 16),
                       Text(
                         'Auditing "${_selectedCategory.title}"...',
                         style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.deepForest,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.deepNavy,
                         ),
                       ),
                       const SizedBox(height: 6),
@@ -748,7 +794,7 @@ Analyze the document thoroughly and provide:
                         'Checking statutory clauses, risk balance, and Indian legal compliance...',
                         style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.textSecondary,
+                          color: AppColors.slateBlue,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -763,7 +809,7 @@ Analyze the document thoroughly and provide:
                 Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: Colors.red.withValues(alpha: 0.08),
+                    color: AppColors.palePeach,
                     border: Border.all(color: Colors.red.shade300),
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -776,8 +822,9 @@ Analyze the document thoroughly and provide:
                         child: Text(
                           _errorMessage!,
                           style: TextStyle(
-                            color: Colors.red.shade800,
+                            color: Colors.red.shade900,
                             fontSize: 13,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
@@ -830,7 +877,8 @@ class _CheckboxRow extends StatelessWidget {
             Checkbox(
               value: value,
               onChanged: onChanged,
-              activeColor: AppColors.deepForest,
+              activeColor: AppColors.deepNavy,
+              checkColor: AppColors.mustardGold,
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
             const SizedBox(width: 6),
@@ -839,7 +887,8 @@ class _CheckboxRow extends StatelessWidget {
                 label,
                 style: const TextStyle(
                   fontSize: 13,
-                  color: AppColors.onSurface,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.deepNavy,
                 ),
               ),
             ),
@@ -866,11 +915,11 @@ class _ReviewResultCard extends StatelessWidget {
   Color _getRiskColor() {
     switch (result.riskLevel) {
       case 'Low':
-        return Colors.green.shade700;
+        return const Color(0xFF2E7D32);
       case 'High':
-        return Colors.red.shade700;
+        return const Color(0xFFC62828);
       default:
-        return Colors.orange.shade800;
+        return const Color(0xFFD97706);
     }
   }
 
@@ -886,8 +935,8 @@ class _ReviewResultCard extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            color: AppColors.surface,
-            border: Border.all(color: AppColors.border),
+            color: Colors.white,
+            border: Border.all(color: AppColors.outline),
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
@@ -904,9 +953,9 @@ class _ReviewResultCard extends StatelessWidget {
                 width: 68,
                 height: 68,
                 decoration: BoxDecoration(
-                  color: riskColor.withValues(alpha: 0.12),
+                  color: AppColors.paleBlue,
                   shape: BoxShape.circle,
-                  border: Border.all(color: riskColor, width: 2),
+                  border: Border.all(color: riskColor, width: 2.5),
                 ),
                 child: Center(
                   child: Column(
@@ -924,8 +973,8 @@ class _ReviewResultCard extends StatelessWidget {
                         '/100',
                         style: TextStyle(
                           fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.slateBlue,
                         ),
                       ),
                     ],
@@ -940,24 +989,24 @@ class _ReviewResultCard extends StatelessWidget {
                     Text(
                       result.documentType,
                       style: const TextStyle(
-                        fontSize: 15,
+                        fontSize: 16,
                         fontWeight: FontWeight.w800,
-                        color: AppColors.deepForest,
+                        color: AppColors.deepNavy,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 3),
+                          horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: riskColor.withValues(alpha: 0.15),
+                        color: riskColor.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
                         '${result.riskLevel} Risk Level',
                         style: TextStyle(
                           fontSize: 12,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w800,
                           color: riskColor,
                         ),
                       ),
@@ -971,29 +1020,34 @@ class _ReviewResultCard extends StatelessWidget {
 
         const SizedBox(height: 14),
 
-        // Executive Summary
+        // Executive Summary (Pale Blue surface)
         _AuditSection(
           icon: Icons.summarize_outlined,
           title: 'Executive Summary',
-          color: AppColors.deepForest,
+          cardColor: AppColors.paleBlue,
+          borderColor: const Color(0xFFD4E2EC),
+          iconColor: AppColors.deepNavy,
           child: Text(
             result.summary,
             style: const TextStyle(
               fontSize: 13,
               height: 1.5,
-              color: AppColors.onSurface,
+              fontWeight: FontWeight.w500,
+              color: AppColors.deepNavy,
             ),
           ),
         ),
 
         const SizedBox(height: 12),
 
-        // Red Flags
+        // Red Flags (Pale Peach surface)
         if (result.redFlags.isNotEmpty) ...[
           _AuditSection(
             icon: Icons.warning_amber_rounded,
             title: 'Critical Red Flags & High-Risk Terms',
-            color: Colors.red.shade700,
+            cardColor: AppColors.palePeach,
+            borderColor: const Color(0xFFE8C8B5),
+            iconColor: const Color(0xFFC62828),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: result.redFlags.map((flag) {
@@ -1002,15 +1056,16 @@ class _ReviewResultCard extends StatelessWidget {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.dangerous_outlined,
-                          size: 16, color: Colors.red.shade700),
+                      const Icon(Icons.dangerous_outlined,
+                          size: 16, color: Color(0xFFC62828)),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           flag,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 13,
-                            color: Colors.red.shade900,
+                            color: Color(0xFF5A1A1A),
+                            fontWeight: FontWeight.w600,
                             height: 1.4,
                           ),
                         ),
@@ -1024,12 +1079,14 @@ class _ReviewResultCard extends StatelessWidget {
           const SizedBox(height: 12),
         ],
 
-        // Missing Protections
+        // Missing Protections (Pale Yellow surface)
         if (result.missingClauses.isNotEmpty) ...[
           _AuditSection(
             icon: Icons.shield_outlined,
             title: 'Missing Standard Protections',
-            color: Colors.orange.shade800,
+            cardColor: AppColors.paleYellow,
+            borderColor: const Color(0xFFEDDAA8),
+            iconColor: const Color(0xFFB45309),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: result.missingClauses.map((clause) {
@@ -1038,15 +1095,16 @@ class _ReviewResultCard extends StatelessWidget {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.add_circle_outline,
-                          size: 16, color: Colors.orange.shade800),
+                      const Icon(Icons.add_circle_outline,
+                          size: 16, color: Color(0xFFB45309)),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           clause,
                           style: const TextStyle(
                             fontSize: 13,
-                            color: AppColors.onSurface,
+                            color: AppColors.deepNavy,
+                            fontWeight: FontWeight.w500,
                             height: 1.4,
                           ),
                         ),
@@ -1060,12 +1118,14 @@ class _ReviewResultCard extends StatelessWidget {
           const SizedBox(height: 12),
         ],
 
-        // Recommendations
+        // Recommendations (Pale Green surface)
         if (result.recommendations.isNotEmpty) ...[
           _AuditSection(
             icon: Icons.lightbulb_outline_rounded,
             title: 'Actionable Recommendations',
-            color: AppColors.deepForest,
+            cardColor: AppColors.paleGreen,
+            borderColor: const Color(0xFFCADCCF),
+            iconColor: const Color(0xFF2E7D32),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: result.recommendations.map((rec) {
@@ -1075,14 +1135,15 @@ class _ReviewResultCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Icon(Icons.check_circle_outline,
-                          size: 16, color: AppColors.brightEmerald),
+                          size: 16, color: Color(0xFF2E7D32)),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           rec,
                           style: const TextStyle(
                             fontSize: 13,
-                            color: AppColors.onSurface,
+                            color: AppColors.deepNavy,
+                            fontWeight: FontWeight.w500,
                             height: 1.4,
                           ),
                         ),
@@ -1096,17 +1157,20 @@ class _ReviewResultCard extends StatelessWidget {
           const SizedBox(height: 12),
         ],
 
-        // Statutory Context
+        // Statutory Context (Pale Blue surface)
         if (result.statutoryContext.isNotEmpty) ...[
           _AuditSection(
             icon: Icons.account_balance_outlined,
             title: 'Indian Law & Statutory References',
-            color: AppColors.deepForest,
+            cardColor: AppColors.paleBlue,
+            borderColor: const Color(0xFFD4E2EC),
+            iconColor: AppColors.deepNavy,
             child: Text(
               result.statutoryContext,
               style: const TextStyle(
                 fontSize: 13,
-                color: AppColors.onSurface,
+                color: AppColors.deepNavy,
+                fontWeight: FontWeight.w500,
                 height: 1.5,
               ),
             ),
@@ -1123,8 +1187,9 @@ class _ReviewResultCard extends StatelessWidget {
                 icon: const Icon(Icons.copy_outlined, size: 18),
                 label: const Text('Copy Report'),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.deepForest,
-                  side: const BorderSide(color: AppColors.border),
+                  foregroundColor: AppColors.deepNavy,
+                  side: const BorderSide(color: AppColors.outline),
+                  backgroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -1136,11 +1201,18 @@ class _ReviewResultCard extends StatelessWidget {
             Expanded(
               child: ElevatedButton.icon(
                 onPressed: onShare,
-                icon: const Icon(Icons.share_outlined, size: 18),
-                label: const Text('Share Report'),
+                icon: const Icon(Icons.share_outlined,
+                    size: 18, color: AppColors.deepNavy),
+                label: const Text(
+                  'Share Report',
+                  style: TextStyle(
+                    color: AppColors.deepNavy,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.deepForest,
-                  foregroundColor: Colors.white,
+                  backgroundColor: AppColors.mustardGold,
+                  foregroundColor: AppColors.deepNavy,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -1156,9 +1228,15 @@ class _ReviewResultCard extends StatelessWidget {
         Center(
           child: TextButton.icon(
             onPressed: onReset,
-            icon: const Icon(Icons.refresh_rounded, size: 18),
-            label: const Text('Review Another Document'),
-            style: TextButton.styleFrom(foregroundColor: AppColors.deepForest),
+            icon: const Icon(Icons.refresh_rounded,
+                size: 18, color: AppColors.slateBlue),
+            label: const Text(
+              'Review Another Document',
+              style: TextStyle(
+                color: AppColors.slateBlue,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ),
         ),
 
@@ -1172,13 +1250,17 @@ class _ReviewResultCard extends StatelessWidget {
 class _AuditSection extends StatelessWidget {
   final IconData icon;
   final String title;
-  final Color color;
+  final Color cardColor;
+  final Color borderColor;
+  final Color iconColor;
   final Widget child;
 
   const _AuditSection({
     required this.icon,
     required this.title,
-    required this.color,
+    required this.cardColor,
+    required this.borderColor,
+    required this.iconColor,
     required this.child,
   });
 
@@ -1186,10 +1268,10 @@ class _AuditSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        border: Border.all(color: AppColors.border),
+        color: cardColor,
+        border: Border.all(color: borderColor),
         borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
@@ -1197,7 +1279,7 @@ class _AuditSection extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, size: 18, color: color),
+              Icon(icon, size: 18, color: iconColor),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -1206,7 +1288,7 @@ class _AuditSection extends StatelessWidget {
                     fontSize: 11,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 0.5,
-                    color: color,
+                    color: iconColor,
                   ),
                 ),
               ),
@@ -1226,16 +1308,16 @@ class _DisclaimerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.10),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+        color: AppColors.paleBlue,
+        border: Border.all(color: const Color(0xFFD4E2EC)),
         borderRadius: BorderRadius.circular(12),
       ),
       child: const Row(
         children: [
           Icon(Icons.info_outline_rounded,
-              color: AppColors.deepForest, size: 20),
+              color: AppColors.slateBlue, size: 20),
           SizedBox(width: 10),
           Expanded(
             child: Text(
@@ -1243,7 +1325,7 @@ class _DisclaimerCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 11,
                 height: 1.4,
-                color: AppColors.deepForest,
+                color: AppColors.deepNavy,
               ),
             ),
           ),

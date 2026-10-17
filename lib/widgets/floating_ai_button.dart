@@ -34,10 +34,10 @@ class _FloatingAIButtonState extends State<FloatingAIButton>
       shape: BoxShape.circle,
       gradient: SweepGradient(
         colors: [
-          AppColors.primaryDark.withValues(alpha: 0),
-          AppColors.primaryLight,
-          AppColors.legalGold,
-          AppColors.primaryDark.withValues(alpha: 0),
+          AppColors.deepNavy.withValues(alpha: 0),
+          AppColors.paleBlue,
+          AppColors.mustardGold,
+          AppColors.deepNavy.withValues(alpha: 0),
         ],
       ),
     ),
@@ -52,17 +52,17 @@ class _FloatingAIButtonState extends State<FloatingAIButton>
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          AppColors.legalGold,
-          AppColors.amber,
-          AppColors.amberDark,
+          Color(0xFFFFC74F),
+          AppColors.mustardGold,
+          Color(0xFFE59F1C),
         ],
       ),
-      boxShadow: [
+      boxShadow: const [
         BoxShadow(
-          color: AppColors.shadowGold.withValues(alpha: 0.9),
-          blurRadius: 20,
-          spreadRadius: 2,
-          offset: const Offset(0, 8),
+          color: AppColors.shadowGold,
+          blurRadius: 16,
+          spreadRadius: 1,
+          offset: Offset(0, 6),
         ),
       ],
     ),

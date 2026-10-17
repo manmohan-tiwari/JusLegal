@@ -279,76 +279,7 @@ class FormStep extends StatelessWidget {
           ),
           const SizedBox(height: 24),
         ],
-        const SectionLabel('DOCUMENT LANGUAGE'),
-        const SizedBox(height: 10),
-        Row(
-          children: [
-            Expanded(
-              child: GestureDetector(
-                onTap: () => onLanguageChanged('en'),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  decoration: BoxDecoration(
-                    color: languageCode == 'en'
-                        ? AppColors.trustBlue
-                        : AppColors.surface,
-                    border: Border.all(
-                      color: languageCode == 'en'
-                          ? AppColors.trustBlue
-                          : AppColors.border,
-                    ),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Center(
-                    child: Text(
-                      'English',
-                      style: TextStyle(
-                        color: languageCode == 'en'
-                            ? Colors.white
-                            : AppColors.primaryNavy,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: GestureDetector(
-                onTap: () => onLanguageChanged('hi'),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  decoration: BoxDecoration(
-                    color: languageCode == 'hi'
-                        ? AppColors.trustBlue
-                        : AppColors.surface,
-                    border: Border.all(
-                      color: languageCode == 'hi'
-                          ? AppColors.trustBlue
-                          : AppColors.border,
-                    ),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Center(
-                    child: Text(
-                      'हिंदी',
-                      style: TextStyle(
-                        color: languageCode == 'hi'
-                            ? Colors.white
-                            : AppColors.primaryNavy,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 24),
+
         if (!formValid) ...[
           Text(
             'Complete all required fields to generate this document.',

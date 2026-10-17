@@ -2,7 +2,7 @@ part of 'app_config.dart';
 
 const String _environmentFile = String.fromEnvironment(
   'JUSLEGAL_ENV_FILE',
-  defaultValue: '',
+  defaultValue: '.env',
 );
 
 const String _compileTimeEnvironment = String.fromEnvironment(

@@ -88,27 +88,42 @@ class _AILegalChatScreenState extends ConsumerState<AILegalChatScreen> {
     });
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.warmOffWhite,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        foregroundColor: AppColors.white,
-        iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: AppColors.warmOffWhite,
+        foregroundColor: AppColors.deepNavy,
+        iconTheme: const IconThemeData(color: AppColors.deepNavy),
         surfaceTintColor: Colors.transparent,
-        elevation: 8,
-        shadowColor: AppColors.shadowStrong,
+        elevation: 0,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(
+            color: AppColors.divider,
+            height: 1,
+          ),
+        ),
         systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.light,
-          statusBarBrightness: Brightness.dark,
+          statusBarIconBrightness: Brightness.dark,
+          statusBarBrightness: Brightness.light,
         ),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(gradient: AppColors.appBarGradient),
-        ),
-        title: const Column(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('JusLegal AI', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Colors.white)),
-            Text('Legal guidance, not legal advice', style: TextStyle(fontSize: 12, color: Colors.white70)),
+            Text(
+              'JusLegal AI',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: AppColors.deepNavy,
+                    fontWeight: FontWeight.w800,
+                  ),
+            ),
+            Text(
+              'Legal guidance, not legal advice',
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: AppColors.slateBlue,
+                    fontWeight: FontWeight.w500,
+                  ),
+            ),
           ],
         ),
         actions: [
@@ -118,8 +133,10 @@ class _AILegalChatScreenState extends ConsumerState<AILegalChatScreen> {
             label: 'Start a new chat',
             child: IconButton(
               tooltip: 'New chat',
-              onPressed: isSendUnavailable ? null : () => ref.read(chatProvider.notifier).clearHistory(),
-              icon: const Icon(Icons.add_comment_outlined),
+              onPressed: isSendUnavailable
+                  ? null
+                  : () => ref.read(chatProvider.notifier).clearHistory(),
+              icon: const Icon(Icons.add_comment_outlined, color: AppColors.deepNavy),
             ),
           ),
         ],
@@ -127,7 +144,7 @@ class _AILegalChatScreenState extends ConsumerState<AILegalChatScreen> {
       body: SafeArea(
         top: false,
         child: Container(
-          decoration: const BoxDecoration(gradient: AppColors.backgroundGradient),
+          color: AppColors.warmOffWhite,
           child: Column(children: [
             Expanded(child: _messageList(chat.conversationHistory, isSendUnavailable)),
             if (chat.isSending) const _TypingIndicator(),
@@ -172,52 +189,68 @@ class _AILegalChatScreenState extends ConsumerState<AILegalChatScreen> {
       reverse: true,
       keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       child: Container(
-        padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          border: const Border(top: BorderSide(color: AppColors.border)),
-          boxShadow: [BoxShadow(color: AppColors.shadowBlack.withValues(alpha: .12), blurRadius: 18, offset: const Offset(0, -4))],
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+        decoration: const BoxDecoration(
+          color: AppColors.warmOffWhite,
+          border: Border(top: BorderSide(color: AppColors.divider)),
         ),
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          if (showSuggestions) SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(children: [
-              _SuggestionChip('Damaged online order', _sendMessage, enabled: !isSendUnavailable),
-              _SuggestionChip('Banking fraud', _sendMessage, enabled: !isSendUnavailable),
-              _SuggestionChip('Refund not received', _sendMessage, enabled: !isSendUnavailable),
-            ]),
-          ),
-          if (showSuggestions) const SizedBox(height: 10),
+          if (showSuggestions)
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(children: [
+                _SuggestionChip('Damaged online order', _sendMessage, enabled: !isSendUnavailable),
+                _SuggestionChip('Banking fraud', _sendMessage, enabled: !isSendUnavailable),
+                _SuggestionChip('Refund not received', _sendMessage, enabled: !isSendUnavailable),
+              ]),
+            ),
+          if (showSuggestions) const SizedBox(height: 12),
           Row(children: [
-            Expanded(child: Semantics(
-              textField: true,
-              label: 'Legal issue message',
-              child: TextField(
-                controller: _textController,
-                enabled: !isSendUnavailable,
-                style: const TextStyle(color: AppColors.textPrimary, fontSize: 16),
-                minLines: 1,
-                maxLines: 4,
-                textCapitalization: TextCapitalization.sentences,
-                onSubmitted: (_) => _sendMessage(),
-                decoration: InputDecoration(
-                  hintText: 'Describe your legal issue...',
-                  hintStyle: const TextStyle(color: AppColors.textSecondary),
-                  filled: true,
-                  fillColor: AppColors.surfaceBright,
-                  border: _inputBorder(AppColors.border),
-                  enabledBorder: _inputBorder(AppColors.border),
-                  focusedBorder: _inputBorder(AppColors.legalGold, width: 1.5),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+            Expanded(
+              child: Semantics(
+                textField: true,
+                label: 'Legal issue message',
+                child: TextField(
+                  controller: _textController,
+                  enabled: !isSendUnavailable,
+                  style: const TextStyle(
+                    color: AppColors.deepNavy,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  minLines: 1,
+                  maxLines: 4,
+                  textCapitalization: TextCapitalization.sentences,
+                  onSubmitted: (_) => _sendMessage(),
+                  decoration: InputDecoration(
+                    hintText: 'Describe your legal issue...',
+                    hintStyle: const TextStyle(
+                      color: AppColors.slateBlue,
+                      fontSize: 14,
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: _inputBorder(AppColors.outline),
+                    enabledBorder: _inputBorder(AppColors.outline),
+                    focusedBorder: _inputBorder(AppColors.deepNavy, width: 1.5),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                  ),
                 ),
               ),
-            )),
-            const SizedBox(width: 8),
-            Material(
-              color: AppColors.legalGold,
-              shape: const CircleBorder(),
-              elevation: 8,
-              shadowColor: AppColors.shadowGold,
+            ),
+            const SizedBox(width: 10),
+            Container(
+              decoration: BoxDecoration(
+                color: AppColors.mustardGold,
+                shape: BoxShape.circle,
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x22162B49),
+                    blurRadius: 8,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
               child: Semantics(
                 // Fix 7: this stays meaningful when only the icon is read.
                 button: true,
@@ -225,8 +258,11 @@ class _AILegalChatScreenState extends ConsumerState<AILegalChatScreen> {
                 child: IconButton(
                   tooltip: 'Send message',
                   onPressed: isSendUnavailable ? null : _sendMessage,
-                  style: IconButton.styleFrom(minimumSize: const Size(48, 48), foregroundColor: const Color(0xFF0B0F19)),
-                  icon: const Icon(Icons.send_rounded),
+                  style: IconButton.styleFrom(
+                    minimumSize: const Size(48, 48),
+                    foregroundColor: AppColors.deepNavy,
+                  ),
+                  icon: const Icon(Icons.arrow_upward_rounded, color: AppColors.deepNavy, size: 22),
                 ),
               ),
             ),
@@ -239,7 +275,8 @@ class _AILegalChatScreenState extends ConsumerState<AILegalChatScreen> {
   }
 
   OutlineInputBorder _inputBorder(Color color, {double width = 1}) => OutlineInputBorder(
-    borderRadius: BorderRadius.circular(24), borderSide: BorderSide(color: color, width: width),
+    borderRadius: BorderRadius.circular(16),
+    borderSide: BorderSide(color: color, width: width),
   );
 }
 
@@ -274,21 +311,14 @@ class _MessageBubble extends StatelessWidget {
           if (!isUser) ...[
             Container(
               margin: const EdgeInsets.only(top: 2, right: 8),
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
+              padding: const EdgeInsets.all(7),
+              decoration: const BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: AppColors.appBarGradient,
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.deepForest.withValues(alpha: 0.25),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+                color: AppColors.mustardGold,
               ),
               child: const Icon(
-                Icons.gavel_rounded,
-                color: AppColors.legalGold,
+                Icons.balance_rounded,
+                color: AppColors.deepNavy,
                 size: 16,
               ),
             ),
@@ -298,28 +328,22 @@ class _MessageBubble extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
               decoration: BoxDecoration(
-                gradient: isUser
-                    ? AppColors.userBubbleGradient
-                    : AppColors.botBubbleGradient,
+                color: isUser ? AppColors.deepNavy : AppColors.paleBlue,
                 borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(20),
-                  topRight: const Radius.circular(20),
-                  bottomLeft: Radius.circular(isUser ? 20 : 4),
-                  bottomRight: Radius.circular(isUser ? 4 : 20),
+                  topLeft: const Radius.circular(16),
+                  topRight: const Radius.circular(16),
+                  bottomLeft: Radius.circular(isUser ? 16 : 4),
+                  bottomRight: Radius.circular(isUser ? 4 : 16),
                 ),
                 border: Border.all(
-                  color: isUser
-                      ? AppColors.brightEmerald.withValues(alpha: 0.4)
-                      : AppColors.outlineVariant,
+                  color: isUser ? AppColors.deepNavyDark : const Color(0xFFD4E2EC),
                   width: 1,
                 ),
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(
-                    color: isUser
-                        ? AppColors.deepForest.withValues(alpha: 0.2)
-                        : AppColors.shadowBlack.withValues(alpha: 0.06),
+                    color: Color(0x0A162B49),
                     blurRadius: 8,
-                    offset: const Offset(0, 2),
+                    offset: Offset(0, 2),
                   ),
                 ],
               ),
@@ -336,7 +360,7 @@ class _MessageBubble extends StatelessWidget {
                         color: Colors.white,
                         fontSize: 15,
                         height: 1.45,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                       ),
                     )
                   else ...[
@@ -353,16 +377,17 @@ class _MessageBubble extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: AppColors.surfaceBright,
+                          color: Colors.white,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                              color: AppColors.legalGold.withValues(alpha: 0.5),
-                              width: 1.2),
-                          boxShadow: [
+                            color: const Color(0xFFD4E2EC),
+                            width: 1,
+                          ),
+                          boxShadow: const [
                             BoxShadow(
-                              color: AppColors.shadowBlack.withValues(alpha: 0.04),
+                              color: Color(0x06162B49),
                               blurRadius: 6,
-                              offset: const Offset(0, 2),
+                              offset: Offset(0, 2),
                             ),
                           ],
                         ),
@@ -371,16 +396,19 @@ class _MessageBubble extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                const Icon(Icons.flash_on_rounded,
-                                    color: AppColors.legalGold, size: 18),
+                                const Icon(
+                                  Icons.lightbulb_outline_rounded,
+                                  color: AppColors.mustardGold,
+                                  size: 18,
+                                ),
                                 const SizedBox(width: 6),
                                 Expanded(
                                   child: Text(
                                     message.action!.title,
                                     style: const TextStyle(
-                                      color: AppColors.deepForest,
+                                      color: AppColors.deepNavy,
                                       fontSize: 14,
-                                      fontWeight: FontWeight.w700,
+                                      fontWeight: FontWeight.w800,
                                     ),
                                   ),
                                 ),
@@ -395,14 +423,14 @@ class _MessageBubble extends StatelessWidget {
                                   children: [
                                     const Text('• ',
                                         style: TextStyle(
-                                            color: AppColors.legalGold,
+                                            color: AppColors.mustardGold,
                                             fontWeight: FontWeight.bold,
                                             fontSize: 14)),
                                     Expanded(
                                       child: Text(
                                         item,
                                         style: const TextStyle(
-                                            color: AppColors.onSurface,
+                                            color: AppColors.deepNavy,
                                             fontSize: 13.5,
                                             height: 1.35),
                                       ),
@@ -421,22 +449,24 @@ class _MessageBubble extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: AppColors.deepForest.withValues(alpha: 0.05),
+                          color: AppColors.paleYellow,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                              color: AppColors.deepForest.withValues(alpha: 0.25)),
+                            color: const Color(0xFFF3DE9C),
+                            width: 1,
+                          ),
                         ),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Icon(Icons.help_outline_rounded,
-                                color: AppColors.deepForest, size: 18),
+                                color: AppColors.deepNavy, size: 18),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 message.question!,
                                 style: const TextStyle(
-                                  color: AppColors.deepForest,
+                                  color: AppColors.deepNavy,
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
                                   height: 1.35,
@@ -454,22 +484,23 @@ class _MessageBubble extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 8),
                         decoration: BoxDecoration(
-                          color: AppColors.surfaceContainerLow,
+                          color: Colors.white,
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                              color: AppColors.brightEmerald.withValues(alpha: 0.3)),
+                            color: const Color(0xFFD4E2EC),
+                          ),
                         ),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Icon(Icons.gavel_rounded,
-                                color: AppColors.deepForest, size: 14),
+                                color: AppColors.slateBlue, size: 14),
                             const SizedBox(width: 6),
                             Expanded(
                               child: Text(
                                 message.legalContext!,
                                 style: const TextStyle(
-                                  color: AppColors.onSurface,
+                                  color: AppColors.slateBlue,
                                   fontSize: 12,
                                   fontStyle: FontStyle.italic,
                                   height: 1.35,
@@ -486,15 +517,15 @@ class _MessageBubble extends StatelessWidget {
                       Row(
                         children: [
                           const Icon(Icons.arrow_forward_rounded,
-                              color: AppColors.legalGold, size: 14),
+                              color: AppColors.mustardGold, size: 14),
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
                               'Next: ${message.nextStep}',
                               style: const TextStyle(
-                                color: AppColors.textSecondary,
+                                color: AppColors.slateBlue,
                                 fontSize: 12,
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.w700,
                               ),
                             ),
                           ),
@@ -522,7 +553,9 @@ class _MessageBubble extends StatelessWidget {
                   Text(
                     _formatTime(message.timestamp),
                     style: TextStyle(
-                      color: isUser ? Colors.white70 : AppColors.onSurfaceVariant,
+                      color: isUser
+                          ? Colors.white70
+                          : AppColors.slateBlue.withValues(alpha: 0.8),
                       fontSize: 10,
                       fontWeight: FontWeight.w500,
                     ),
@@ -534,22 +567,14 @@ class _MessageBubble extends StatelessWidget {
           if (isUser) ...[
             Container(
               margin: const EdgeInsets.only(top: 2, left: 8),
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
+              padding: const EdgeInsets.all(7),
+              decoration: const BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.deepForest,
-                border: Border.all(color: AppColors.legalGold.withValues(alpha: 0.6), width: 1),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.shadowBlack.withValues(alpha: 0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+                color: AppColors.deepNavy,
               ),
               child: const Icon(
                 Icons.person_rounded,
-                color: Colors.white,
+                color: AppColors.mustardGold,
                 size: 16,
               ),
             ),
@@ -572,42 +597,42 @@ class _MessageBubble extends StatelessWidget {
 
   static MarkdownStyleSheet _markdownStyle(BuildContext context) {
     final base = Theme.of(context).textTheme.bodyLarge?.copyWith(
-          color: AppColors.onSurface,
-          fontSize: 15,
+          color: AppColors.deepNavy,
+          fontSize: 14.5,
           height: 1.5,
         );
     return MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(
       p: base,
       h3: base?.copyWith(
-        color: AppColors.deepForest,
-        fontSize: 17,
-        fontWeight: FontWeight.w700,
+        color: AppColors.deepNavy,
+        fontSize: 16,
+        fontWeight: FontWeight.w800,
         height: 1.3,
       ),
       h3Padding: const EdgeInsets.only(top: 10, bottom: 4),
       strong: base?.copyWith(
-        color: AppColors.deepForest,
-        fontWeight: FontWeight.w700,
+        color: AppColors.deepNavy,
+        fontWeight: FontWeight.w800,
       ),
       a: base?.copyWith(
-        color: AppColors.deepForest,
+        color: AppColors.slateBlue,
         decoration: TextDecoration.underline,
-        decorationColor: AppColors.deepForest,
-        fontWeight: FontWeight.w600,
+        decorationColor: AppColors.slateBlue,
+        fontWeight: FontWeight.w700,
       ),
-      listBullet: base?.copyWith(color: AppColors.deepForest, fontSize: 15),
+      listBullet: base?.copyWith(color: AppColors.mustardGold, fontSize: 15),
       listIndent: 20,
       listBulletPadding: const EdgeInsets.only(right: 6),
       code: const TextStyle(
-        color: AppColors.onSurface,
-        backgroundColor: AppColors.surfaceContainerLow,
+        color: AppColors.deepNavy,
+        backgroundColor: AppColors.warmOffWhite,
         fontFamily: 'monospace',
         fontSize: 13,
       ),
       codeblockDecoration: BoxDecoration(
-        color: AppColors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: AppColors.outlineVariant),
+        color: AppColors.warmOffWhite,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.outline),
       ),
       codeblockPadding: const EdgeInsets.all(8),
       blockSpacing: 8,
@@ -656,10 +681,11 @@ class _TypingIndicatorState extends State<_TypingIndicator>
       child: Align(
         alignment: Alignment.centerLeft,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
-            gradient: AppColors.botBubbleGradient,
+            color: AppColors.paleBlue,
             borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: const Color(0xFFD4E2EC)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -668,8 +694,8 @@ class _TypingIndicatorState extends State<_TypingIndicator>
                 turns: _spinnerController,
                 child: const Icon(
                   Icons.sync_rounded,
-                  color: AppColors.legalGold,
-                  size: 18,
+                  color: AppColors.deepNavy,
+                  size: 16,
                 ),
               ),
               const SizedBox(width: 8),
@@ -678,9 +704,9 @@ class _TypingIndicatorState extends State<_TypingIndicator>
               const Text(
                 'JusLegal is responding...',
                 style: TextStyle(
-                  color: AppColors.textSecondary,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
+                  color: AppColors.deepNavy,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],
@@ -698,10 +724,10 @@ class _AnimatedDots extends StatelessWidget {
   Widget build(BuildContext context) => AnimatedBuilder(
     animation: animation,
     builder: (context, child) => SizedBox(
-      width: 30, height: 16,
+      width: 28, height: 16,
       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: List.generate(3, (index) {
         final phase = (animation.value * 3 - index).abs();
-        return Opacity(opacity: (1 - phase).clamp(.25, 1.0), child: const CircleAvatar(radius: 3, backgroundColor: AppColors.legalGold));
+        return Opacity(opacity: (1 - phase).clamp(.25, 1.0), child: const CircleAvatar(radius: 3, backgroundColor: AppColors.mustardGold));
       })),
     ),
   );
@@ -711,12 +737,12 @@ class _QueuedSendIndicator extends StatelessWidget {
   const _QueuedSendIndicator();
   @override
   Widget build(BuildContext context) => Padding(
-    padding: EdgeInsets.only(top: 8),
+    padding: const EdgeInsets.only(top: 8),
     child: Semantics(
       liveRegion: true, label: 'Message queued for sending',
-      child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2)),
-        SizedBox(width: 8), Text('Message queued…', style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+      child: const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.deepNavy)),
+        SizedBox(width: 8), Text('Message queued…', style: TextStyle(color: AppColors.slateBlue, fontSize: 13, fontWeight: FontWeight.w500)),
       ]),
     ),
   );
@@ -729,14 +755,13 @@ class _ChatErrorBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     width: double.infinity, margin: const EdgeInsets.only(top: 10), padding: const EdgeInsets.fromLTRB(12, 8, 6, 8),
-    decoration: BoxDecoration(color: Colors.red.shade50, borderRadius: BorderRadius.circular(10), border: Border.all(color: Colors.red.shade200)),
+    decoration: BoxDecoration(color: const Color(0xFFFDE8E8), borderRadius: BorderRadius.circular(10), border: Border.all(color: const Color(0xFFF8B4B4))),
     child: Semantics(
       liveRegion: true, label: 'Send failed: $error',
       child: Row(children: [
-        Icon(Icons.error_outline, color: Colors.red.shade700), const SizedBox(width: 8),
-        Expanded(child: Text(error, style: TextStyle(color: Colors.red.shade900))),
-        // Fix 7: make the recovery control discoverable to screen readers.
-        Semantics(button: true, label: 'Retry sending message', child: TextButton(onPressed: onRetry, child: const Text('Retry'))),
+        const Icon(Icons.error_outline, color: Color(0xFF9B1C1C)), const SizedBox(width: 8),
+        Expanded(child: Text(error, style: const TextStyle(color: Color(0xFF9B1C1C), fontSize: 13, fontWeight: FontWeight.w500))),
+        Semantics(button: true, label: 'Retry sending message', child: TextButton(onPressed: onRetry, child: const Text('Retry', style: TextStyle(color: Color(0xFF9B1C1C), fontWeight: FontWeight.w700)))),
       ]),
     ),
   );
@@ -754,13 +779,26 @@ class _SuggestionChip extends StatelessWidget {
       button: true, enabled: enabled, label: 'Send suggested issue: $label',
       child: AppAnimations.pressScale(
         onTap: enabled ? () => onTap(label) : null,
-        borderRadius: BorderRadius.circular(999), splashColor: AppColors.legalGold.withValues(alpha: .18),
+        borderRadius: BorderRadius.circular(999),
+        splashColor: AppColors.mustardGold.withValues(alpha: .18),
         child: Opacity(
           opacity: enabled ? 1 : .55,
           child: Container(
-            constraints: const BoxConstraints(minHeight: 48), padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            decoration: BoxDecoration(color: AppColors.cardBackground, borderRadius: BorderRadius.circular(999), border: Border.all(color: AppColors.border)),
-            child: Text(label, style: const TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w700)),
+            constraints: const BoxConstraints(minHeight: 40),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+              color: AppColors.paleBlue,
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: const Color(0xFFD4E2EC)),
+            ),
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: AppColors.deepNavy,
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ),
         ),
       ),
@@ -785,24 +823,22 @@ class _QuickOptionChip extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(20),
-        splashColor: AppColors.brightEmerald.withValues(alpha: 0.2),
+        splashColor: AppColors.mustardGold.withValues(alpha: 0.2),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
-            color: enabled
-                ? AppColors.surfaceContainerLowest
-                : AppColors.surfaceContainerLow,
+            color: enabled ? Colors.white : AppColors.warmOffWhite,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: enabled ? AppColors.deepForest : AppColors.outlineVariant,
+              color: enabled ? AppColors.deepNavy : AppColors.outline,
               width: 1.2,
             ),
             boxShadow: enabled
-                ? [
+                ? const [
                     BoxShadow(
-                      color: AppColors.deepForest.withValues(alpha: 0.08),
+                      color: Color(0x0A162B49),
                       blurRadius: 4,
-                      offset: const Offset(0, 2),
+                      offset: Offset(0, 2),
                     )
                   ]
                 : null,
@@ -810,8 +846,8 @@ class _QuickOptionChip extends StatelessWidget {
           child: Text(
             label,
             style: TextStyle(
-              color: enabled ? AppColors.deepForest : AppColors.onSurfaceVariant,
-              fontSize: 13.5,
+              color: enabled ? AppColors.deepNavy : AppColors.slateBlue,
+              fontSize: 13,
               fontWeight: FontWeight.w700,
             ),
           ),

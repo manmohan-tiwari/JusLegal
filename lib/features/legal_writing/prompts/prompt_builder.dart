@@ -74,7 +74,7 @@ class PromptBuilder {
     required DocumentDefinition definition,
     required DocumentFormData formData,
   }) {
-    final language = formData.languageCode == 'hi' ? 'Hindi' : 'English';
+    const language = 'English';
     if (definition.promptId == 'rent_agreement') {
       return _buildRentAgreementPrompt(formData, language);
     }

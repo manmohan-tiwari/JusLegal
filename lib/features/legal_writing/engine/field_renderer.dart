@@ -52,22 +52,22 @@ class _FieldRendererState extends State<FieldRenderer> {
   InputDecoration _decoration(String hint) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+      hintStyle: const TextStyle(color: AppColors.slateBlue, fontSize: 13),
       filled: true,
-      fillColor: AppColors.surface,
+      fillColor: Colors.white,
       errorText: widget.error,
       errorStyle: const TextStyle(fontSize: 11),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: AppColors.border),
+        borderSide: const BorderSide(color: AppColors.outline),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: AppColors.border),
+        borderSide: const BorderSide(color: AppColors.outline),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.legalGold, width: 1.5),
+        borderSide: const BorderSide(color: AppColors.deepNavy, width: 1.5),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -77,7 +77,7 @@ class _FieldRendererState extends State<FieldRenderer> {
         borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: Colors.red, width: 1.5),
       ),
-      contentPadding: const EdgeInsets.all(12),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
     );
   }
 
@@ -196,12 +196,20 @@ class _FieldRendererState extends State<FieldRenderer> {
           children: options.map((opt) {
             // ignore: deprecated_member_use
             return RadioListTile<String>(
-              title: Text(opt.label),
+              title: Text(
+                opt.label,
+                style: const TextStyle(
+                  color: AppColors.deepNavy,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
+              ),
               value: opt.value,
               // ignore: deprecated_member_use
               groupValue: groupValue,
               // ignore: deprecated_member_use
               onChanged: (v) => widget.onChanged(v),
+              activeColor: AppColors.deepNavy,
               dense: true,
               contentPadding: EdgeInsets.zero,
             );
@@ -214,7 +222,14 @@ class _FieldRendererState extends State<FieldRenderer> {
           children: options.map((opt) {
             final checked = current.contains(opt.value);
             return CheckboxListTile(
-              title: Text(opt.label),
+              title: Text(
+                opt.label,
+                style: const TextStyle(
+                  color: AppColors.deepNavy,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
+              ),
               value: checked,
               onChanged: (v) {
                 final updated = List<String>.from(current);
@@ -225,7 +240,8 @@ class _FieldRendererState extends State<FieldRenderer> {
                 }
                 widget.onChanged(updated);
               },
-              activeColor: AppColors.trustBlue,
+              activeColor: AppColors.deepNavy,
+              checkColor: AppColors.mustardGold,
               dense: true,
               contentPadding: EdgeInsets.zero,
               controlAffinity: ListTileControlAffinity.leading,
@@ -235,10 +251,18 @@ class _FieldRendererState extends State<FieldRenderer> {
       case FormFieldType.toggle:
         final current = widget.value == true;
         return SwitchListTile(
-          title: Text(widget.field.label),
+          title: Text(
+            widget.field.label,
+            style: const TextStyle(
+              color: AppColors.deepNavy,
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+            ),
+          ),
           value: current,
+          activeThumbColor: AppColors.deepNavy,
+          activeTrackColor: AppColors.mustardGold,
           onChanged: (v) => widget.onChanged(v),
-          activeThumbColor: AppColors.trustBlue,
           dense: true,
           contentPadding: EdgeInsets.zero,
         );

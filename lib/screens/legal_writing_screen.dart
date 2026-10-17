@@ -9,6 +9,7 @@ import '../features/legal_writing/engine/document_form_screen.dart';
 import '../features/legal_writing/models/document_definition.dart';
 import '../features/legal_writing/models/form_field_definition.dart';
 import '../features/legal_writing/models/form_section_definition.dart';
+import '../widgets/hover_stay_reveal_box.dart';
 import '../widgets/section_label.dart';
 
 class LegalWritingScreen extends ConsumerStatefulWidget {
@@ -464,45 +465,66 @@ class _LegalWritingScreenState extends ConsumerState<LegalWritingScreen> {
     }).toList();
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.warmOffWhite,
       appBar: AppBar(
-        title: const Text('Draft Legal Document'),
-        leading: BackButton(onPressed: () => Navigator.of(context).pop()),
+        backgroundColor: AppColors.warmOffWhite,
+        foregroundColor: AppColors.deepNavy,
+        iconTheme: const IconThemeData(color: AppColors.deepNavy),
+        elevation: 0,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(
+            color: AppColors.divider,
+            height: 1,
+          ),
+        ),
+        title: Text(
+          'Draft Legal Document',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: AppColors.deepNavy,
+                fontWeight: FontWeight.w800,
+              ),
+        ),
+        leading: BackButton(
+          color: AppColors.deepNavy,
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+          padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Search Input
               Container(
                 decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  border: Border.all(color: AppColors.border),
+                  color: Colors.white,
+                  border: Border.all(color: AppColors.outline),
                   borderRadius: BorderRadius.circular(14),
-                  boxShadow: [
+                  boxShadow: const [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.03),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
+                      color: Color(0x06162B49),
+                      blurRadius: 8,
+                      offset: Offset(0, 2),
                     ),
                   ],
                 ),
                 child: TextField(
                   controller: _searchController,
+                  style: const TextStyle(color: AppColors.deepNavy, fontSize: 14.5),
                   onChanged: (val) => setState(() => _searchQuery = val),
                   decoration: InputDecoration(
                     hintText: 'Search 32+ templates (Rent, Notice, PoA, RTI, Bail)...',
                     hintStyle: const TextStyle(
-                      color: AppColors.textSecondary,
+                      color: AppColors.slateBlue,
                       fontSize: 13,
                     ),
                     prefixIcon: const Icon(Icons.search_rounded,
-                        color: AppColors.textSecondary),
+                        color: AppColors.slateBlue),
                     suffixIcon: _searchQuery.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(Icons.clear, size: 18),
+                            icon: const Icon(Icons.clear, size: 18, color: AppColors.slateBlue),
                             onPressed: () {
                               _searchController.clear();
                               setState(() => _searchQuery = '');
@@ -528,27 +550,29 @@ class _LegalWritingScreenState extends ConsumerState<LegalWritingScreen> {
                       child: InkWell(
                         onTap: () => setState(() => _selectedCategoryFilter = cat),
                         borderRadius: BorderRadius.circular(20),
-                        child: Container(
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 180),
                           padding: const EdgeInsets.symmetric(
                               horizontal: 14, vertical: 7),
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? AppColors.deepForest
-                                : AppColors.surface,
+                                ? AppColors.deepNavy
+                                : Colors.white,
                             border: Border.all(
                               color: isSelected
-                                  ? AppColors.deepForest
-                                  : AppColors.border,
+                                  ? AppColors.deepNavy
+                                  : AppColors.outline,
+                              width: 1.2,
                             ),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
                             cat,
                             style: TextStyle(
-                              color: isSelected ? Colors.white : AppColors.onSurface,
-                              fontSize: 12,
+                              color: isSelected ? Colors.white : AppColors.deepNavy,
+                              fontSize: 12.5,
                               fontWeight:
-                                  isSelected ? FontWeight.w700 : FontWeight.w500,
+                                  isSelected ? FontWeight.w800 : FontWeight.w600,
                             ),
                           ),
                         ),
@@ -558,7 +582,7 @@ class _LegalWritingScreenState extends ConsumerState<LegalWritingScreen> {
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 22),
 
               // Template Grid
               SectionLabel(
@@ -573,28 +597,28 @@ class _LegalWritingScreenState extends ConsumerState<LegalWritingScreen> {
                   padding: const EdgeInsets.all(24),
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: AppColors.surface,
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppColors.border),
+                    border: Border.all(color: AppColors.outline),
                   ),
                   child: Column(
                     children: [
                       const Icon(Icons.search_off_rounded,
-                          size: 40, color: AppColors.textSecondary),
+                          size: 40, color: AppColors.slateBlue),
                       const SizedBox(height: 10),
                       Text(
                         'No matching template found for "$_searchQuery"',
                         style: const TextStyle(
                           fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.deepForest,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.deepNavy,
                         ),
                       ),
                       const SizedBox(height: 6),
                       const Text(
                         'Try searching for "Rent", "Notice", "Affidavit", "PoA", or "RTI".',
                         style: TextStyle(
-                            fontSize: 12, color: AppColors.textSecondary),
+                            fontSize: 12, color: AppColors.slateBlue),
                       ),
                     ],
                   ),
@@ -606,111 +630,163 @@ class _LegalWritingScreenState extends ConsumerState<LegalWritingScreen> {
                   itemCount: filteredTemplates.length,
                   itemBuilder: (context, index) {
                     final t = filteredTemplates[index];
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      decoration: BoxDecoration(
-                        color: AppColors.surface,
-                        border: Border.all(color: AppColors.border),
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.03),
-                            blurRadius: 8,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 10),
-                        leading: Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            color: AppColors.primary.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Icon(
-                            t['icon'] as IconData,
-                            color: AppColors.deepForest,
-                            size: 24,
-                          ),
-                        ),
-                        title: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                t['title'] as String,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 14.5,
-                                  color: AppColors.deepForest,
-                                ),
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: AppColors.primary.withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                t['category'] as String,
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.deepForest,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(top: 4),
-                              child: Text(
-                                t['desc'] as String,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.textSecondary,
-                                  height: 1.35,
-                                ),
-                              ),
-                            ),
-                            if (t['act'] != null) ...[
-                              const SizedBox(height: 6),
-                              Row(
-                                children: [
-                                  const Icon(Icons.shield_outlined,
-                                      size: 13, color: AppColors.brightEmerald),
-                                  const SizedBox(width: 4),
-                                  Expanded(
-                                    child: Text(
-                                      t['act'] as String,
-                                      style: const TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppColors.deepForest,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ],
-                        ),
-                        trailing: const Icon(
-                          Icons.arrow_forward_ios_rounded,
-                          size: 15,
-                          color: AppColors.textSecondary,
-                        ),
+                    final radius = BorderRadius.circular(14);
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: HoverStayRevealBox(
                         onTap: () => _openDocumentById(
                           t['id'] as String,
                           t['title'] as String,
                         ),
+                        borderRadius: radius,
+                        builder: (context, isRevealed) {
+                          return AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 12),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              border: Border.all(
+                                color: isRevealed
+                                    ? AppColors.deepNavy.withValues(alpha: 0.35)
+                                    : AppColors.outline,
+                                width: isRevealed ? 1.4 : 1,
+                              ),
+                              borderRadius: radius,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: isRevealed
+                                      ? AppColors.deepNavy.withValues(alpha: 0.1)
+                                      : const Color(0x06162B49),
+                                  blurRadius: isRevealed ? 12 : 8,
+                                  offset: Offset(0, isRevealed ? 4 : 2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  width: 44,
+                                  height: 44,
+                                  decoration: BoxDecoration(
+                                    color: isRevealed
+                                        ? AppColors.mustardGold
+                                            .withValues(alpha: 0.25)
+                                        : AppColors.paleBlue,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Icon(
+                                    t['icon'] as IconData,
+                                    color: AppColors.deepNavy,
+                                    size: 22,
+                                  ),
+                                ),
+                                const SizedBox(width: 14),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              t['title'] as String,
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w800,
+                                                fontSize: 14.5,
+                                                color: AppColors.deepNavy,
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 8, vertical: 3),
+                                            decoration: BoxDecoration(
+                                              color: AppColors.paleYellow,
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
+                                              border: Border.all(
+                                                  color: const Color(0xFFF3DE9C)),
+                                            ),
+                                            child: Text(
+                                              t['category'] as String,
+                                              style: const TextStyle(
+                                                fontSize: 10.5,
+                                                fontWeight: FontWeight.w800,
+                                                color: Color(0xFF8C5B00),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      HoverRevealContent(
+                                        isRevealed: isRevealed,
+                                        padding: const EdgeInsets.only(top: 6),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              t['desc'] as String,
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                color: AppColors.slateBlue,
+                                                height: 1.35,
+                                              ),
+                                            ),
+                                            if (t['act'] != null) ...[
+                                              const SizedBox(height: 6),
+                                              Row(
+                                                children: [
+                                                  const Icon(
+                                                      Icons.shield_outlined,
+                                                      size: 13,
+                                                      color: AppColors
+                                                          .mustardGold),
+                                                  const SizedBox(width: 4),
+                                                  Expanded(
+                                                    child: Text(
+                                                      t['act'] as String,
+                                                      style: const TextStyle(
+                                                        fontSize: 11,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        color:
+                                                            AppColors.deepNavy,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 2),
+                                  child: AnimatedSlide(
+                                    duration: const Duration(milliseconds: 180),
+                                    offset: isRevealed
+                                        ? const Offset(0.2, 0)
+                                        : Offset.zero,
+                                    child: const Icon(
+                                      Icons.arrow_forward_ios_rounded,
+                                      size: 14,
+                                      color: AppColors.slateBlue,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
                       ),
                     );
                   },
@@ -722,20 +798,20 @@ class _LegalWritingScreenState extends ConsumerState<LegalWritingScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.08),
-                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+                  color: AppColors.paleBlue,
+                  border: Border.all(color: const Color(0xFFD4E2EC)),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Row(
                   children: [
                     Icon(Icons.verified_outlined,
-                        color: AppColors.deepForest, size: 20),
+                        color: AppColors.deepNavy, size: 20),
                     SizedBox(width: 10),
                     Expanded(
                       child: Text(
                         'All templates comply with Indian statutory laws (Registration Act, Specific Relief Act, Negotiable Instruments Act, etc.) and generate printable PDFs.',
                         style: TextStyle(
-                            fontSize: 11, height: 1.4, color: AppColors.deepForest),
+                            fontSize: 11.5, height: 1.4, color: AppColors.deepNavy),
                       ),
                     ),
                   ],

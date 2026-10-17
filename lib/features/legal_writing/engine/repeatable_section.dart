@@ -78,11 +78,18 @@ class RepeatableSectionRenderer extends StatelessWidget {
             width: double.infinity,
             child: OutlinedButton.icon(
               onPressed: () => onAddItem(section.id, null),
-              icon: const Icon(Icons.add_outlined, size: 18),
-              label: Text(section.addButtonLabel),
+              icon: const Icon(Icons.add_outlined,
+                  size: 18, color: AppColors.deepNavy),
+              label: Text(
+                section.addButtonLabel,
+                style: const TextStyle(
+                  color: AppColors.deepNavy,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.trustBlue,
-                side: BorderSide(color: AppColors.trustBlue.withValues(alpha: 0.5)),
+                backgroundColor: AppColors.paleBlue,
+                side: const BorderSide(color: AppColors.outline),
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -100,11 +107,18 @@ class RepeatableSectionRenderer extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
-        color: AppColors.surface.withValues(alpha: 0.5),
-        border: Border.all(color: AppColors.border),
+        color: Colors.white,
+        border: Border.all(color: AppColors.outline),
         borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      padding: const EdgeInsets.fromLTRB(14, 10, 14, 4),
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 6),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -113,19 +127,27 @@ class RepeatableSectionRenderer extends StatelessWidget {
               Expanded(
                 child: Text(
                   '${section.itemTitlePrefix} ${index + 1}',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.primaryNavy,
-                      ),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 14,
+                    color: AppColors.deepNavy,
+                  ),
                 ),
               ),
               if (items.length > section.minItems)
                 TextButton.icon(
                   onPressed: () => onRemoveItem(section.id, index),
-                  icon: const Icon(Icons.delete_outline, size: 16),
-                  label: Text(section.removeButtonLabel),
+                  icon: const Icon(Icons.delete_outline,
+                      size: 16, color: Color(0xFFC62828)),
+                  label: Text(
+                    section.removeButtonLabel,
+                    style: const TextStyle(
+                      color: Color(0xFFC62828),
+                      fontWeight: FontWeight.w700,
+                      fontSize: 12,
+                    ),
+                  ),
                   style: TextButton.styleFrom(
-                    foregroundColor: Colors.red.shade700,
                     padding: EdgeInsets.zero,
                     minimumSize: const Size(0, 0),
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,

@@ -15,25 +15,27 @@ class LegalInfoBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.legalGold.withValues(alpha: 0.10),
-        border: Border.all(color: AppColors.legalGold),
+        color: AppColors.paleBlue,
+        border: Border.all(color: const Color(0xFFD4E2EC)),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         crossAxisAlignment: crossAxisAlignment,
         children: [
           const Icon(Icons.info_outline_rounded,
-              color: AppColors.legalGold, size: 18),
+              color: AppColors.slateBlue, size: 18),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               message,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.primaryNavy,
-                    height: 1.4,
-                  ),
+              style: const TextStyle(
+                fontSize: 12,
+                color: AppColors.deepNavy,
+                fontWeight: FontWeight.w500,
+                height: 1.45,
+              ),
             ),
           ),
         ],

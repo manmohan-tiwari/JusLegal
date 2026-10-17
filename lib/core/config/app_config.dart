@@ -63,14 +63,8 @@ Return ONLY one JSON object. It must have exactly these keys and no others:
 
 type and message are required. Use question only when type is question, with one question and normally 2-4 short, mutually clear string options. Keep options as strings, never write them in message. Use steps only when useful (1-4 short strings). Use legalContext only when relevant. nextAction is optional. caseUpdates must contain only facts learned from this latest user message; never invent facts, repeat old facts, or overwrite known facts with null unless explicitly corrected. Flutter controls all UI formatting.''';
 
-String chatSystemPromptForLanguage(String languageCode) {
-  final base = jusLegalChatSystemPrompt;
-  if (languageCode.toLowerCase() == 'hi') {
-    return '$base\n'
-        'Output valid JSON. Write message, question, steps, options, and legalContext strings naturally in Hindi (Devanagari script). '
-        'Keep legal terms like RBI, RTI, FIR, IPC, NCH, and Act names in English script/acronyms where appropriate.';
-  }
-  return '$base\nRespond in English.';
+String chatSystemPromptForLanguage([String languageCode = 'en']) {
+  return '$jusLegalChatSystemPrompt\nRespond in English.';
 }
 
 // ============================ RUNTIME / ENV ==================================
@@ -96,13 +90,16 @@ class EnvConfig {
   static Future<void> initialize() async {
     configurationError = null;
     try {
-      if (_environmentFile.isNotEmpty) {
-        await dotenv.dotenv.load(
-          fileName: _environmentFile,
-          isOptional: true,
-        );
-      }
+      final envFile = _environmentFile.isNotEmpty ? _environmentFile : '.env';
+      await dotenv.dotenv.load(
+        fileName: envFile,
+        isOptional: true,
+      );
       _EnvironmentState.load(dotenv.dotenv.env);
+      if (kDebugMode) {
+        debugPrint(
+            '[EnvConfig] Loaded ${dotenv.dotenv.env.length} keys from $envFile. Gemini key configured: ${EnvironmentState.geminiApiKey.isNotEmpty}');
+      }
       if (!EnvironmentState.isValid) {
         throw const ConfigurationException(
           'Website URL and country code must be valid.',
@@ -243,32 +240,17 @@ class AppStrings {
   static const String actionFindNearest = 'Find nearest';
   static const String actionContactAirline = 'Contact airline';
 
-  // Chat Error Messages (localized en/hi – resolved via localeProvider)
-  static const Map<String, Map<String, String>> chatErrorMessages = {
-    'serviceUnavailable': {
-      'en': 'AI services are unavailable. Please try again shortly.',
-      'hi': 'AI सेवाएँ उपलब्ध नहीं हैं। कृपया थोड़ी देर बाद पुनः प्रयास करें।',
-    },
-    'network': {
-      'en':
-          'Could not reach the AI service. Check your connection and try again.',
-      'hi':
-          'AI सेवा से संपर्क नहीं हो सका। अपना कनेक्शन जाँचें और फिर प्रयास करें।',
-    },
-    'generic': {
-      'en': 'Could not get an AI response. Please try again.',
-      'hi': 'AI उत्तर प्राप्त नहीं हो सका। कृपया पुनः प्रयास करें।',
-    },
-    'cancelled': {
-      'en': 'Previous request cancelled. Sending your new message…',
-      'hi': 'पिछला अनुरोध रद्द किया गया। आपका नया संदेश भेजा जा रहा है…',
-    },
+  // Chat Error Messages
+  static const Map<String, String> chatErrorMessages = {
+    'serviceUnavailable': 'AI services are unavailable. Please try again shortly.',
+    'network':
+        'Could not reach the AI service. Check your connection and try again.',
+    'generic': 'Could not get an AI response. Please try again.',
+    'cancelled': 'Previous request cancelled. Sending your new message…',
   };
 
-  static String chatErrorMessage(String key, String languageCode) {
-    final messages = chatErrorMessages[key];
-    if (messages == null) return '';
-    return messages[languageCode] ?? messages['en']!;
+  static String chatErrorMessage(String key, [String languageCode = 'en']) {
+    return chatErrorMessages[key] ?? '';
   }
 
   // Error Messages

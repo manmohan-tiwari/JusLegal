@@ -6,7 +6,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_en.dart';
-import 'app_localizations_hi.dart';
 
 // ignore_for_file: type=lint
 
@@ -93,10 +92,7 @@ abstract class AppLocalizations {
   ];
 
   /// A list of this localizations delegate's supported locales.
-  static const List<Locale> supportedLocales = <Locale>[
-    Locale('en'),
-    Locale('hi')
-  ];
+  static const List<Locale> supportedLocales = <Locale>[Locale('en')];
 
   /// No description provided for @appName.
   ///
@@ -127,30 +123,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Settings'**
   String get settings;
-
-  /// No description provided for @language.
-  ///
-  /// In en, this message translates to:
-  /// **'Language'**
-  String get language;
-
-  /// No description provided for @selectLanguage.
-  ///
-  /// In en, this message translates to:
-  /// **'Select Language'**
-  String get selectLanguage;
-
-  /// No description provided for @english.
-  ///
-  /// In en, this message translates to:
-  /// **'English'**
-  String get english;
-
-  /// No description provided for @hindi.
-  ///
-  /// In en, this message translates to:
-  /// **'Hindi'**
-  String get hindi;
 
   /// No description provided for @preferences.
   ///
@@ -343,24 +315,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Settings'**
   String get settingsTooltip;
-
-  /// No description provided for @languageSubtitleEnglish.
-  ///
-  /// In en, this message translates to:
-  /// **'English'**
-  String get languageSubtitleEnglish;
-
-  /// No description provided for @languageSubtitleHindi.
-  ///
-  /// In en, this message translates to:
-  /// **'Hindi'**
-  String get languageSubtitleHindi;
-
-  /// No description provided for @languageTileSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Switch between English and Hindi'**
-  String get languageTileSubtitle;
 
   /// No description provided for @homeHeroHeadline1.
   ///
@@ -1496,7 +1450,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['en', 'hi'].contains(locale.languageCode);
+      <String>['en'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -1507,8 +1461,6 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   switch (locale.languageCode) {
     case 'en':
       return AppLocalizationsEn();
-    case 'hi':
-      return AppLocalizationsHi();
   }
 
   throw FlutterError(

@@ -1,7 +1,7 @@
 class DocumentPromptsComplete {
   static Map<String, String> getPromptsForType(
       String documentType, String language) {
-    final languageName = language == 'hi' ? 'Hindi' : 'English';
+    const languageName = 'English';
 
     final type =
         documentType.toLowerCase().replaceAll('_', ' ').replaceAll('-', ' ');

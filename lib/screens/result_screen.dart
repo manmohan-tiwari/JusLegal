@@ -30,15 +30,30 @@ class ResultScreen extends ConsumerStatefulWidget {
 
 class _ResultScreenState extends ConsumerState<ResultScreen> {
   ({Color color, String label}) _confidenceMeta(AppLocalizations l10n, int confidence) {
-    if (confidence > 70) return (color: AppTheme.success, label: l10n.strongCase);
-    if (confidence >= 40) return (color: AppTheme.legalGold, label: l10n.moderateCase);
-    return (color: AppTheme.error, label: l10n.weakCase);
+    if (confidence > 70) return (color: AppColors.mustardGold, label: l10n.strongCase);
+    if (confidence >= 40) return (color: AppColors.slateBlue, label: l10n.moderateCase);
+    return (color: AppColors.error, label: l10n.weakCase);
   }
 
   Widget _maybeTruncatedLawChip(String text) {
     final isTruncated = text.length > 30;
     final displayText = isTruncated ? '${text.substring(0, 27)}...' : text;
-    final chip = Chip(label: Text(displayText));
+    final chip = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppColors.paleYellow,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFF3DE9C)),
+      ),
+      child: Text(
+        displayText,
+        style: const TextStyle(
+          color: AppColors.deepNavy,
+          fontSize: 12.5,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
 
     if (!isTruncated) return chip;
     return Tooltip(message: text, child: chip);
@@ -269,12 +284,31 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
           );
 
     return Scaffold(
+      backgroundColor: AppColors.warmOffWhite,
       appBar: AppBar(
-        title: Text(l10n.yourLegalAnalysis),
+        backgroundColor: AppColors.warmOffWhite,
+        foregroundColor: AppColors.deepNavy,
+        iconTheme: const IconThemeData(color: AppColors.deepNavy),
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(
+            color: AppColors.divider,
+            height: 1,
+          ),
+        ),
+        title: Text(
+          l10n.yourLegalAnalysis,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: AppColors.deepNavy,
+                fontWeight: FontWeight.w800,
+              ),
+        ),
         actions: [
           IconButton(
             onPressed: () => _share(result),
-            icon: const Icon(Icons.share_outlined),
+            icon: const Icon(Icons.share_outlined, color: AppColors.deepNavy),
           ),
         ],
       ),
@@ -283,15 +317,15 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
           if (isRefreshing || errorMessage != null)
             Container(
               width: double.infinity,
-              color: errorMessage != null ? AppTheme.error : AppTheme.surface,
+              color: errorMessage != null ? const Color(0xFFFDE8E8) : AppColors.paleBlue,
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
               child: Row(
                 children: [
                   Icon(
                     errorMessage != null ? Icons.error_outline : Icons.refresh,
                     color: errorMessage != null
-                        ? Colors.white
-                        : AppTheme.primaryNavy,
+                        ? const Color(0xFF9B1C1C)
+                        : AppColors.deepNavy,
                     size: 18,
                   ),
                   const SizedBox(width: 8),
@@ -300,9 +334,10 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                       errorMessage ?? l10n.updatingAnalysisStatus,
                       style: TextStyle(
                         color: errorMessage != null
-                            ? Colors.white
-                            : AppTheme.primaryNavy,
+                            ? const Color(0xFF9B1C1C)
+                            : AppColors.deepNavy,
                         fontSize: 13,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
@@ -312,7 +347,13 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                         HapticFeedback.lightImpact();
                         ref.invalidate(analysisProvider);
                       },
-                      child: Text(l10n.retry),
+                      child: Text(
+                        l10n.retry,
+                        style: const TextStyle(
+                          color: Color(0xFF9B1C1C),
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                     ),
                 ],
               ),
@@ -363,8 +404,8 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
           Container(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
             decoration: const BoxDecoration(
-              color: AppTheme.background,
-              border: Border(top: BorderSide(color: AppTheme.border)),
+              color: AppColors.warmOffWhite,
+              border: Border(top: BorderSide(color: AppColors.divider)),
             ),
             child: Row(
               children: [
@@ -374,7 +415,18 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
                       HapticFeedback.lightImpact();
                       _saveCase(context, ref, result);
                     },
-                    child: Text(l10n.saveCase),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.deepNavy,
+                      side: const BorderSide(color: AppColors.deepNavy, width: 1.2),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    child: Text(
+                      l10n.saveCase,
+                      style: const TextStyle(fontWeight: FontWeight.w700),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -437,7 +489,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
           borderRadius: BorderRadius.circular(999),
           child: LinearProgressIndicator(
             value: confidence / 100,
-            backgroundColor: AppTheme.border,
+            backgroundColor: AppColors.paleBlue,
             color: meta.color,
             minHeight: 8,
           ),
@@ -569,37 +621,43 @@ class _ReportCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: AppTheme.surface,
+    return Container(
       clipBehavior: Clip.antiAlias,
-      elevation: 0,
       margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side: const BorderSide(color: AppTheme.border),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.outline),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x08162B49),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            color: AppTheme.surfaceBright,
-            padding: const EdgeInsets.all(16),
+            color: AppColors.paleBlue,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
-                Icon(icon, color: AppTheme.legalGold, size: 18),
-                const SizedBox(width: 8),
+                Icon(icon, color: AppColors.deepNavy, size: 18),
+                const SizedBox(width: 10),
                 Text(
                   title,
                   style: const TextStyle(
-                    color: AppTheme.textPrimary,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
+                    color: AppColors.deepNavy,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
               ],
             ),
           ),
-          const Divider(height: 1),
+          const Divider(height: 1, color: AppColors.divider),
           Padding(
             padding: const EdgeInsets.all(16),
             child: child,

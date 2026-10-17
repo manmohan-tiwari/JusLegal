@@ -109,8 +109,6 @@ class _DocumentFormRendererState extends ConsumerState<DocumentFormRenderer> {
           _buildPromptHintCard(context),
           const SizedBox(height: 20),
           _buildSectionContent(section),
-          const SizedBox(height: 20),
-          _buildLanguageSelector(context),
           const SizedBox(height: 24),
           _buildStepIndicator(context),
           const SizedBox(height: 12),
@@ -122,23 +120,36 @@ class _DocumentFormRendererState extends ConsumerState<DocumentFormRenderer> {
 
   Widget _buildHeaderCard(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppColors.primaryNavy, AppColors.trustBlue],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(14),
+        color: AppColors.deepNavy,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.deepNavy.withValues(alpha: 0.15),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         children: [
-          Icon(
-            widget.definition.category.icon,
-            color: Colors.white,
-            size: 24,
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppColors.mustardGold.withValues(alpha: 0.20),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: AppColors.mustardGold.withValues(alpha: 0.4),
+              ),
+            ),
+            child: Icon(
+              widget.definition.category.icon,
+              color: AppColors.mustardGold,
+              size: 24,
+            ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -147,15 +158,17 @@ class _DocumentFormRendererState extends ConsumerState<DocumentFormRenderer> {
                   widget.definition.title,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 16,
                   ),
                 ),
+                const SizedBox(height: 3),
                 Text(
                   widget.definition.description,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.8),
+                  style: const TextStyle(
+                    color: AppColors.paleBlue,
                     fontSize: 12,
+                    height: 1.4,
                   ),
                 ),
               ],
@@ -170,13 +183,14 @@ class _DocumentFormRendererState extends ConsumerState<DocumentFormRenderer> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'TONE',
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: AppColors.textSecondary,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0.5,
-              ),
+        const Text(
+          'TONE OF DRAFT',
+          style: TextStyle(
+            color: AppColors.slateBlue,
+            fontWeight: FontWeight.w800,
+            fontSize: 11,
+            letterSpacing: 0.8,
+          ),
         ),
         const SizedBox(height: 10),
         Row(
@@ -188,22 +202,29 @@ class _DocumentFormRendererState extends ConsumerState<DocumentFormRenderer> {
                 child: GestureDetector(
                   onTap: () => widget.onToneChanged(tone),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    padding: const EdgeInsets.symmetric(vertical: 11),
                     decoration: BoxDecoration(
-                      color: selected ? AppColors.trustBlue : AppColors.surface,
+                      color: selected ? AppColors.deepNavy : Colors.white,
                       border: Border.all(
                         color:
-                            selected ? AppColors.trustBlue : AppColors.border,
+                            selected ? AppColors.deepNavy : AppColors.outline,
                       ),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.02),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
                     child: Center(
                       child: Text(
                         tone,
                         style: TextStyle(
                           color:
-                              selected ? Colors.white : AppColors.primaryNavy,
-                          fontWeight: FontWeight.w600,
+                              selected ? Colors.white : AppColors.deepNavy,
+                          fontWeight: FontWeight.w700,
                           fontSize: 13,
                         ),
                       ),
@@ -220,29 +241,31 @@ class _DocumentFormRendererState extends ConsumerState<DocumentFormRenderer> {
 
   Widget _buildPromptHintCard(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.trustBlue.withValues(alpha: 0.06),
+        color: AppColors.paleBlue,
         border: Border.all(
-          color: AppColors.trustBlue.withValues(alpha: 0.3),
+          color: const Color(0xFFD4E2EC),
         ),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
         children: [
           const Icon(
             Icons.lightbulb_outline,
-            color: AppColors.trustBlue,
-            size: 18,
+            color: AppColors.slateBlue,
+            size: 20,
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
               widget.definition.promptHint,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.primaryNavy,
-                    height: 1.4,
-                  ),
+              style: const TextStyle(
+                color: AppColors.deepNavy,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                height: 1.45,
+              ),
             ),
           ),
         ],
@@ -346,56 +369,7 @@ class _DocumentFormRendererState extends ConsumerState<DocumentFormRenderer> {
   String _label(String key) =>
       key.replaceAllMapped(RegExp(r'([a-z])([A-Z])'), (m) => '${m[1]} ${m[2]}');
 
-  Widget _buildLanguageSelector(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'DOCUMENT LANGUAGE',
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: AppColors.textSecondary,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0.5,
-              ),
-        ),
-        const SizedBox(height: 10),
-        Row(
-          children: [
-            Expanded(child: _languageOption(context, 'en', 'English')),
-            const SizedBox(width: 8),
-            Expanded(child: _languageOption(context, 'hi', 'हिंदी')),
-          ],
-        ),
-      ],
-    );
-  }
 
-  Widget _languageOption(BuildContext context, String code, String label) {
-    final selected = widget.languageCode == code;
-    return GestureDetector(
-      onTap: () => widget.onLanguageChanged(code),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          color: selected ? AppColors.trustBlue : AppColors.surface,
-          border: Border.all(
-            color: selected ? AppColors.trustBlue : AppColors.border,
-          ),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Center(
-          child: Text(
-            label,
-            style: TextStyle(
-              color: selected ? Colors.white : AppColors.primaryNavy,
-              fontWeight: FontWeight.w600,
-              fontSize: 13,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget _buildStepIndicator(BuildContext context) {
     if (widget.definition.sections.length <= 1) {
@@ -413,10 +387,10 @@ class _DocumentFormRendererState extends ConsumerState<DocumentFormRenderer> {
               height: 4,
               decoration: BoxDecoration(
                 color: isActive
-                    ? AppColors.trustBlue
+                    ? AppColors.mustardGold
                     : isCompleted
-                        ? AppColors.trustBlue.withValues(alpha: 0.4)
-                        : AppColors.border,
+                        ? AppColors.deepNavy
+                        : AppColors.outline,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -439,9 +413,18 @@ class _DocumentFormRendererState extends ConsumerState<DocumentFormRenderer> {
             flex: 1,
             child: OutlinedButton.icon(
               onPressed: widget.isGenerating ? null : _handleBack,
-              icon: const Icon(Icons.arrow_back),
-              label: const Text('Back'),
+              icon: const Icon(Icons.arrow_back,
+                  size: 18, color: AppColors.deepNavy),
+              label: const Text(
+                'Back',
+                style: TextStyle(
+                  color: AppColors.deepNavy,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
               style: OutlinedButton.styleFrom(
+                backgroundColor: Colors.white,
+                side: const BorderSide(color: AppColors.outline),
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
@@ -453,19 +436,24 @@ class _DocumentFormRendererState extends ConsumerState<DocumentFormRenderer> {
         Expanded(
           flex: 2,
           child: SizedBox(
-            height: 50,
+            height: 52,
             child: ElevatedButton.icon(
               onPressed: widget.isGenerating ? null : _handleNext,
-              icon: Icon(nextIcon, size: 20),
+              icon: Icon(nextIcon, size: 20, color: AppColors.deepNavy),
               label: Text(
                 widget.isGenerating
                     ? (canGenerate ? 'Generating...' : 'Please wait')
                     : nextLabel,
-                style: const TextStyle(fontWeight: FontWeight.w700),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 14,
+                  color: AppColors.deepNavy,
+                ),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primaryNavy,
-                foregroundColor: Colors.white,
+                backgroundColor: AppColors.mustardGold,
+                foregroundColor: AppColors.deepNavy,
+                elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),

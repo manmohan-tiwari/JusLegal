@@ -78,15 +78,15 @@ class _LoadingWidgetState extends State<LoadingWidget>
               width: widget.size,
               height: widget.size,
               decoration: BoxDecoration(
-                gradient: AppTheme.heroGradient,
+                color: AppColors.deepNavy,
                 borderRadius: BorderRadius.circular(widget.size / 3),
               ),
               child: Center(
                 child: Container(
-                  width: widget.size * 0.7,
-                  height: widget.size * 0.7,
+                  width: widget.size * 0.65,
+                  height: widget.size * 0.65,
                   decoration: BoxDecoration(
-                    color: AppTheme.surface,
+                    color: AppColors.mustardGold,
                     borderRadius: BorderRadius.circular(widget.size / 4),
                   ),
                 ),
@@ -100,13 +100,10 @@ class _LoadingWidgetState extends State<LoadingWidget>
             opacity: const AlwaysStoppedAnimation(1.0),
             child: Text(
               widget.message!,
-              style: const TextStyle(
-                color: AppTheme.darkText,
+              style: TextStyle(
+                color: widget.color ?? AppColors.deepNavy,
                 fontSize: 14,
-                fontWeight: FontWeight.w400,
-              ).copyWith(
-                color: widget.color ?? AppTheme.textMediumGrey,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w600,
               ),
               textAlign: TextAlign.center,
             ),

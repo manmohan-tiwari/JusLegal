@@ -18,26 +18,42 @@ class _PrivacyPolicyScreenState extends ConsumerState<PrivacyPolicyScreen> {
     required List<String> bullets,
     String? body,
   }) {
-    final textTheme = Theme.of(context).textTheme;
-
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: const Color(0xFFFFFFFF),
-        borderRadius: BorderRadius.circular(AppTheme.radiusM),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.outline),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: textTheme.titleMedium),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w800,
+              color: AppColors.deepNavy,
+            ),
+          ),
           if (body != null) ...[
             const SizedBox(height: 10),
             Text(
               body,
-              style: textTheme.bodyMedium?.copyWith(color: AppTheme.textSecondary),
+              style: const TextStyle(
+                fontSize: 13,
+                color: AppColors.slateBlue,
+                height: 1.5,
+              ),
             ),
           ],
           if (bullets.isNotEmpty) ...[
@@ -54,7 +70,7 @@ class _PrivacyPolicyScreenState extends ConsumerState<PrivacyPolicyScreen> {
                         width: 6,
                         height: 6,
                         decoration: const BoxDecoration(
-                          color: AppTheme.legalGold,
+                          color: AppColors.mustardGold,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -63,8 +79,9 @@ class _PrivacyPolicyScreenState extends ConsumerState<PrivacyPolicyScreen> {
                     Expanded(
                       child: Text(
                         bullet,
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: AppTheme.textSecondary,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: AppColors.deepNavy,
                           height: 1.55,
                         ),
                       ),
@@ -81,11 +98,27 @@ class _PrivacyPolicyScreenState extends ConsumerState<PrivacyPolicyScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-
     return Scaffold(
+      backgroundColor: AppColors.warmOffWhite,
       appBar: AppBar(
-        title: const Text('Privacy Policy'),
+        title: const Text(
+          'Privacy Policy',
+          style: TextStyle(
+            color: AppColors.deepNavy,
+            fontSize: 18,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        backgroundColor: AppColors.warmOffWhite,
+        elevation: 0,
+        leading: BackButton(
+          color: AppColors.deepNavy,
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(color: AppColors.divider, height: 1),
+        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -97,34 +130,55 @@ class _PrivacyPolicyScreenState extends ConsumerState<PrivacyPolicyScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFFFFF),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusL),
-                  border: Border.all(color: const Color(0xFFE5E7EB)),
+                  color: AppColors.deepNavy,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.deepNavy.withValues(alpha: 0.15),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppTheme.trustBlue.withValues(alpha: 0.08),
-                        borderRadius: BorderRadius.circular(AppTheme.radiusS),
+                        color: AppColors.mustardGold.withValues(alpha: 0.20),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppColors.mustardGold.withValues(alpha: 0.4),
+                        ),
                       ),
                       child: const Icon(
                         Icons.privacy_tip_outlined,
-                        color: AppTheme.trustBlue,
+                        color: AppColors.mustardGold,
+                        size: 26,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 14),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Privacy Policy', style: textTheme.headlineSmall),
-                          const SizedBox(height: 6),
+                        children: const [
+                          Text(
+                            'Privacy Policy',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                            ),
+                          ),
+                          SizedBox(height: 6),
                           Text(
                             'This page explains how JusLegal handles your information when you use the app for legal guidance.',
-                            style: textTheme.bodyMedium?.copyWith(color: AppTheme.textSecondary),
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: AppColors.paleBlue,
+                              height: 1.45,
+                            ),
                           ),
                         ],
                       ),
@@ -240,18 +294,36 @@ class _PrivacyPolicyScreenState extends ConsumerState<PrivacyPolicyScreen> {
                 margin: const EdgeInsets.only(bottom: 16),
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFFFFF),
-                  borderRadius: BorderRadius.circular(AppTheme.radiusM),
-                  border: Border.all(color: const Color(0xFFE5E7EB)),
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.outline),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.02),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Privacy Controls', style: textTheme.titleMedium),
-                    const SizedBox(height: 12),
-                    Text(
+                    const Text(
+                      'Privacy Controls',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.deepNavy,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
                       'You can control whether JusLegal collects analytics and crash reporting data.',
-                      style: textTheme.bodyMedium?.copyWith(color: AppTheme.textSecondary),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: AppColors.slateBlue,
+                        height: 1.45,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     _buildConsentToggle(
@@ -284,9 +356,12 @@ class _PrivacyPolicyScreenState extends ConsumerState<PrivacyPolicyScreen> {
                   ],
                 ),
               ),
-              Text(
+              const Text(
                 'Last updated: 26 August 2026',
-                style: textTheme.bodySmall?.copyWith(color: AppTheme.textSecondary),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.slateBlue,
+                ),
               ),
             ],
           ),
@@ -301,7 +376,6 @@ class _PrivacyPolicyScreenState extends ConsumerState<PrivacyPolicyScreen> {
     bool value,
     Function(bool) onChanged,
   ) {
-    final textTheme = Theme.of(context).textTheme;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -311,14 +385,19 @@ class _PrivacyPolicyScreenState extends ConsumerState<PrivacyPolicyScreen> {
             children: [
               Text(
                 title,
-                style: textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.deepNavy,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 description,
-                style: textTheme.bodySmall?.copyWith(color: AppTheme.textSecondary),
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: AppColors.slateBlue,
+                ),
               ),
             ],
           ),
@@ -326,7 +405,8 @@ class _PrivacyPolicyScreenState extends ConsumerState<PrivacyPolicyScreen> {
         Switch(
           value: value,
           onChanged: onChanged,
-          activeTrackColor: AppTheme.trustBlue,
+          activeThumbColor: AppColors.deepNavy,
+          activeTrackColor: AppColors.mustardGold,
         ),
       ],
     );

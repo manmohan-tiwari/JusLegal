@@ -375,14 +375,24 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.warmOffWhite,
       appBar: AppBar(
-        title: Text(_isResultStep
-            ? 'Generated Document'
-            : _result.isEmpty && widget.definition.sections.length > 1
-                ? widget.definition.sections[_currentStep].title
-                : widget.definition.title),
+        title: Text(
+          _isResultStep
+              ? 'Generated Document'
+              : _result.isEmpty && widget.definition.sections.length > 1
+                  ? widget.definition.sections[_currentStep].title
+                  : widget.definition.title,
+          style: const TextStyle(
+            color: AppColors.deepNavy,
+            fontSize: 18,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        backgroundColor: AppColors.warmOffWhite,
+        elevation: 0,
         leading: BackButton(
+          color: AppColors.deepNavy,
           onPressed: () {
             if (_isResultStep) {
               _resetToForm();
@@ -398,6 +408,10 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
               }
             }
           },
+        ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(color: AppColors.divider, height: 1),
         ),
       ),
       body: SafeArea(
@@ -459,13 +473,11 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
         Row(
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
               decoration: BoxDecoration(
-                color: AppColors.primaryNavy.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: AppColors.primaryNavy.withValues(alpha: 0.2),
-                ),
+                color: AppColors.paleBlue,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xFFD4E2EC)),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -473,15 +485,15 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
                   Icon(
                     widget.categoryIcon,
                     size: 14,
-                    color: AppColors.primaryNavy,
+                    color: AppColors.deepNavy,
                   ),
                   const SizedBox(width: 6),
                   Text(
                     widget.definition.title,
                     style: const TextStyle(
-                      color: AppColors.primaryNavy,
+                      color: AppColors.deepNavy,
                       fontSize: 12,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ],
@@ -489,20 +501,18 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
             ),
             const SizedBox(width: 8),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
               decoration: BoxDecoration(
-                color: AppColors.trustBlue.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: AppColors.trustBlue.withValues(alpha: 0.2),
-                ),
+                color: AppColors.paleYellow,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xFFEDDAA8)),
               ),
               child: Text(
                 _tone,
                 style: const TextStyle(
-                  color: AppColors.trustBlue,
+                  color: AppColors.deepNavy,
                   fontSize: 12,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),
@@ -513,7 +523,7 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Colors.red.withValues(alpha: 0.08),
+              color: AppColors.palePeach,
               border: Border.all(color: Colors.red.shade300),
               borderRadius: BorderRadius.circular(14),
             ),
@@ -524,9 +534,11 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
                 Expanded(
                   child: Text(
                     'Generation failed. Please try again.',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.red.shade700,
-                        ),
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.red.shade900,
+                    ),
                   ),
                 ),
                 TextButton(
@@ -541,32 +553,40 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
         Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            color: AppColors.surface,
-            border: Border.all(color: AppColors.border),
+            color: Colors.white,
+            border: Border.all(color: AppColors.outline),
             borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.03),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 child: Row(
                   children: [
                     const Icon(
                       Icons.article_outlined,
                       size: 16,
-                      color: AppColors.trustBlue,
+                      color: AppColors.slateBlue,
                     ),
-                    const SizedBox(width: 6),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         widget.definition.title.toUpperCase(),
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: AppColors.primaryNavy,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 0.5,
-                            ),
+                        style: const TextStyle(
+                          color: AppColors.deepNavy,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 11,
+                          letterSpacing: 0.5,
+                        ),
                       ),
                     ),
                     TextButton.icon(
@@ -578,10 +598,17 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
                       icon: Icon(
                         _isEditing ? Icons.lock_outline : Icons.edit_outlined,
                         size: 16,
+                        color: AppColors.slateBlue,
                       ),
-                      label: Text(_isEditing ? 'Lock' : 'Edit'),
+                      label: Text(
+                        _isEditing ? 'Lock' : 'Edit',
+                        style: const TextStyle(
+                          color: AppColors.slateBlue,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 12,
+                        ),
+                      ),
                       style: TextButton.styleFrom(
-                        foregroundColor: AppColors.trustBlue,
                         padding: EdgeInsets.zero,
                         minimumSize: const Size(0, 0),
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -590,7 +617,7 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
                   ],
                 ),
               ),
-              const Divider(height: 1),
+              const Divider(height: 1, color: AppColors.outline),
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: TextField(
@@ -600,7 +627,7 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
                   style: const TextStyle(
                     fontSize: 13,
                     height: 1.8,
-                    color: Color(0xFF1F2937),
+                    color: AppColors.deepNavy,
                   ),
                   decoration: const InputDecoration(
                     border: InputBorder.none,
@@ -617,13 +644,23 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Text(
+            const Text(
               'Not satisfied?',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+              style: TextStyle(
+                fontSize: 12,
+                color: AppColors.slateBlue,
+              ),
             ),
-            TextButton(onPressed: _generate, child: const Text('Regenerate')),
+            TextButton(
+              onPressed: _generate,
+              child: const Text(
+                'Regenerate',
+                style: TextStyle(
+                  color: AppColors.deepNavy,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 8),
@@ -639,16 +676,46 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
                     const SnackBar(content: Text('Copied to clipboard')),
                   );
                 },
-                icon: const Icon(Icons.copy_outlined, size: 18),
-                label: const Text('Copy'),
+                icon: const Icon(Icons.copy_outlined,
+                    size: 18, color: AppColors.deepNavy),
+                label: const Text(
+                  'Copy',
+                  style: TextStyle(
+                    color: AppColors.deepNavy,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  side: const BorderSide(color: AppColors.outline),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
               ),
             ),
             const SizedBox(width: 10),
             Expanded(
               child: OutlinedButton.icon(
                 onPressed: _resetToCategory,
-                icon: const Icon(Icons.add_outlined, size: 18),
-                label: const Text('New Document'),
+                icon: const Icon(Icons.add_outlined,
+                    size: 18, color: AppColors.deepNavy),
+                label: const Text(
+                  'New Document',
+                  style: TextStyle(
+                    color: AppColors.deepNavy,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  side: const BorderSide(color: AppColors.outline),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
               ),
             ),
           ],
@@ -656,13 +723,24 @@ class _DocumentFormScreenState extends ConsumerState<DocumentFormScreen> {
         const SizedBox(height: 16),
         SizedBox(
           width: double.infinity,
+          height: 50,
           child: ElevatedButton.icon(
-            icon: const Icon(Icons.picture_as_pdf),
-            label: const Text('Download / Print PDF'),
+            icon: const Icon(Icons.picture_as_pdf, color: AppColors.deepNavy),
+            label: const Text(
+              'Download / Print PDF',
+              style: TextStyle(
+                fontWeight: FontWeight.w800,
+                fontSize: 14,
+                color: AppColors.deepNavy,
+              ),
+            ),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.legalGold,
-              foregroundColor: const Color(0xFF0B0F19),
-              padding: const EdgeInsets.symmetric(vertical: 14),
+              backgroundColor: AppColors.mustardGold,
+              foregroundColor: AppColors.deepNavy,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
             ),
             onPressed: () => LegalPdfService.showPrintPreview(
               _pdfDocumentFor(),

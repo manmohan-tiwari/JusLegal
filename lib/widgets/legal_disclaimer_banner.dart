@@ -36,31 +36,31 @@ class LegalDisclaimerBanner extends StatelessWidget {
             padding: padding ??
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
-              color: AppTheme.legalGold.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(8),
+              color: AppColors.paleBlue,
+              borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: AppTheme.legalGold.withValues(alpha: 0.65),
+                color: const Color(0xFFD4E2EC),
                 width: 1,
               ),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
-                  Icons.verified_outlined,
+                const Icon(
+                  Icons.shield_outlined,
                   size: 18,
-                  color: AppTheme.legalGold,
+                  color: AppColors.deepNavy,
                 ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     'AI-generated legal information only. Not legal advice.',
-                    style: TextStyle(
-                          color: AppTheme.darkText,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          height: 1.4,
-                        ),
+                    style: const TextStyle(
+                      color: AppColors.deepNavy,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      height: 1.4,
+                    ),
                   ),
                 ),
               ],

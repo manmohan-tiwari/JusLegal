@@ -252,20 +252,41 @@ class _ProblemAnalyzerScreenState extends ConsumerState<ProblemAnalyzerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.warmOffWhite,
       appBar: AppBar(
-        title: const Text('Solve Legal Issue'),
-        leading: BackButton(onPressed: () => Navigator.of(context).pop()),
+        backgroundColor: AppColors.warmOffWhite,
+        foregroundColor: AppColors.deepNavy,
+        iconTheme: const IconThemeData(color: AppColors.deepNavy),
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(
+            color: AppColors.divider,
+            height: 1,
+          ),
+        ),
+        title: Text(
+          'Solve Legal Issue',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: AppColors.deepNavy,
+                fontWeight: FontWeight.w800,
+              ),
+        ),
+        leading: BackButton(
+          color: AppColors.deepNavy,
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
           controller: _scrollController,
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+          padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 1. Category Selector (Horizontal Pills)
-              SectionLabel('1. SELECT TOPIC'),
+              const SectionLabel('1. SELECT TOPIC'),
               const SizedBox(height: 10),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
@@ -277,27 +298,38 @@ class _ProblemAnalyzerScreenState extends ConsumerState<ProblemAnalyzerScreen> {
                       child: InkWell(
                         onTap: () => setState(() => _selectedCategory = cat.name),
                         borderRadius: BorderRadius.circular(20),
-                        child: Container(
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 180),
                           padding: const EdgeInsets.symmetric(
                               horizontal: 14, vertical: 8),
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? AppColors.deepForest
-                                : AppColors.surface,
+                                ? AppColors.deepNavy
+                                : Colors.white,
                             border: Border.all(
                               color: isSelected
-                                  ? AppColors.deepForest
-                                  : AppColors.border,
+                                  ? AppColors.deepNavy
+                                  : AppColors.outline,
+                              width: 1.2,
                             ),
                             borderRadius: BorderRadius.circular(20),
+                            boxShadow: isSelected
+                                ? const [
+                                    BoxShadow(
+                                      color: Color(0x14162B49),
+                                      blurRadius: 4,
+                                      offset: Offset(0, 2),
+                                    ),
+                                  ]
+                                : null,
                           ),
                           child: Text(
                             cat.name,
                             style: TextStyle(
-                              color: isSelected ? Colors.white : AppColors.onSurface,
+                              color: isSelected ? Colors.white : AppColors.deepNavy,
                               fontSize: 12.5,
                               fontWeight:
-                                  isSelected ? FontWeight.w700 : FontWeight.w500,
+                                  isSelected ? FontWeight.w800 : FontWeight.w600,
                             ),
                           ),
                         ),
@@ -307,22 +339,29 @@ class _ProblemAnalyzerScreenState extends ConsumerState<ProblemAnalyzerScreen> {
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 22),
 
               // 2. Quick Scenario Chips (1-tap to populate)
-              SectionLabel('2. COMMON SCENARIOS (1-TAP TO FILL)'),
-              const SizedBox(height: 8),
+              const SectionLabel('2. COMMON SCENARIOS (1-TAP TO FILL)'),
+              const SizedBox(height: 10),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
                 children: _quickScenarios.map((qs) {
                   return ActionChip(
-                    label: Text(qs['label']!),
-                    avatar: const Icon(Icons.bolt, size: 16, color: AppColors.brightEmerald),
-                    backgroundColor: AppColors.surface,
+                    label: Text(
+                      qs['label']!,
+                      style: const TextStyle(
+                        color: AppColors.deepNavy,
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    avatar: const Icon(Icons.bolt, size: 16, color: AppColors.mustardGold),
+                    backgroundColor: AppColors.paleBlue,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
-                      side: const BorderSide(color: AppColors.border),
+                      side: const BorderSide(color: Color(0xFFD4E2EC)),
                     ),
                     onPressed: () {
                       HapticFeedback.lightImpact();
@@ -335,21 +374,21 @@ class _ProblemAnalyzerScreenState extends ConsumerState<ProblemAnalyzerScreen> {
                 }).toList(),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 22),
 
               // 3. Problem Description & Voice Input
-              SectionLabel('3. DESCRIBE YOUR ISSUE'),
-              const SizedBox(height: 8),
+              const SectionLabel('3. DESCRIBE YOUR ISSUE'),
+              const SizedBox(height: 10),
               Container(
                 decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  border: Border.all(color: AppColors.border),
+                  color: Colors.white,
+                  border: Border.all(color: AppColors.outline),
                   borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
+                  boxShadow: const [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.03),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
+                      color: Color(0x08162B49),
+                      blurRadius: 8,
+                      offset: Offset(0, 2),
                     ),
                   ],
                 ),
@@ -361,19 +400,26 @@ class _ProblemAnalyzerScreenState extends ConsumerState<ProblemAnalyzerScreen> {
                       maxLines: 5,
                       maxLength: 2000,
                       textInputAction: TextInputAction.newline,
+                      style: const TextStyle(
+                        color: AppColors.deepNavy,
+                        fontSize: 14.5,
+                        height: 1.5,
+                      ),
                       decoration: const InputDecoration(
                         hintText:
-                            'Explain what happened in plain Hindi or English...\n\nE.g. My landlord is not returning my ₹45,000 security deposit after 30 days of vacating with all electricity dues paid.',
+                            'Explain what happened in plain English...\n\nE.g. My landlord is not returning my ₹45,000 security deposit after 30 days of vacating with all electricity dues paid.',
                         hintStyle: TextStyle(
-                          color: AppColors.textSecondary,
+                          color: AppColors.slateBlue,
                           fontSize: 13,
                           height: 1.5,
                         ),
                         border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
                         contentPadding: EdgeInsets.all(16),
                       ),
                     ),
-                    const Divider(height: 1, color: AppColors.border),
+                    const Divider(height: 1, color: AppColors.divider),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                       child: Row(
@@ -382,7 +428,7 @@ class _ProblemAnalyzerScreenState extends ConsumerState<ProblemAnalyzerScreen> {
                             onPressed: _toggleVoiceInput,
                             icon: Icon(
                               _isListening ? Icons.mic : Icons.mic_none_rounded,
-                              color: _isListening ? Colors.red : AppColors.deepForest,
+                              color: _isListening ? AppColors.error : AppColors.deepNavy,
                             ),
                             tooltip: 'Voice Input',
                           ),
@@ -390,15 +436,21 @@ class _ProblemAnalyzerScreenState extends ConsumerState<ProblemAnalyzerScreen> {
                             _isListening ? 'Listening...' : 'Tap mic to speak',
                             style: TextStyle(
                               fontSize: 12,
-                              color: _isListening ? Colors.red : AppColors.textSecondary,
-                              fontWeight: _isListening ? FontWeight.w700 : FontWeight.w500,
+                              color: _isListening ? AppColors.error : AppColors.slateBlue,
+                              fontWeight: _isListening ? FontWeight.w800 : FontWeight.w600,
                             ),
                           ),
                           const Spacer(),
                           if (_summaryController.text.isNotEmpty)
                             TextButton(
                               onPressed: () => setState(() => _summaryController.clear()),
-                              child: const Text('Clear'),
+                              child: const Text(
+                                'Clear',
+                                style: TextStyle(
+                                  color: AppColors.slateBlue,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
                             ),
                         ],
                       ),
@@ -420,7 +472,7 @@ class _ProblemAnalyzerScreenState extends ConsumerState<ProblemAnalyzerScreen> {
                       Icon(
                         _showExtraDetails ? Icons.expand_less : Icons.add_circle_outline,
                         size: 18,
-                        color: AppColors.deepForest,
+                        color: AppColors.deepNavy,
                       ),
                       const SizedBox(width: 8),
                       Text(
@@ -430,7 +482,7 @@ class _ProblemAnalyzerScreenState extends ConsumerState<ProblemAnalyzerScreen> {
                         style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.deepForest,
+                          color: AppColors.deepNavy,
                         ),
                       ),
                     ],
@@ -443,38 +495,50 @@ class _ProblemAnalyzerScreenState extends ConsumerState<ProblemAnalyzerScreen> {
                 Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: AppColors.surface,
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppColors.border),
+                    border: Border.all(color: AppColors.outline),
                   ),
                   child: Column(
                     children: [
                       TextField(
                         controller: _amountController,
                         keyboardType: TextInputType.number,
+                        style: const TextStyle(color: AppColors.deepNavy),
                         decoration: const InputDecoration(
                           labelText: 'Disputed Amount (₹)',
                           hintText: 'E.g. 45000',
                           prefixText: '₹ ',
-                          border: OutlineInputBorder(),
                         ),
                       ),
                       const SizedBox(height: 12),
                       TextField(
                         controller: _opponentController,
+                        style: const TextStyle(color: AppColors.deepNavy),
                         decoration: const InputDecoration(
                           labelText: 'Opposite Party / Company Name',
                           hintText: 'E.g. Landlord Name / Bank / Company',
-                          border: OutlineInputBorder(),
                         ),
                       ),
                       const SizedBox(height: 12),
                       OutlinedButton.icon(
                         onPressed: _pickFiles,
-                        icon: const Icon(Icons.attach_file_rounded),
-                        label: Text(_attachedFiles.isEmpty
-                            ? 'Attach Photos / PDF Evidence'
-                            : '${_attachedFiles.length} file(s) attached'),
+                        icon: const Icon(Icons.attach_file_rounded, color: AppColors.deepNavy),
+                        label: Text(
+                          _attachedFiles.isEmpty
+                              ? 'Attach Photos / PDF Evidence'
+                              : '${_attachedFiles.length} file(s) attached',
+                          style: const TextStyle(
+                            color: AppColors.deepNavy,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: AppColors.outline),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -495,10 +559,10 @@ class _ProblemAnalyzerScreenState extends ConsumerState<ProblemAnalyzerScreen> {
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2.5,
-                            color: AppColors.onPrimary,
+                            color: AppColors.deepNavy,
                           ),
                         )
-                      : const Icon(Icons.gavel_rounded),
+                      : const Icon(Icons.gavel_rounded, color: AppColors.deepNavy),
                   label: Text(
                     _isAnalyzing
                         ? 'Analyzing Legal Rights & Sections...'
@@ -506,14 +570,15 @@ class _ProblemAnalyzerScreenState extends ConsumerState<ProblemAnalyzerScreen> {
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w800,
+                      color: AppColors.deepNavy,
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: AppColors.onPrimary,
+                    backgroundColor: AppColors.mustardGold,
+                    foregroundColor: AppColors.deepNavy,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
                 ),
@@ -525,18 +590,18 @@ class _ProblemAnalyzerScreenState extends ConsumerState<ProblemAnalyzerScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.08),
-                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+                  color: AppColors.paleBlue,
+                  border: Border.all(color: const Color(0xFFD4E2EC)),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Row(
                   children: [
-                    Icon(Icons.shield_outlined, color: AppColors.deepForest, size: 20),
+                    Icon(Icons.shield_outlined, color: AppColors.deepNavy, size: 20),
                     SizedBox(width: 10),
                     Expanded(
                       child: Text(
                         'AI analyzes Indian Acts (Consumer Protection, NI Act, BNS/IPC, RERA, Labor Laws) to provide exact legal sections and step-by-step remedies.',
-                        style: TextStyle(fontSize: 11.5, height: 1.4, color: AppColors.deepForest),
+                        style: TextStyle(fontSize: 11.5, height: 1.4, color: AppColors.deepNavy),
                       ),
                     ),
                   ],
