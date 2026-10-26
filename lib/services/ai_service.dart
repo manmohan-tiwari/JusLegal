@@ -503,10 +503,11 @@ class GeminiChatClient {
   final String? _explicitApiKey;
 
   GeminiChatClient({
-    this.modelName = 'gemini-3.8-flash',
+    String? modelName,
     String? apiKey,
     AiProvider? provider,
-  }) : _explicitApiKey = apiKey;
+  })  : modelName = modelName ?? AppConfig.geminiModel,
+        _explicitApiKey = apiKey;
 
   String get _apiKey {
     final key = _explicitApiKey ?? AppConfig.geminiApiKey;
@@ -517,13 +518,14 @@ class GeminiChatClient {
   }
 
   GenerativeModel _createModel({
+    String? modelOverride,
     String? systemInstruction,
     bool jsonResponse = false,
     double? temperature,
     int? maxTokens,
   }) {
     return GenerativeModel(
-      model: modelName,
+      model: modelOverride ?? modelName,
       apiKey: _apiKey,
       generationConfig: GenerationConfig(
         temperature: temperature ?? ApiConstants.temperature,
@@ -535,6 +537,59 @@ class GeminiChatClient {
               ? Content.system(systemInstruction.trim())
               : null,
     );
+  }
+
+  Future<GenerateContentResponse> _generateContentWithFallback(
+    GenerativeModel primaryModel,
+    Iterable<Content> prompt, {
+    String? systemInstruction,
+    bool jsonResponse = false,
+    double? temperature,
+    int? maxTokens,
+  }) async {
+    try {
+      return await primaryModel.generateContent(prompt);
+    } catch (e) {
+      final errorStr = e.toString();
+      final isDemandOrNotFound = errorStr.contains('503') ||
+          errorStr.contains('UNAVAILABLE') ||
+          errorStr.contains('high demand') ||
+          errorStr.contains('404') ||
+          errorStr.contains('not found') ||
+          errorStr.contains('no longer available');
+
+      if (isDemandOrNotFound) {
+        const fallbacks = [
+          'gemini-flash-lite-latest',
+          'gemini-3.6-flash',
+          'gemini-3.5-flash-lite',
+        ];
+        final candidates = fallbacks.where((m) => m != modelName).toList();
+        for (final fallback in candidates) {
+          try {
+            if (kDebugMode) {
+              debugPrint(
+                  '[GeminiChatClient] Model $modelName unavailable ($errorStr). Falling back to $fallback...');
+            }
+            final fallbackModel = _createModel(
+              modelOverride: fallback,
+              systemInstruction: systemInstruction,
+              jsonResponse: jsonResponse,
+              temperature: temperature,
+              maxTokens: maxTokens,
+            );
+            return await fallbackModel.generateContent(prompt);
+          } catch (fallbackError) {
+            if (kDebugMode) {
+              debugPrint(
+                  '[GeminiChatClient] Fallback $fallback also failed: $fallbackError');
+            }
+            continue;
+          }
+        }
+      }
+      rethrow;
+    }
   }
 
   Future<String> sendMessage(
@@ -575,7 +630,13 @@ class GeminiChatClient {
             '[GeminiChatClient] Calling Gemini for chat ($modelName, history=${conversationHistory.length})');
       }
 
-      final response = await model.generateContent(contents);
+      final response = await _generateContentWithFallback(
+        model,
+        contents,
+        systemInstruction: systemPrompt.toString(),
+        jsonResponse: true,
+        maxTokens: ApiConstants.chatMaxTokens,
+      );
       final responseText = response.text;
       if (responseText == null || responseText.trim().isEmpty) {
         throw ParseException('Empty response received from Gemini');
@@ -603,7 +664,13 @@ class GeminiChatClient {
             '[GeminiChatClient] Calling Gemini for analysis ($modelName, category=$category)');
       }
 
-      final response = await model.generateContent([Content.text(problemText)]);
+      final response = await _generateContentWithFallback(
+        model,
+        [Content.text(problemText)],
+        systemInstruction: systemPrompt,
+        jsonResponse: true,
+        maxTokens: ApiConstants.maxTokens,
+      );
       final responseText = response.text;
       if (responseText == null || responseText.trim().isEmpty) {
         throw ParseException('Empty analysis response received from Gemini');
@@ -638,7 +705,13 @@ class GeminiChatClient {
             '[GeminiChatClient] Calling Gemini for text generation ($modelName)');
       }
 
-      final response = await model.generateContent([Content.text(prompt)]);
+      final response = await _generateContentWithFallback(
+        model,
+        [Content.text(prompt)],
+        systemInstruction: systemPrompt,
+        jsonResponse: jsonResponse,
+        maxTokens: maxTokens ?? ApiConstants.letterMaxTokens,
+      );
       final responseText = response.text;
       if (responseText == null || responseText.trim().isEmpty) {
         throw ParseException('Empty text response received from Gemini');
@@ -675,6 +748,12 @@ class GeminiChatClient {
     if (errorStr.contains('RESOURCE_EXHAUSTED') || errorStr.contains('429')) {
       throw RateLimitException(
           'Gemini rate limit exceeded. Please wait a moment.', 'Gemini');
+    }
+    if (errorStr.contains('503') ||
+        errorStr.contains('UNAVAILABLE') ||
+        errorStr.contains('high demand')) {
+      throw RateLimitException(
+          'Gemini is experiencing temporary high demand. Please try again shortly.', 'Gemini');
     }
     if (errorStr.contains('SocketException') ||
         errorStr.contains('HandshakeException') ||

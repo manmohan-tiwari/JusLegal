@@ -13,6 +13,10 @@ const String _compileTimeGeminiApiKey = String.fromEnvironment(
   'GEMINI_API_KEY',
   defaultValue: '',
 );
+const String _compileTimeGeminiModel = String.fromEnvironment(
+  'GEMINI_MODEL',
+  defaultValue: '',
+);
 const String _compileTimeWebsiteUrl = String.fromEnvironment(
   'WEBSITE_URL',
   defaultValue: '',
@@ -160,6 +164,8 @@ class EnvironmentState {
       _EnvironmentState.value('DEFAULT_COUNTRY_CODE', '+91');
   static String get geminiApiKey =>
       _EnvironmentState.value('GEMINI_API_KEY', '');
+  static String get geminiModel =>
+      _EnvironmentState.value('GEMINI_MODEL', 'gemini-flash-lite-latest');
 
   static bool get isValid =>
       Uri.tryParse(websiteUrl)?.hasScheme == true &&
@@ -179,6 +185,7 @@ class _EnvironmentState {
     final buildValue = switch (key) {
       'JUSLEGAL_ENV' => _compileTimeEnvironment,
       'GEMINI_API_KEY' => _compileTimeGeminiApiKey,
+      'GEMINI_MODEL' => _compileTimeGeminiModel,
       'WEBSITE_URL' => _compileTimeWebsiteUrl,
       'FIREBASE_PROJECT_ID' => _compileTimeFirebaseProjectId,
       'FIREBASE_AUTH_DOMAIN' => _compileTimeFirebaseAuthDomain,

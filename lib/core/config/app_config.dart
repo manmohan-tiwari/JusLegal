@@ -180,6 +180,7 @@ class AppConfig {
   static String? get apiKey =>
       EnvironmentState.geminiApiKey.isNotEmpty ? EnvironmentState.geminiApiKey : null;
   static String get geminiApiKey => EnvironmentState.geminiApiKey;
+  static String get geminiModel => EnvironmentState.geminiModel;
   static String? get analyticsKey => null;
 
   // Phone authentication
