@@ -280,24 +280,10 @@ class _HomeContent extends StatelessWidget {
         category: 'chat',
       ),
       _AiFeatureTool(
-        title: l10n.toolLegalAdviceTitle,
-        description: l10n.toolLegalAdviceDesc,
-        icon: Icons.balance_outlined,
-        route: '/home/legal-advice',
-        category: 'chat',
-      ),
-      _AiFeatureTool(
         title: l10n.toolCaseAnalysisTitle,
         description: l10n.toolCaseAnalysisDesc,
         icon: Icons.track_changes_rounded,
-        route: '/home/case-analysis',
-        category: 'chat',
-      ),
-      _AiFeatureTool(
-        title: l10n.toolLegalTermsTitle,
-        description: l10n.toolLegalTermsDesc,
-        icon: Icons.menu_book_outlined,
-        route: '/home/legal-terms',
+        route: '/home/analyzer',
         category: 'chat',
       ),
     ];
@@ -314,22 +300,6 @@ class _HomeContent extends StatelessWidget {
         description: l10n.toolDocumentReviewDesc,
         icon: Icons.fact_check_outlined,
         route: '/home/document-review',
-        category: 'documents',
-      ),
-      _AiFeatureTool(
-        title: 'Formal Notice & Complaint',
-        description:
-            'Draft formal legal notices with statutory consumer sections',
-        icon: Icons.gavel_rounded,
-        route: '/home/complaint',
-        category: 'documents',
-      ),
-      _AiFeatureTool(
-        title: l10n.authorities,
-        description:
-            'Direct access to Cybercrime, Consumer Helpline & RBI CMS',
-        icon: Icons.account_balance_outlined,
-        route: '/home/authorities',
         category: 'documents',
       ),
     ];

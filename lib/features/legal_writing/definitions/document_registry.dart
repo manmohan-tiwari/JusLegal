@@ -11,38 +11,34 @@ import 'hr_employment.dart';
 import '_definition_builder.dart';
 
 final Map<String, DocumentDefinition> legalDocumentDefinitions = {
-  'rent_agreement': rentAgreementDefinition,
+  // 1. Notices & Complaints (Consumer Protection)
   'legal_notice': legalNoticeDefinition,
   'consumer_complaint': consumerComplaintDefinition,
   'police_complaint': policeComplaintDefinition,
   'cease_desist': ceaseDesistDefinition,
   'demand_letter': demandLetterDefinition,
-  'sale_agreement': saleAgreementDefinition,
-  'partnership_deed': partnershipDeedDefinition,
-  'mou_term_sheet': mouTermSheetDefinition,
-  'service_agreement': serviceAgreementDefinition,
-  'nda_confidentiality': ndaConfidentialityDefinition,
-  'employment_contract': employmentContractDefinition,
+
+  // 2. Citizen Court & Statutory Filings
+  'consumer_court_complaint': consumerCourtComplaintDefinition,
+  'rti_application': rtiApplicationDefinition,
+
+  // 3. Agreements & Tenancy
+  'rent_agreement': rentAgreementDefinition,
   'freelance_contract': freelanceContractDefinition,
+
+  // 4. Affidavits & Declarations
   'general_affidavit': generalAffidavitDefinition,
   'address_proof_affidavit': addressProofAffidavitDefinition,
   'name_change_affidavit': nameChangeAffidavitDefinition,
   'income_affidavit': incomeAffidavitDefinition,
   'declaration_statement': declarationStatementDefinition,
-  'consumer_court_complaint': consumerCourtComplaintDefinition,
-  'vakalatnama': vakalatnamaDefinition,
-  'bail_application': bailApplicationDefinition,
-  'appeal_letter': appealLetterDefinition,
-  'rti_application': rtiApplicationDefinition,
-  'will_testament': willTestamentDefinition,
-  'power_of_attorney': powerOfAttorneyDefinition,
-  'gift_deed': giftDeedDefinition,
-  'relinquishment_deed': relinquishmentDeedDefinition,
-  'property_transfer_letter': propertyTransferLetterDefinition,
+
+  // 5. Employment Self-Help
   'resignation_letter': resignationLetterDefinition,
-  'termination_letter': terminationLetterDefinition,
   'experience_letter': experienceLetterDefinition,
-  'offer_letter': offerLetterDefinition,
+
+  // 6. Representation
+  'power_of_attorney': powerOfAttorneyDefinition,
 };
 
 DocumentDefinition? getDocumentDefinitionById(String id) {

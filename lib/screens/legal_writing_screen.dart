@@ -26,16 +26,76 @@ class _LegalWritingScreenState extends ConsumerState<LegalWritingScreen> {
 
   static const List<String> _categoryFilters = [
     'All',
+    'Notices & Demands',
+    'Consumer & RTI',
     'Agreements',
-    'Notices',
     'Affidavits',
-    'Court Filings',
-    'Property & Estate',
     'Employment',
+    'Property & PoA',
   ];
 
   static const List<Map<String, dynamic>> _allTemplates = [
-    // 1. Agreements & Contracts
+    // 1. Notices & Demands (Consumer Protection Core)
+    {
+      'id': 'legal_notice',
+      'title': '15-Day Legal Notice',
+      'category': 'Notices & Demands',
+      'act': 'Sec 80 CPC / Specific Relief Act',
+      'icon': Icons.gavel_rounded,
+      'desc': 'Mandatory formal legal demand notice prior to filing court lawsuit',
+    },
+    {
+      'id': 'cease_desist',
+      'title': 'Cheque Bounce Notice',
+      'category': 'Notices & Demands',
+      'act': 'Section 138 Negotiable Instruments Act',
+      'icon': Icons.account_balance_wallet_outlined,
+      'desc': 'Statutory notice for dishonored cheque with 15 days payment demand',
+    },
+    {
+      'id': 'demand_letter',
+      'title': 'Payment Recovery Demand',
+      'category': 'Notices & Demands',
+      'act': 'Order 37 CPC / Contract Act',
+      'icon': Icons.request_quote_outlined,
+      'desc': 'Formal demand letter for unpaid dues, invoices or pending loans',
+    },
+    {
+      'id': 'consumer_complaint',
+      'title': 'Consumer Grievance Notice',
+      'category': 'Notices & Demands',
+      'act': 'Consumer Protection Act 2019',
+      'icon': Icons.report_problem_outlined,
+      'desc': 'Formal pre-litigation notice for defective products or deficiency of service',
+    },
+    {
+      'id': 'police_complaint',
+      'title': 'Police Complaint (FIR Draft)',
+      'category': 'Notices & Demands',
+      'act': 'Sec 154 CrPC / Sec 173 BNSS',
+      'icon': Icons.local_police_outlined,
+      'desc': 'Structured complaint application to SHO for cognizable criminal offenses',
+    },
+
+    // 2. Consumer Court & RTI (Citizen Statutory Rights)
+    {
+      'id': 'consumer_court_complaint',
+      'title': 'Consumer Court Petition',
+      'category': 'Consumer & RTI',
+      'act': 'CPA 2019 District/State Commission',
+      'icon': Icons.account_balance_outlined,
+      'desc': 'Complete formal petition with facts, jurisdiction, evidence index and prayer',
+    },
+    {
+      'id': 'rti_application',
+      'title': 'RTI Application (Sec 6)',
+      'category': 'Consumer & RTI',
+      'act': 'Right to Information Act 2005',
+      'icon': Icons.article_outlined,
+      'desc': 'Standard statutory request to Public Information Officer (PIO)',
+    },
+
+    // 3. Agreements & Leases (Consumer-safe)
     {
       'id': 'rent_agreement',
       'title': 'Rent / Lease Agreement',
@@ -45,105 +105,15 @@ class _LegalWritingScreenState extends ConsumerState<LegalWritingScreen> {
       'desc': 'Residential lease with security deposit, lock-in & rent escalation terms',
     },
     {
-      'id': 'sale_agreement',
-      'title': 'Sale & Purchase Agreement',
-      'category': 'Agreements',
-      'act': 'Indian Contract Act & Sale of Goods',
-      'icon': Icons.shopping_bag_outlined,
-      'desc': 'Agreement for sale of immovable/movable property and goods',
-    },
-    {
-      'id': 'partnership_deed',
-      'title': 'Partnership Deed',
-      'category': 'Agreements',
-      'act': 'Indian Partnership Act 1932',
-      'icon': Icons.handshake_outlined,
-      'desc': 'Formal deed defining partner shares, capital, profits & firm rules',
-    },
-    {
-      'id': 'mou_term_sheet',
-      'title': 'MOU / Term Sheet',
-      'category': 'Agreements',
-      'act': 'Indian Contract Act 1872',
-      'icon': Icons.description_outlined,
-      'desc': 'Memorandum of Understanding setting mutual terms before final contract',
-    },
-    {
-      'id': 'service_agreement',
-      'title': 'Service Provider Agreement',
-      'category': 'Agreements',
-      'act': 'Specific Relief & Contract Act',
-      'icon': Icons.design_services_outlined,
-      'desc': 'Contract between service provider and client detailing scope & milestones',
-    },
-    {
-      'id': 'nda_confidentiality',
-      'title': 'Non-Disclosure (NDA)',
-      'category': 'Agreements',
-      'act': 'Trade Secrets & Contract Act',
-      'icon': Icons.lock_outline_rounded,
-      'desc': 'Mutual confidentiality agreement safeguarding proprietary business secrets',
-    },
-    {
-      'id': 'employment_contract',
-      'title': 'Employment Agreement',
-      'category': 'Agreements',
-      'act': 'Indian Contract & Labor Laws',
-      'icon': Icons.work_outline_rounded,
-      'desc': 'Comprehensive job terms, IP assignment, non-compete and duties',
-    },
-    {
       'id': 'freelance_contract',
       'title': 'Freelancer Contract',
       'category': 'Agreements',
       'act': 'Indian Contract Act 1872',
       'icon': Icons.laptop_chromebook_rounded,
-      'desc': 'Independent contractor agreement with payment schedules & deliverables',
+      'desc': 'Independent contractor agreement protecting gig workers with clear payment schedules',
     },
 
-    // 2. Notices & Demands
-    {
-      'id': 'legal_notice',
-      'title': '15-Day Legal Notice',
-      'category': 'Notices',
-      'act': 'Sec 80 CPC / Specific Relief Act',
-      'icon': Icons.gavel_rounded,
-      'desc': 'Mandatory formal legal demand notice prior to filing court lawsuit',
-    },
-    {
-      'id': 'cease_desist',
-      'title': 'Cheque Bounce Notice',
-      'category': 'Notices',
-      'act': 'Section 138 Negotiable Instruments Act',
-      'icon': Icons.account_balance_wallet_outlined,
-      'desc': 'Statutory notice for dishonored cheque with 15 days payment demand',
-    },
-    {
-      'id': 'demand_letter',
-      'title': 'Payment Recovery Demand',
-      'category': 'Notices',
-      'act': 'Order 37 CPC / Contract Act',
-      'icon': Icons.request_quote_outlined,
-      'desc': 'Formal demand letter for unpaid dues, invoices or pending loans',
-    },
-    {
-      'id': 'consumer_complaint',
-      'title': 'Consumer Grievance Notice',
-      'category': 'Notices',
-      'act': 'Consumer Protection Act 2019',
-      'icon': Icons.report_problem_outlined,
-      'desc': 'Formal pre-litigation notice for defective products or deficiency of service',
-    },
-    {
-      'id': 'police_complaint',
-      'title': 'Police Complaint (FIR Draft)',
-      'category': 'Notices',
-      'act': 'Sec 154 CrPC / Sec 173 BNSS',
-      'icon': Icons.local_police_outlined,
-      'desc': 'Structured complaint application to SHO for cognizable criminal offenses',
-    },
-
-    // 3. Affidavits & Declarations
+    // 4. Affidavits & Declarations
     {
       'id': 'general_affidavit',
       'title': 'General Sworn Affidavit',
@@ -185,91 +155,7 @@ class _LegalWritingScreenState extends ConsumerState<LegalWritingScreen> {
       'desc': 'Formally signed self-declaration certificate for government procedures',
     },
 
-    // 4. Court Filings & Petitions
-    {
-      'id': 'consumer_court_complaint',
-      'title': 'Consumer Court Petition',
-      'category': 'Court Filings',
-      'act': 'CPA 2019 District/State Commission',
-      'icon': Icons.account_balance_outlined,
-      'desc': 'Complete formal petition with facts, jurisdiction, evidence index and prayer',
-    },
-    {
-      'id': 'vakalatnama',
-      'title': 'Court Vakalatnama Memo',
-      'category': 'Court Filings',
-      'act': 'Advocates Act 1961',
-      'icon': Icons.edit_document,
-      'desc': 'Formal authority document authorizing an advocate to represent in court',
-    },
-    {
-      'id': 'bail_application',
-      'title': 'Bail Application Draft',
-      'category': 'Court Filings',
-      'act': 'Sec 437/439 CrPC / BNSS 2023',
-      'icon': Icons.balance_outlined,
-      'desc': 'Structured petition for regular or interim bail before Magistrate / Sessions',
-    },
-    {
-      'id': 'appeal_letter',
-      'title': 'Legal Appeal Petition',
-      'category': 'Court Filings',
-      'act': 'CPC / CrPC Appellate Provisions',
-      'icon': Icons.rule_folder_outlined,
-      'desc': 'Formal memo of appeal challenging an impugned court order or decree',
-    },
-    {
-      'id': 'rti_application',
-      'title': 'RTI Application (Sec 6)',
-      'category': 'Court Filings',
-      'act': 'Right to Information Act 2005',
-      'icon': Icons.article_outlined,
-      'desc': 'Standard statutory request to Public Information Officer (PIO)',
-    },
-
-    // 5. Property & Estate
-    {
-      'id': 'will_testament',
-      'title': 'Last Will & Testament',
-      'category': 'Property & Estate',
-      'act': 'Indian Succession Act 1925',
-      'icon': Icons.history_edu_outlined,
-      'desc': 'Legal will specifying executor, legal heirs, asset distribution and witnesses',
-    },
-    {
-      'id': 'power_of_attorney',
-      'title': 'Power of Attorney (PoA)',
-      'category': 'Property & Estate',
-      'act': 'Powers of Attorney Act 1882',
-      'icon': Icons.assignment_ind_outlined,
-      'desc': 'Grant General or Special authority for property, court & banking acts',
-    },
-    {
-      'id': 'gift_deed',
-      'title': 'Property Gift Deed',
-      'category': 'Property & Estate',
-      'act': 'Transfer of Property Act 1882',
-      'icon': Icons.card_giftcard_outlined,
-      'desc': 'Deed for voluntary transfer of immovable/movable asset without consideration',
-    },
-    {
-      'id': 'relinquishment_deed',
-      'title': 'Relinquishment Deed',
-      'category': 'Property & Estate',
-      'act': 'Registration Act 1908',
-      'icon': Icons.real_estate_agent_outlined,
-      'desc': 'Release deed surrendering share in ancestral property to co-heirs',
-    },
-    {
-      'id': 'property_transfer_letter',
-      'title': 'Property Mutation Request',
-      'category': 'Property & Estate',
-      'act': 'Municipal & Land Revenue Codes',
-      'icon': Icons.apartment_outlined,
-      'desc': 'Application for mutation and title update in municipal / society records',
-    },
-
-    // 6. HR & Employment
+    // 5. Employment Self-Help (Employee Rights)
     {
       'id': 'resignation_letter',
       'title': 'Formal Resignation Letter',
@@ -279,28 +165,22 @@ class _LegalWritingScreenState extends ConsumerState<LegalWritingScreen> {
       'desc': 'Resignation notice specifying notice period, handover and gratitude statement',
     },
     {
-      'id': 'termination_letter',
-      'title': 'Employment Termination Letter',
-      'category': 'Employment',
-      'act': 'Industrial Disputes & Labor Code',
-      'icon': Icons.person_off_outlined,
-      'desc': 'Official employer notice outlining termination terms, settlement & asset return',
-    },
-    {
       'id': 'experience_letter',
-      'title': 'Experience & Relieving Letter',
+      'title': 'Experience & Relieving Letter Request',
       'category': 'Employment',
       'act': 'Standard Corporate Format',
       'icon': Icons.workspace_premium_outlined,
-      'desc': 'Certificate confirming tenure, designation, achievements and clearance',
+      'desc': 'Formal request confirming tenure, designation, achievements and clearance',
     },
+
+    // 6. Representation
     {
-      'id': 'offer_letter',
-      'title': 'Job Offer & Appointment Letter',
-      'category': 'Employment',
-      'act': 'Indian Contract Act 1872',
-      'icon': Icons.mark_email_read_outlined,
-      'desc': 'Official job appointment letter with CTC breakdown, probation & joining date',
+      'id': 'power_of_attorney',
+      'title': 'Power of Attorney (PoA)',
+      'category': 'Property & PoA',
+      'act': 'Powers of Attorney Act 1882',
+      'icon': Icons.assignment_ind_outlined,
+      'desc': 'Grant General or Special authority for property, administrative & banking acts',
     },
   ];
 

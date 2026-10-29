@@ -469,13 +469,13 @@ abstract class AppLocalizations {
   /// No description provided for @toolAiLawyerChatTitle.
   ///
   /// In en, this message translates to:
-  /// **'AI Lawyer Chat'**
+  /// **'AI Legal Assistant'**
   String get toolAiLawyerChatTitle;
 
   /// No description provided for @toolAiLawyerChatDesc.
   ///
   /// In en, this message translates to:
-  /// **'Ask legal questions in natural conversation'**
+  /// **'Ask consumer rights and legal questions in natural conversation'**
   String get toolAiLawyerChatDesc;
 
   /// No description provided for @toolLegalAdviceTitle.

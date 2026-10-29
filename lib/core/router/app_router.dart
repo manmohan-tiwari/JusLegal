@@ -9,7 +9,6 @@ import '../../screens/auth_flow_screens.dart';
 import '../../screens/home_screen.dart';
 import '../../screens/ai_legal_chat_screen.dart';
 import '../../screens/document_review_screen.dart';
-import '../../screens/legal_terms_screen.dart';
 import '../../screens/legal_writing_screen.dart';
 import '../../screens/my_cases_screen.dart';
 import '../../screens/not_found_screen.dart';
@@ -38,11 +37,9 @@ class AppRouteNames {
   static const String settings = 'settings';
   static const String privacyPolicy = 'privacyPolicy';
   static const String firebaseUnavailable = 'firebaseUnavailable';
-  static const String legalTermsRoot = 'legalTermsRoot';
 
   // Legal utilities
   static const String aiLawyerChat = 'aiLawyerChat';
-  static const String homeLegalTerms = 'legalTerms';
   static const String homeLegalWriting = 'legalWriting';
   static const String homeDocumentReview = 'documentReview';
 }
@@ -82,7 +79,6 @@ GoRouter buildRouter({
       final path = state.uri.path;
       if (!firebaseAvailable) {
         if (path == '/privacy-policy' ||
-            path == '/legal-terms' ||
             path == '/firebase-unavailable') {
           return null;
         }
@@ -105,12 +101,6 @@ GoRouter buildRouter({
         name: AppRouteNames.privacyPolicy,
         pageBuilder: (context, state) =>
             _buildFadeSlidePage(state, const PrivacyPolicyScreen()),
-      ),
-      GoRoute(
-        path: '/legal-terms',
-        name: AppRouteNames.legalTermsRoot,
-        pageBuilder: (context, state) =>
-            _buildFadeSlidePage(state, const LegalTermsScreen()),
       ),
       GoRoute(
         path: '/firebase-unavailable',
@@ -251,12 +241,6 @@ GoRouter buildRouter({
               state,
               const AILegalChatScreen(userName: 'there'),
             ),
-          ),
-          GoRoute(
-            path: 'legal-terms',
-            name: AppRouteNames.homeLegalTerms,
-            pageBuilder: (context, state) =>
-                _buildFadeSlidePage(state, const LegalTermsScreen()),
           ),
           GoRoute(
             path: 'legal-writing',

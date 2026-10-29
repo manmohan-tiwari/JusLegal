@@ -214,11 +214,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get there => 'there';
 
   @override
-  String get toolAiLawyerChatTitle => 'AI Lawyer Chat';
+  String get toolAiLawyerChatTitle => 'AI Legal Assistant';
 
   @override
   String get toolAiLawyerChatDesc =>
-      'Ask legal questions in natural conversation';
+      'Ask consumer rights and legal questions in natural conversation';
 
   @override
   String get toolLegalAdviceTitle => 'Legal Advice Q&A';
