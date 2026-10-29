@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:juslegal/core/core.dart';
 import 'package:juslegal/core/router/otp_route_params.dart';
 import 'package:juslegal/core/utils/phone_number_validator.dart';
@@ -54,11 +55,23 @@ class WelcomeScreen extends ConsumerStatefulWidget {
 
 class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
     with SingleTickerProviderStateMixin {
+  // Design tokens (8px grid)
+  static const Color _ink = Color(0xFF17294A);
+  static const Color _paper = Color(0xFFF9F7F2);
+  static const Color _accent = Color(0xFFF5B82E);
+  static const Color _moss = Color(0xFF6CC47A);
+  static const Color _muted = Color(0xFF3D6A96);
+  static const double _radiusField = 12.0;
+  static const double _radiusBtn = 14.0;
+
   final _form = GlobalKey<FormState>();
   final _name = TextEditingController();
   final _email = TextEditingController();
   final _password = TextEditingController();
   late final AnimationController _entrance;
+  late final Animation<double> _fadeAnimation;
+  late final Animation<Offset> _slideAnimation;
+  bool _hasStartedAnimation = false;
   bool _acceptedTerms = false;
   bool _hidePassword = true;
   bool _loading = false;
@@ -68,8 +81,35 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
     super.initState();
     _entrance = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 850),
-    )..forward();
+      duration: const Duration(milliseconds: 400),
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _entrance,
+      curve: Curves.easeOut,
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.04),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _entrance,
+      curve: Curves.easeOut,
+    ));
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_hasStartedAnimation) {
+      _hasStartedAnimation = true;
+      // Wrap all animation to disable under prefers-reduced-motion
+      final prefersReducedMotion =
+          MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+      if (prefersReducedMotion) {
+        _entrance.value = 1.0;
+      } else {
+        _entrance.forward();
+      }
+    }
   }
 
   @override
@@ -114,96 +154,50 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        backgroundColor: AppColors.warmOffWhite,
+        backgroundColor: _paper,
         body: SafeArea(
           child: LayoutBuilder(
             builder: (context, constraints) {
-              final isWide = constraints.maxWidth >= 820;
-              return isWide
-                  ? Row(children: [
-                      Expanded(flex: 11, child: _visualPanel()),
-                      Expanded(flex: 9, child: _formPanel())
-                    ])
-                  : SingleChildScrollView(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(children: [
-                        SizedBox(height: 310, child: _visualPanel()),
-                        const SizedBox(height: 24),
-                        _formPanel(),
-                      ]),
-                    );
-            },
-          ),
-        ),
-      );
-
-  Widget _visualPanel() => Container(
-        padding: const EdgeInsets.all(28),
-        decoration: BoxDecoration(
-          color: AppColors.deepNavy,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: AnimatedBuilder(
-          animation: _entrance,
-          builder: (context, child) => Opacity(
-            opacity: _entrance.value,
-            child: Transform.translate(
-              offset: Offset(-24 * (1 - _entrance.value), 0),
-              child: child,
-            ),
-          ),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: IntrinsicHeight(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Spacer(),
-                        Center(
-                          child: Image.asset(
-                            'assets/images/logo.png',
-                            height: constraints.maxHeight < 300 ? 70 : 90,
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        const Text('Expert Legal Guidance',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w800)),
-                        const SizedBox(height: 8),
-                        const Text('Instant clarity on Indian laws, rights, and remedies.',
-                            style: TextStyle(
-                                color: AppColors.paleBlue,
-                                fontSize: 13,
-                                height: 1.4)),
-                        const SizedBox(height: 16),
-                        ...[
-                          'Instant Legal Answers',
-                          'Case References & Laws',
-                          '100% Private & Secure',
-                        ].map((item) => Padding(
-                              padding: const EdgeInsets.only(bottom: 10),
-                              child: Row(children: [
-                                const Icon(Icons.check_circle_rounded,
-                                    color: AppColors.mustardGold, size: 18),
-                                const SizedBox(width: 8),
-                                Text(item,
-                                    style: TextStyle(
-                                        color: Colors.white.withValues(alpha: .92),
-                                        fontSize: 13.5,
-                                        fontWeight: FontWeight.w600)),
-                              ]),
-                            )),
-                        const Spacer(),
-                      ],
+              final isWide = constraints.maxWidth >= 900;
+              if (isWide) {
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                      flex: 10,
+                      child: _visualPanelDesktop(),
                     ),
-                  ),
+                    Expanded(
+                      flex: 11,
+                      child: Center(
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 48,
+                            vertical: 32,
+                          ),
+                          child: _animatedForm(isWide: true),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }
+
+              return SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _visualPanelMobile(),
+                    Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: constraints.maxWidth < 400 ? 16 : 24,
+                          vertical: 24,
+                        ),
+                        child: _animatedForm(isWide: false),
+                      ),
+                    ),
+                  ],
                 ),
               );
             },
@@ -211,131 +205,519 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen>
         ),
       );
 
-  Widget _formPanel() => Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 470),
-          child: Padding(
-            padding: const EdgeInsets.all(36),
-            child: Form(
-              key: _form,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Get Legal Clarity',
-                      style: TextStyle(
-                          color: AppColors.deepNavy,
-                          fontSize: 30,
-                          fontWeight: FontWeight.w800)),
-                  const SizedBox(height: 8),
-                  const Text('Sign up to start exploring your rights',
-                      style: TextStyle(color: AppColors.slateBlue, fontSize: 15)),
-                  const SizedBox(height: 32),
-                  _input(_name, 'Full name', Icons.person_outline,
-                      validator: legalNameError),
-                  const SizedBox(height: 16),
-                  _input(_email, 'Email address', Icons.mail_outline,
-                      keyboard: TextInputType.emailAddress,
-                      validator: (value) =>
-                          EmailValidator.isValid(value?.trim() ?? '')
-                              ? null
-                              : 'Enter a valid email address'),
-                  const SizedBox(height: 16),
-                  _input(_password, 'Password', Icons.lock_outline,
-                      obscure: _hidePassword,
-                      suffix: IconButton(
-                          icon: Icon(_hidePassword
-                              ? Icons.visibility_outlined
-                              : Icons.visibility_off_outlined),
-                          onPressed: () =>
-                              setState(() => _hidePassword = !_hidePassword)),
-                      validator: (value) => PasswordValidator.isStrong(
-                              value ?? '')
-                          ? null
-                          : 'Use 8+ characters with upper, lower, number, and symbol'),
-                  const SizedBox(height: 16),
-                  CheckboxListTile(
-                    value: _acceptedTerms,
-                    onChanged: (value) =>
-                        setState(() => _acceptedTerms = value ?? false),
-                    contentPadding: EdgeInsets.zero,
-                    controlAffinity: ListTileControlAffinity.leading,
-                    activeColor: AppColors.mustardGold,
-                    checkColor: AppColors.deepNavy,
-                    title: const Text('I agree to the Terms of Service',
-                        style:
-                            TextStyle(color: AppColors.slateBlue, fontSize: 13, fontWeight: FontWeight.w600)),
-                  ),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 52,
-                    child: ElevatedButton(
-                      onPressed: _loading ? null : _submit,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.mustardGold,
-                        foregroundColor: AppColors.deepNavy,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: _loading
-                          ? const SizedBox(
-                              width: 22,
-                              height: 22,
-                              child: CircularProgressIndicator(
-                                  strokeWidth: 2, color: AppColors.deepNavy))
-                          : const Text('Create account',
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w800,
-                                  color: AppColors.deepNavy)),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Center(
-                    child: TextButton.icon(
-                      onPressed: () => context.go('/home'),
-                      icon: const Icon(Icons.arrow_forward_rounded, size: 18, color: AppColors.mustardGold),
-                      label: const Text(
-                        'Explore App as Guest',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.deepNavy,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Center(
-                      child: Wrap(alignment: WrapAlignment.center, crossAxisAlignment: WrapCrossAlignment.center, children: [
-                    const Text('Already have an account? ',
-                        style: TextStyle(color: AppColors.slateBlue, fontWeight: FontWeight.w500)),
-                    TextButton(
-                        onPressed: () => context.push('/login'),
-                        child: const Text('Log in', style: TextStyle(color: AppColors.deepNavy, fontWeight: FontWeight.w800)))
-                  ])),
-                ],
+  Widget _visualPanelDesktop() => Container(
+        color: _ink,
+        padding: const EdgeInsets.all(48),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Logo moved to top-left, aligned with panel left margin
+            Image.asset(
+              'assets/images/logo.png',
+              height: 48,
+              fit: BoxFit.contain,
+              alignment: Alignment.centerLeft,
+            ),
+            // Pin copy to lower third
+            const Spacer(flex: 3),
+            Text(
+              'Expert Legal Guidance',
+              style: GoogleFonts.plusJakartaSans(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.01,
               ),
             ),
-          ),
+            const SizedBox(height: 8),
+            Text(
+              'Instant clarity on Indian laws, rights, and remedies.',
+              style: GoogleFonts.plusJakartaSans(
+                color: Colors.white.withValues(alpha: 0.8),
+                fontSize: 14,
+                height: 1.45,
+              ),
+            ),
+            const SizedBox(height: 24),
+            // Realistic sample card with plain-language legal question, answer, and editable citation placeholder
+            _buildSampleCard(),
+            const Spacer(flex: 1),
+          ],
         ),
       );
 
-  Widget _input(TextEditingController controller, String label, IconData icon,
-          {bool obscure = false,
-          Widget? suffix,
-          TextInputType? keyboard,
-          String? Function(String?)? validator}) =>
+  Widget _visualPanelMobile() => Container(
+        color: _ink,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        child: Row(
+          children: [
+            Image.asset(
+              'assets/images/logo.png',
+              height: 32,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Instant clarity on Indian laws, rights, and remedies.',
+                style: GoogleFonts.plusJakartaSans(
+                  color: Colors.white.withValues(alpha: 0.88),
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w500,
+                  height: 1.3,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      );
+
+  Widget _buildSampleCard() => Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.07),
+          borderRadius: BorderRadius.circular(_radiusField),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.12),
+            width: 1,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: _moss.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    'Q',
+                    style: GoogleFonts.plusJakartaSans(
+                      color: _moss,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Can my landlord cut the power?',
+                    style: GoogleFonts.plusJakartaSans(
+                      color: Colors.white,
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w600,
+                      height: 1.35,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.only(left: 24),
+              child: Text(
+                'A: No. Electricity is an essential service; cutting it without due process is unlawful.\n— cite: Model Tenancy Act / Relevant State Rent Control Act, Sec. 20',
+                style: GoogleFonts.plusJakartaSans(
+                  color: Colors.white.withValues(alpha: 0.82),
+                  fontSize: 12.5,
+                  height: 1.45,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+
+  Widget _animatedForm({required bool isWide}) => AnimatedBuilder(
+        animation: _entrance,
+        builder: (context, child) => FadeTransition(
+          opacity: _fadeAnimation,
+          child: SlideTransition(
+            position: _slideAnimation,
+            child: child,
+          ),
+        ),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 440),
+          child: _formContent(),
+        ),
+      );
+
+  Widget _formContent() => Form(
+        key: _form,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Refined serif headline without all-caps, eyebrows, or single-word accents
+            Text(
+              'Get Legal Clarity',
+              style: GoogleFonts.fraunces(
+                fontSize: 40,
+                fontWeight: FontWeight.w600,
+                letterSpacing: -0.4,
+                color: _ink,
+                height: 1.15,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Sign up to start exploring your rights',
+              style: GoogleFonts.plusJakartaSans(
+                color: _muted,
+                fontSize: 15,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+            const SizedBox(height: 32),
+
+            // Visible label above Full name
+            _buildFieldLabel('Full name'),
+            const SizedBox(height: 8),
+            _buildTextInput(
+              controller: _name,
+              hint: 'Enter your full legal name',
+              icon: Icons.person_outline,
+              validator: legalNameError,
+              textCapitalization: TextCapitalization.words,
+            ),
+            const SizedBox(height: 16),
+
+            // Visible label above Email address
+            _buildFieldLabel('Email address'),
+            const SizedBox(height: 8),
+            _buildTextInput(
+              controller: _email,
+              hint: 'name@example.com',
+              icon: Icons.mail_outline,
+              keyboard: TextInputType.emailAddress,
+              validator: (value) => EmailValidator.isValid(value?.trim() ?? '')
+                  ? null
+                  : 'Enter a valid email address',
+            ),
+            const SizedBox(height: 16),
+
+            // Visible label above Password
+            _buildFieldLabel('Password'),
+            const SizedBox(height: 8),
+            _buildTextInput(
+              controller: _password,
+              hint: 'At least 8 characters',
+              icon: Icons.lock_outline,
+              obscure: _hidePassword,
+              suffix: Semantics(
+                label: _hidePassword ? 'Show password' : 'Hide password',
+                button: true,
+                toggled: !_hidePassword,
+                child: IconButton(
+                  tooltip: _hidePassword ? 'Show password' : 'Hide password',
+                  icon: Icon(
+                    _hidePassword
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
+                    size: 20,
+                    color: _muted,
+                  ),
+                  onPressed: () =>
+                      setState(() => _hidePassword = !_hidePassword),
+                ),
+              ),
+              validator: (value) => PasswordValidator.isStrong(value ?? '')
+                  ? null
+                  : 'Use 8+ characters with upper, lower, number, and symbol',
+            ),
+            const SizedBox(height: 16),
+
+            // Terms checkbox with label association, smaller text, underlined link, and navy text
+            InkWell(
+              onTap: () => setState(() => _acceptedTerms = !_acceptedTerms),
+              borderRadius: BorderRadius.circular(6),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: Checkbox(
+                        value: _acceptedTerms,
+                        onChanged: (value) =>
+                            setState(() => _acceptedTerms = value ?? false),
+                        activeColor: _accent,
+                        checkColor: _ink,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        side: const BorderSide(color: _muted, width: 1.5),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text.rich(
+                        TextSpan(
+                          text: 'I agree to the ',
+                          style: GoogleFonts.plusJakartaSans(
+                            color: _ink,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: 'Terms of Service',
+                              style: GoogleFonts.plusJakartaSans(
+                                color: _ink,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Primary "Create account" button: only amber element, full width, --radius-btn, navy text
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: ElevatedButton(
+                onPressed: _loading ? null : _submit,
+                style: ButtonStyle(
+                  backgroundColor: WidgetStateProperty.resolveWith((states) {
+                    if (states.contains(WidgetState.disabled)) {
+                      return _accent.withValues(alpha: 0.55);
+                    }
+                    if (states.contains(WidgetState.hovered)) {
+                      return const Color(0xFFE5A822); // subtle darken on hover
+                    }
+                    return _accent;
+                  }),
+                  foregroundColor: WidgetStateProperty.all(_ink),
+                  elevation: WidgetStateProperty.all(0),
+                  shape: WidgetStateProperty.resolveWith((states) {
+                    final side = states.contains(WidgetState.focused)
+                        ? const BorderSide(color: _ink, width: 2)
+                        : BorderSide.none;
+                    return RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(_radiusBtn),
+                      side: side,
+                    );
+                  }),
+                ),
+                child: _loading
+                    ? const SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: _ink,
+                        ),
+                      )
+                    : Text(
+                        'Create account',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: _ink,
+                        ),
+                      ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Secondary text-style button with no arrow icon
+            Center(
+              child: TextButton(
+                onPressed: () => context.go('/home'),
+                style: TextButton.styleFrom(
+                  foregroundColor: _ink,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                ),
+                child: Text(
+                  'Explore App as Guest',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: _ink,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // "Already have an account? Log in" with hover underline on link
+            Center(
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  Text(
+                    'Already have an account? ',
+                    style: GoogleFonts.plusJakartaSans(
+                      color: _muted,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  _HoverLink(
+                    text: 'Log in',
+                    onTap: () => context.push('/login'),
+                    style: GoogleFonts.plusJakartaSans(
+                      color: _ink,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+
+  Widget _buildFieldLabel(String label) => Text(
+        label,
+        style: GoogleFonts.plusJakartaSans(
+          color: _ink,
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+        ),
+      );
+
+  Widget _buildTextInput({
+    required TextEditingController controller,
+    required String hint,
+    required IconData icon,
+    bool obscure = false,
+    Widget? suffix,
+    TextInputType? keyboard,
+    TextCapitalization textCapitalization = TextCapitalization.none,
+    String? Function(String?)? validator,
+  }) =>
       TextFormField(
         controller: controller,
         obscureText: obscure,
         keyboardType: keyboard,
+        textCapitalization: textCapitalization,
         validator: validator,
+        style: GoogleFonts.plusJakartaSans(
+          color: _ink,
+          fontSize: 15,
+          fontWeight: FontWeight.w500,
+        ),
+        cursorColor: _ink,
         decoration: InputDecoration(
-            labelText: label, prefixIcon: Icon(icon), suffixIcon: suffix),
+          hintText: hint,
+          hintStyle: GoogleFonts.plusJakartaSans(
+            color: _muted.withValues(alpha: 0.65),
+            fontSize: 14,
+          ),
+          filled: true,
+          fillColor: Colors.white,
+          isDense: true,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 14,
+          ),
+          prefixIcon: Icon(
+            icon,
+            size: 20,
+            color: _muted,
+          ),
+          suffixIcon: suffix,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(_radiusField),
+            borderSide: const BorderSide(color: Color(0xFFD4E2EC), width: 1.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(_radiusField),
+            borderSide: const BorderSide(color: Color(0xFFD4E2EC), width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(_radiusField),
+            borderSide: const BorderSide(color: _ink, width: 2.0),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(_radiusField),
+            borderSide: const BorderSide(color: Color(0xFFC62828), width: 1.0),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(_radiusField),
+            borderSide: const BorderSide(color: Color(0xFFC62828), width: 2.0),
+          ),
+        ),
       );
+}
+
+class _HoverLink extends StatefulWidget {
+  final String text;
+  final VoidCallback onTap;
+  final TextStyle style;
+
+  const _HoverLink({
+    required this.text,
+    required this.onTap,
+    required this.style,
+  });
+
+  @override
+  State<_HoverLink> createState() => _HoverLinkState();
+}
+
+class _HoverLinkState extends State<_HoverLink> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Focus(
+      child: Builder(
+        builder: (context) {
+          final isFocused = Focus.of(context).hasFocus;
+          return MouseRegion(
+            cursor: SystemMouseCursors.click,
+            onEnter: (_) => setState(() => _isHovered = true),
+            onExit: (_) => setState(() => _isHovered = false),
+            child: GestureDetector(
+              onTap: widget.onTap,
+              child: Container(
+                decoration: BoxDecoration(
+                  border: isFocused
+                      ? Border.all(color: const Color(0xFF17294A), width: 1.5)
+                      : null,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
+                child: Text(
+                  widget.text,
+                  style: widget.style.copyWith(
+                    decoration: (_isHovered || isFocused)
+                        ? TextDecoration.underline
+                        : TextDecoration.none,
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
 }
 
 
